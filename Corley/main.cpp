@@ -88,20 +88,70 @@ int main(){
      m[1] = 1;
 
 
+     X[1][1] = new int[n];
      X[1][1][0] = 1; 
      /* primeiro inidce r = 1 
         segundo indice k = 1
         terceiro indice vertice 0 incluso
      */ 
+
+    A[1][1] = new int[nA];
+
     for (int r = 1; r<n; r++){
     	map<int, int* > Wr; 
-    	for (int k = 1; k<m[r]; k++){
-    		Wr[k] = vmin(X[r][k], my_grafo);
-    	}
-	     /* pra guardar o retorno do Step2
+    	/* pra guardar o retorno do Step2
 	     O indice do map é o valor de K (que será reinicializado a cada execucao do passo 2)
 	     o int* é o conjunto de id de arestas 
 	     */
+    	for (int k = 1; k<=m[r]; k++){
+    		Wr[k] = vmin(X[r][k], my_grafo);  //Step2
+    	}
+	     
+	     for (int s = 1; s<=m[r]; s++){
+	     	int *wrs = Wr[s];
+	     	//int *wrs = new int[]
+	     	m[r+1] = 0;
+	     	map <int, Aresta *> arestas = my_grafo.get_allArestas();
+	 
+	     	for (int j = 0; j<nA; j++){
+	     		if (wrs[j]==1){ // para escolher uma aresta em wrs
+					wrs[j]=0;
+					m[r+1]+=1;
+					X[r+1][m[r+1]] = new int[n];
+					for (int y = 0; y<n; y++){
+					 X[r+1][m[r+1]][y] = X[r][s][y]; // apenas para fazer uma copia // pode MELHORAR
+					}
+					//A[r+1][m[r+1]] = new int[nA];
+					//for (int y = 0; y<nA; y++){
+					 //A[r+1][m[r+1]][y] = A[r][s][y]; // apenas para fazer uma copia // pode MELHORAR
+				//	}
+					int p = arestas[j]->getOrigem();
+					int q = arestas[j]->getDestino();
+					X[r+1][m[r+1]][p] = 1; // redundante
+					X[r+1][m[r+1]][q] = 1;
+					//A[r+1][m[r+1]][j] = 1;
+					if (m[r+1] != 1){
+						cout<<"verificar duplicata!!!"<<endl;
+						cout<<"s = "<<s<<"  r = "<<r<<"m[r+1] = "<<m[r+1]<<endl;
+					}
+	     		}
+	     	}
+	    }
+    }
+    cout<<"saiu"<<endl;
+    for (int k = 0; k < m[n]; k++){ // cada arvore formada
+    	int *arestas  = A[n][k]; 
+    	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
+    	cout<<"Arvore "<<k+1<<endl;
+    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
+			if (arestas[a] == 1){
+    			cout<<arestasPtr[a]->getOrigem() << " ";
+    			cout<<arestasPtr[a]->getDestino() << " ";
+    			cout<<arestasPtr[a]->getPeso1() << " ";
+    			cout<<arestasPtr[a]->getPeso2() << endl;
+    		}
+    	}
+    	cout<<endl;
     }
 	return 0;
 }
