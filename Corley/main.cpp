@@ -1,3 +1,12 @@
+/*
+#=======================================================================
+# Islame Felipe DA COSTA FERNANDES --- Copyright 2016
+#-----------------------------------------------------------------------
+# This code implements the Corley's (1985) algorithm 
+# to resolve the Bi-objective Spanning Tree Problem
+#=======================================================================
+*/
+
 #include <iostream>
 #include <map> 
 #include <string>
@@ -50,6 +59,29 @@ int* vmin(int* vertices, Grafo &my_grafo){
 	return retorno;
 }
 
+bool isEgal(int *t1, int *t2, int size){
+	for (int i=0; i<size; i++){
+		if (t1[i]!=t2[i]) return false;
+	}
+	return true;
+}
+
+bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
+	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
+	for (int i=0; i<arestas.size(); i++){
+		if (t1[i]==1){
+			t1_peso1+=arestas[i]->getPeso1();
+			t1_peso2+=arestas[i]->getPeso2();
+		} 
+		if (t2[i]==1){
+			t2_peso1+=arestas[i]->getPeso1();
+			t2_peso2+=arestas[i]->getPeso2();
+		}
+	}
+	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
+		return true;
+	} else return false;
+}
 int main(){
 	int n;
 	float peso1, peso2;
@@ -119,7 +151,7 @@ int main(){
 	     		if (wrs[j]==1){ // para escolher uma aresta em wrs
 					wrs[j]=0;
 					m[r+1]+=1;
-					cout<<"s = "<<s<<"  r = "<<r<<" m[r+1] = "<<m[r+1]<<endl;
+					//cout<<"s = "<<s<<"  r = "<<r<<" m[r+1] = "<<m[r+1]<<endl;
 		
 					X[r+1][m[r+1]] = new int[n];
 					for (int y = 0; y<n; y++){
@@ -134,14 +166,28 @@ int main(){
 					X[r+1][m[r+1]][p] = 1; // redundante
 					X[r+1][m[r+1]][q] = 1;
 					A[r+1][m[r+1]][j] = 1;
-					if (m[r+1] != 1){
-						//cout<<"verificar duplicata!!!"<<endl;
+					if (m[r+1] != 1){ //precisa incluir um teste de dominância nos testes em k do passo 6
+						for (int k = 1; k<=m[r+1]-1; k++){
+							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
+								m[r+1]-=1;
+							} else if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
+								m[r+1]-=1;
+							} else if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){//carece de testes
+								int *aux = A[r+1][k]; // a dominada vai pra ultima posicao
+								A[r+1][k] = A[r+1][m[r+1]-1];
+								A[r+1][m[r+1]-1] = A[r+1][m[r+1]];
+								A[r+1][m[r+1]] = aux;
+								// se a nova arvore (parcial) domina alguma ja encontrada, entao, transferimos a dominada para a posicao m[r+1]
+								m[r+1]-=1;
+								k--;
+							}
+
+						}
 					}
 	     		}
 	     	}
 	    }
     }
-    cout<<"saiu"<<endl;
     for (int k = 1; k <= m[n]; k++){ // cada arvore formada
     	int *arestas  = A[n][k]; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
