@@ -3,7 +3,7 @@
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
 # This code implements the Corley's (1985) algorithm 
-# to resolve the Bi-objective Spanning Tree Problem
+# to resolve the Biobjective Spanning Tree Problem
 #=======================================================================
 */
 
