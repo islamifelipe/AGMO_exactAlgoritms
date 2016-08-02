@@ -3,7 +3,7 @@
 using namespace std;
 
 Grafo::Grafo(int n1){
-	int n = n1;
+	n = n1;
 	lista_vertices = new Vertice*[n];
 }
 
