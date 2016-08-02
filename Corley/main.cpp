@@ -172,7 +172,7 @@ int main(){
 								m[r+1]-=1;
 							} else if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
 								m[r+1]-=1;
-							} else if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){//carece de testes
+							} /*else if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){//Necessario?
 								int *aux = A[r+1][k]; // a dominada vai pra ultima posicao
 								A[r+1][k] = A[r+1][m[r+1]-1];
 								A[r+1][m[r+1]-1] = A[r+1][m[r+1]];
@@ -180,7 +180,7 @@ int main(){
 								// se a nova arvore (parcial) domina alguma ja encontrada, entao, transferimos a dominada para a posicao m[r+1]
 								m[r+1]-=1;
 								k--;
-							}
+							}*/
 
 						}
 					}
