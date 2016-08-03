@@ -4,6 +4,8 @@
 #-----------------------------------------------------------------------
 # This code implements the Steiner and Radzik's (2003) algorithm 
 # to resolve the Biobjective Spanning Tree Problem
+# This code utilise the SONRENSEN JANSSENS's (2003) algorithm
+# to calculate the k-best tree
 #=======================================================================
 */
 
@@ -15,23 +17,11 @@
 #include <stack>   
 #include "Grafo.h"
 #include "Conjunto.h"
+#include "kruskal.h"
+#include "Heap.h"
 using namespace std;
 
-#define PRECISAO 0.00001
-
-inline bool equalfloat(float a, float b){
-	return abs(a-b)<=PRECISAO;
-	
-}
-
-inline bool maiorQuefloat(float a, float b){ //retorna true se a>b
-	return a-b>PRECISAO;
-}
-
-inline bool maiorIgualQuefloat(float a, float b){ //returna true se a>=b
-	return maiorQuefloat(a, b)||equalfloat(a, b);	
-}
-
+#define MAX1 20000 // TODO : Aumentar
 
 bool isEgal(int *t1, int *t2, int size){
 	for (int i=0; i<size; i++){
@@ -81,159 +71,98 @@ void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
 		} 
 	}
 }
-/*Implementação do MargeSort para utilizar no algortimo de Kruskal*/
-void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Aresta **v, int size, int direto){
-	/* s'  = (x' , y' ) <--> (xl , yl )
-	 * s'' = (x'', y'') <--> (xll , yll )
-	 */
-	 /*O parâmetro "direto" recebe:
-		1 - se as arestas devem ser na ordem lexicográfica direta
-		2 - se as arestas devem ser na ordem lexocográfica inversa  
-		3 - se as arestas devem ser na ordem crescente da pondenraçao dos pesos das arestas (formula do método geometrico da busca dicotômica)
-	  */
-	int i, j, k;
-	Aresta **w = new Aresta *[size];
-	float peso_i, peso_j; 
-	i = p;
-	j = q;
-	k = 0;
-	while (i < q && j < r) {
-		if (direto==1){
-			if (!maiorIgualQuefloat(v[i]->getPeso1(), v[j]->getPeso1())) {
-				w[k] = v[i];
-				i++;
+
+///ALGORITMO DA SONRENSEN JANSSENS (2003)
+
+void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, list <int *> MSTs, int &cont, list<Grafo> vetorParticoes){
+	/*Pa = vetor de arestas = correspondente à partição P
+	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
+	*/
+	Grafo P1 = P, P2 = P;
+	bool res = false;
+	float custo, x, y;
+	Aresta *a; 
+	int *A2;
+	map <int, Aresta *> allArestas = P.get_allArestas();
+	for (int i=0; i<P.getQuantVertices()-1; i++){
+		a = allArestas[Pa[i]];	
+		if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
+			//A2 = new Aresta*[P.getQuantVertices()-1];
+			A2 = new int[allArestas.size()];
+			custo=0;
+			kruskal(&P1, A2, xl, yl, xll, yll,custo, 3);
+			cont++; // estatístico
+			P1.setStatus(a->getId(), 2); /*proibida*/
+			P2.setStatus(a->getId(), 1); /*obrigatória*/
+			
+			if (res){
+				int quantMSTs = MSTs.size();
+				MSTs.push_back(A2);
+				List.insert(quantMSTs, custo); // o valor da variavel "custo" vem do kruskal
+				vetorParticoes.push_back(P1);
 			} else {
-				if (equalfloat(v[i]->getPeso1(), v[j]->getPeso1())){
-					if (!maiorQuefloat(v[i]->getPeso2(), v[j]->getPeso2())){
-						w[k] = v[i];
-						i++;
-					} else {
-						w[k] = v[j];
-						j++;	
-					}
-				} else {
-					w[k] = v[j];
-					j++;
-				}
+				delete[] A2;
 			}
-		} else if(direto==2) {
-			if (!maiorIgualQuefloat(v[i]->getPeso2(), v[j]->getPeso2())) {
-				w[k] = v[i];
-				i++;
-			} else {
-				if (equalfloat(v[i]->getPeso2(), v[j]->getPeso2())){
-					if (!maiorQuefloat(v[i]->getPeso1(), v[j]->getPeso1())){
-						w[k] = v[i];
-						i++;
-					} else {
-						w[k] = v[j];
-						j++;	
-					}
-				} else {
-					w[k] = v[j];
-					j++;
-				}
-			}
-		} else {
-			peso_i=v[i]->getPeso1()*(yl-yll)+v[i]->getPeso2()*(xll-xl);
-			peso_j=v[j]->getPeso1()*(yl-yll)+v[j]->getPeso2()*(xll-xl);
-			if (!maiorIgualQuefloat(peso_i,peso_j)) {
-				w[k] = v[i];
-				i++;
-			} else {
-				if (equalfloat(peso_i, peso_j)){
-					if (!maiorQuefloat(peso_i, peso_j)){
-						w[k] = v[i];
-						i++;
-					} else {
-						w[k] = v[j];
-						j++;	
-					}
-				} else {
-					w[k] = v[j];
-					j++;
-				}
-			}
+			P1 = P2;
 		}
-		k++;
+	
 	}
-	while (i < q) {
-		w[k] = v[i];
-		i++;
-		k++;
-	}
-	while (j < r) {
-		w[k] = v[j];
-		j++;
-		k++;
-	}
-	for (i = p; i < r; i++) v[i] = w[i-p];
-	delete[] w;
 }
 
-void mergesort(float xl, float yl, float xll, float yll, Aresta **v, int size, int direto){
-//v é um vetor de ponteiros do tipo Aresta (as arestas são ponteitos)
-//implementação interativa
-	/* s'  = (x' , y' ) <--> (xl , yl )
-	 * s'' = (x'', y'') <--> (xll , yll )
-	 */
-	int p, r, b=1;;
-	while (b<size){
-		p=0;
-		while (p+b < size){
-			r = p + 2*b;
-			if (r>size) r = size;
-			intercala(xl, yl, xll, yll, p, p+b, r, v, size, direto);
-			p = p+2*b;
-		}
-		b = 2*b;
-	}
-}
-bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, int direto){
-	/*O parâmetro "direto" recebe:
-		1 - se as arestas devem ser na ordem lexicográfica direta
-		2 - se as arestas devem ser na ordem lexocográfica inversa  
-		3 - se as arestas devem ser na ordem crescente de "pesos ponderado"*/
-	/* s'  = (x' , y' ) <--> (xl , yl )
-	 * s'' = (x'', y'') <--> (xll , yll )
-	 */
-	Conjunto conjunto(g->getQuantVertices());
-	int cont=0, i=0;
-	//float peso;
-	Aresta **listaAresta = g->getAllArestasPtr();
-	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/
-		if (g->getStatus(listaAresta[k]->getId())==1){ /*se for obrigatória*/
-		 	
-		 	A[listaAresta[k]->getId()] = 1;
-		 	//A[cont++] = listaAresta[k];
-		 	cout<<"AQUI1"<<endl;
-		 	cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
-		 	conjunto.union1(listaAresta[k]->getOrigem(), listaAresta[k]->getDestino());
-			//peso=listaAresta[k]->getPeso1()*(g->getYl()-g->getYll())+listaAresta[k]->getPeso2()*(g->getXll()-g->getXl());
-			//custo+=peso;
-		}
-	}
-	mergesort(xl, yl, xll, yll, listaAresta, g->getQuantArestas(), direto);
-	i=0;
-	while (cont<g->getQuantVertices()-1 && i<g->getQuantArestas()){ 
-	/*A condição "i<g->getQuantArestas()" assegura que, se por acaso o grafo for desconexo, todas as arestas serão varridas, isto é, i=g->getQuantArestas(), porém, o cont não será será igual a g->getN()-1 */
+// void AllSpaningTree(Grafo *g, ListaArvores *resul, int &contMSTs, int &cont, int k_best){ 
+// 	Aresta **A = new Aresta*[g->getN()-1]; // usada para a primeira árvore 
+// 	ListaArvores *MSTs = new ListaArvores(); // usada para lista de árvores
+// 	contMSTs=0;
+// 	float custoMinimo =0, x=0, y=0;
+// 	Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
+// 	ListaGrafos *vetorParticoes = new ListaGrafos();//Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+// 	//A estrutura "List" do algortimo original é um heap chamada List
+// 	bool res = kruskal(g, A, x, y, custoMinimo, 3);
+// 	cont =1;
+// 	if (res){
+// 		MSTs->insert(A, x, y);
+// 		List.insert(contMSTs, custoMinimo);
+// 		vetorParticoes->insert(*g);
+// 		contMSTs++;
+// 	}
+// 	do{ //List.getChave()<=custoMinimo
+// 		if (List.getSize()>0){
+// 			int id = List.getId();
+// 			Grafo Ps;
+// 			ElementGrafo *init = vetorParticoes->getInit();
+// 			ElementArvore *initArvore = MSTs->getInit();
+// 			for (int k=0; k<id; k++){ // pega o id-ésimo elemento de vetorPartições
+// 				init = init->getNext();
+// 				initArvore = initArvore->getNext();
+// 			}
+// 			Ps = init->getGrafo();
+// 			k_best--;
+// 			List.extract();
+// 			if (k_best>0){
+// 				Partition(Ps, initArvore->getArvore(), List,MSTs, contMSTs, cont,vetorParticoes);
+// 				resul->insert(initArvore->getArvore(), initArvore->getX(), initArvore->getY());
+// 			}
+// 		}
+// 	}while (List.getSize()>0);
+// 	//cout<<"Quantidade de vezes que o Kruskal foi invocado: "<<cont<<endl;
+// 	//cout<<"Quantidade de árvores criadas e armazenadas de fato: "<<contMSTs<<endl;
+// 	//cout<<contMSTs<<endl;
+// 	for (int i=0; i<contMSTs; i++){
 		
-		if (g->getStatus(listaAresta[i]->getId())==0 && !conjunto.compare(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino())){ /*Se não formar ciclo*/
-			//A[cont++] = listaAresta[i];
-			cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
-			A[listaAresta[i]->getId()] = 1;
-			//cout<<"AQUI2"<<endl;
-			conjunto.union1(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino());
-			//peso=listaAresta[i]->getPeso1()*(g->getYl()-g->getYll())+listaAresta[i]->getPeso2()*(g->getXll()-g->getXl());
-			//custo+=peso;
-		}
-		i++;
-	}
-	conjunto.desaloca();
+// 			vetorParticoes->remove(vetorParticoes->getInit());
+// 			ElementArvore *initArvore = MSTs->getInit();
+// 			MSTs->remove(MSTs->getInit());
+// 			delete initArvore;
+// 	}
 	
-	if (cont==g->getQuantVertices()-1) return true; /*grafo conexo*/
-	else return false; /*grafo desconexo*/
-}
+// 	List.desaloca();
+// 	delete MSTs;
+// 	delete vetorParticoes;
+// }
+
+
+// /// END ALGORITMO DA SONRENSEN JANSSENS (2003)
+
 
 void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
 	/* it = interator da lista
@@ -251,21 +180,17 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 		getXandY(s1, g->get_allArestas(), xl, yl);
 		getXandY(s2, g->get_allArestas(), xll, yll);
 		A2 = new int[g->getQuantArestas()];
-		
-		kruskal(g, A2, xl, yl, xll, yll, 3);
+		float cont; // nao utilisazado nesse caso
+		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
 		
 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
-			//s_new= new ElementArvore(A2, x, y);
 			pilha.push(s2);
 			s2 = A2;
 			avanca = true;
-			cout<<"aqui1"<<endl;
 		} else {
 			if (pilha.size()==0){ //se pilha está fazia
 				avanca = false;
-				cout<<"aqui2"<<endl;
 			} else {
-				cout<<"aqui3"<<endl;
 				avanca = true;
 				s1 = s2;
 				resul.push_back(s2);
@@ -288,15 +213,15 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 list<int*> phase1GM(Grafo *g){
 	list<int*> result;
 	int *s1 = new int[g->getQuantArestas()];
-	kruskal(g, s1, 0, 0, 0, 0, 1); // arvore para o primeiro objetivo
+	float cont; // nao utilisazado nesse caso
+	kruskal(g, s1, 0, 0, 0, 0,cont, 1); // arvore para o primeiro objetivo
 	result.push_back(s1);
 	int* s2 = new int[g->getQuantArestas()];
-	kruskal(g, s2, 0, 0, 0, 0, 2); // arvore para o segundo objetivo
+	kruskal(g, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
 	list<int*>::iterator it = result.end();
 	if (isEgalObjetive(s1, s2,g->get_allArestas())==false){
 		borderSearch(g, result, s1, s2);
 		result.push_back(s2);
-		//resul->insert2(s2);
 	}
 	return result;
 }
