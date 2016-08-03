@@ -12,6 +12,7 @@
 #include <list>
 #include <string>
 #include <cmath>
+#include <stack>   
 #include "Grafo.h"
 #include "Conjunto.h"
 using namespace std;
@@ -39,6 +40,21 @@ bool isEgal(int *t1, int *t2, int size){
 	return true;
 }
 
+bool isEgalObjetive(int *t1, int *t2, map <int, Aresta *> arestas){
+	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
+	for (int i=0; i<arestas.size(); i++){
+		if (t1[i]==1){
+			t1_peso1+=arestas[i]->getPeso1();
+			t1_peso2+=arestas[i]->getPeso2();
+		} 
+		if (t2[i]==1){
+			t2_peso1+=arestas[i]->getPeso1();
+			t2_peso2+=arestas[i]->getPeso2();
+		}
+	}
+	return equalfloat(t1_peso1,t2_peso1) && equalfloat(t2_peso2,t1_peso2);
+
+}
 bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
 	for (int i=0; i<arestas.size(); i++){
@@ -56,6 +72,15 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 	} else return false;
 }
 
+void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
+	X = 0; Y = 0;
+	for (int i=0; i<arestas.size(); i++){
+		if (t[i]==1){
+			X+=arestas[i]->getPeso1();
+			Y+=arestas[i]->getPeso2();
+		} 
+	}
+}
 /*Implementação do MargeSort para utilizar no algortimo de Kruskal*/
 void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Aresta **v, int size, int direto){
 	/* s'  = (x' , y' ) <--> (xl , yl )
@@ -197,7 +222,7 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, int d
 			//A[cont++] = listaAresta[i];
 			cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
 			A[listaAresta[i]->getId()] = 1;
-			cout<<"AQUI2"<<endl;
+			//cout<<"AQUI2"<<endl;
 			conjunto.union1(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino());
 			//peso=listaAresta[i]->getPeso1()*(g->getYl()-g->getYll())+listaAresta[i]->getPeso2()*(g->getXll()-g->getXl());
 			//custo+=peso;
@@ -210,6 +235,49 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, int d
 	else return false; /*grafo desconexo*/
 }
 
+void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
+	/* it = interator da lista
+	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
+	* sl = s'
+	* sll = s''
+	**/
+	int *s1 = sl;
+	int *s2 = sll;
+	int * A2;
+	stack<int* >  pilha;
+	bool avanca = true;
+	float xl, yl, xll, yll;
+	do{
+		getXandY(s1, g->get_allArestas(), xl, yl);
+		getXandY(s2, g->get_allArestas(), xll, yll);
+		A2 = new int[g->getQuantArestas()];
+		
+		kruskal(g, A2, xl, yl, xll, yll, 3);
+		
+		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
+			//s_new= new ElementArvore(A2, x, y);
+			pilha.push(s2);
+			s2 = A2;
+			avanca = true;
+			cout<<"aqui1"<<endl;
+		} else {
+			if (pilha.size()==0){ //se pilha está fazia
+				avanca = false;
+				cout<<"aqui2"<<endl;
+			} else {
+				cout<<"aqui3"<<endl;
+				avanca = true;
+				s1 = s2;
+				resul.push_back(s2);
+				s2 = pilha.top();
+				pilha.pop();
+			}
+			//delete[] A2;
+		}	
+	} while (avanca);
+}
+
+
 /*
 #### Primeira fase ####
 # A funcao phase1GM retorna a lista de arvores (elementos do espaço de decisao)
@@ -219,17 +287,17 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, int d
 */
 list<int*> phase1GM(Grafo *g){
 	list<int*> result;
-	int *A2 = new int[g->getQuantArestas()];
-	kruskal(g, A2, 0, 0, 0, 0, 1); // arvore para o primeiro objetivo
-	result.push_back(A2);
-	A2 = new int[g->getQuantArestas()];
-	kruskal(g, A2, 0, 0, 0, 0, 2); // arvore para o segundo objetivo
-	result.push_back(A2);
-	/*if (!(equalfloat(s2->getX(),s1->getX()) && equalfloat(s2->getY(),s1->getY()))){
-		borderSearch(s1, s2, g, resul, quantArvores);
-		resul->insert2(s2);
-		quantArvores++;
-	}*/
+	int *s1 = new int[g->getQuantArestas()];
+	kruskal(g, s1, 0, 0, 0, 0, 1); // arvore para o primeiro objetivo
+	result.push_back(s1);
+	int* s2 = new int[g->getQuantArestas()];
+	kruskal(g, s2, 0, 0, 0, 0, 2); // arvore para o segundo objetivo
+	list<int*>::iterator it = result.end();
+	if (isEgalObjetive(s1, s2,g->get_allArestas())==false){
+		borderSearch(g, result, s1, s2);
+		result.push_back(s2);
+		//resul->insert2(s2);
+	}
 	return result;
 }
 int main(){
