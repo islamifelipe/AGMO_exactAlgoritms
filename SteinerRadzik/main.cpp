@@ -74,94 +74,105 @@ void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
-void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, list <int *> MSTs, int &cont, list<Grafo> vetorParticoes){
+void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, list <int *> &MSTs, int &cont, list<Grafo> &vetorParticoes){
 	/*Pa = vetor de arestas = correspondente à partição P
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
 	Grafo P1 = P, P2 = P;
+	cout<<List.getSize()<<endl;
 	bool res = false;
 	float custo, x, y;
 	Aresta *a; 
 	int *A2;
 	map <int, Aresta *> allArestas = P.get_allArestas();
-	for (int i=0; i<P.getQuantVertices()-1; i++){
-		a = allArestas[Pa[i]];	
-		if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
-			//A2 = new Aresta*[P.getQuantVertices()-1];
-			A2 = new int[allArestas.size()];
-			custo=0;
-			kruskal(&P1, A2, xl, yl, xll, yll,custo, 3);
-			cont++; // estatístico
-			P1.setStatus(a->getId(), 2); /*proibida*/
-			P2.setStatus(a->getId(), 1); /*obrigatória*/
-			
-			if (res){
-				int quantMSTs = MSTs.size();
-				MSTs.push_back(A2);
-				List.insert(quantMSTs, custo); // o valor da variavel "custo" vem do kruskal
-				vetorParticoes.push_back(P1);
-			} else {
-				delete[] A2;
-			}
-			P1 = P2;
-		}
+	//for (int i=0; i<P.getQuantVertices()-1; i++){
 	
+	for (int i=0; i<allArestas.size(); i++){
+		if (Pa[i]==1){
+			a = allArestas[i];	
+			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
+				//A2 = new Aresta*[P.getQuantVertices()-1];
+				A2 = new int[allArestas.size()];
+				P1.setStatus(a->getId(), 2); /*proibida*/
+				P2.setStatus(a->getId(), 1); /*obrigatória*/
+				
+				//custo=0;cout<<"Antes1"<<endl;
+				res = kruskal(&P1, A2, xl, yl, xll, yll,custo, 3);
+				cont++; 
+				if (res){
+					int quantMSTs = MSTs.size();
+					MSTs.push_back(A2);
+					List.insert(quantMSTs, custo); // o valor da variavel "custo" vem do kruskal
+					vetorParticoes.push_back(P1);
+				} else {
+					delete[] A2;
+				}
+				//cout<<"Depois1  "<<List.getSize()<<"   "<<res<<endl;// estatístico
+				
+				P1 = P2;
+			}
+		}
 	}
 }
 
-// void AllSpaningTree(Grafo *g, ListaArvores *resul, int &contMSTs, int &cont, int k_best){ 
-// 	Aresta **A = new Aresta*[g->getN()-1]; // usada para a primeira árvore 
-// 	ListaArvores *MSTs = new ListaArvores(); // usada para lista de árvores
-// 	contMSTs=0;
-// 	float custoMinimo =0, x=0, y=0;
-// 	Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
-// 	ListaGrafos *vetorParticoes = new ListaGrafos();//Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
-// 	//A estrutura "List" do algortimo original é um heap chamada List
-// 	bool res = kruskal(g, A, x, y, custoMinimo, 3);
-// 	cont =1;
-// 	if (res){
-// 		MSTs->insert(A, x, y);
-// 		List.insert(contMSTs, custoMinimo);
-// 		vetorParticoes->insert(*g);
-// 		contMSTs++;
-// 	}
-// 	do{ //List.getChave()<=custoMinimo
-// 		if (List.getSize()>0){
-// 			int id = List.getId();
-// 			Grafo Ps;
-// 			ElementGrafo *init = vetorParticoes->getInit();
-// 			ElementArvore *initArvore = MSTs->getInit();
-// 			for (int k=0; k<id; k++){ // pega o id-ésimo elemento de vetorPartições
-// 				init = init->getNext();
-// 				initArvore = initArvore->getNext();
-// 			}
-// 			Ps = init->getGrafo();
-// 			k_best--;
-// 			List.extract();
-// 			if (k_best>0){
-// 				Partition(Ps, initArvore->getArvore(), List,MSTs, contMSTs, cont,vetorParticoes);
-// 				resul->insert(initArvore->getArvore(), initArvore->getX(), initArvore->getY());
-// 			}
-// 		}
-// 	}while (List.getSize()>0);
-// 	//cout<<"Quantidade de vezes que o Kruskal foi invocado: "<<cont<<endl;
-// 	//cout<<"Quantidade de árvores criadas e armazenadas de fato: "<<contMSTs<<endl;
-// 	//cout<<contMSTs<<endl;
-// 	for (int i=0; i<contMSTs; i++){
+int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, int k_best){ 
+	int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
+	list<int*> MSTs; // usada para lista de árvores
+	float custoMinimo =0, x=0, y=0;
+	Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
+	list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+	//A estrutura "List" do algortimo original é um heap chamada List
+	bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
+	cont =1;
+	if (res){
+		int contMSTs = MSTs.size();
+		MSTs.push_back(A);
+		List.insert(contMSTs, custoMinimo);
+		vetorParticoes.push_back(*g);
+	}
+	do{ //List.getChave()<=custoMinimo
+		if (List.getSize()>0){
+			int id = List.getId();
+			//ElementGrafo *init = vetorParticoes->getInit();
+			//ElementArvore *initArvore = MSTs->getInit();
+			list<int*>::iterator it;
+			list<Grafo>::iterator itg = vetorParticoes.begin();
+			int k=0;
+			for (it=MSTs.begin(); k<id; ++it){
+				k++;
+				itg++;
+			}
+			Grafo Ps = *itg;
+			//cout<<"Size : "<<List.getSize()<<endl;
+			
+			List.extract();
+			//cout<<"Size : "<<List.getSize()<<endl;
+			
+			if (k_best>0){
+				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
+				resul.push_back(*it);
+			}
+			k_best--;
+			
+		}
+	}while (List.getSize()>0);
+	//cout<<"Quantidade de vezes que o Kruskal foi invocado: "<<cont<<endl;
+	//cout<<"Quantidade de árvores criadas e armazenadas de fato: "<<contMSTs<<endl;
+	//cout<<contMSTs<<endl;
+	/*for (int i=0; i<vetorParticoes.size(); i++){ TODO
 		
-// 			vetorParticoes->remove(vetorParticoes->getInit());
-// 			ElementArvore *initArvore = MSTs->getInit();
-// 			MSTs->remove(MSTs->getInit());
-// 			delete initArvore;
-// 	}
+			vetorParticoes->remove(vetorParticoes->getInit());
+			ElementArvore *initArvore = MSTs->getInit();
+			MSTs->remove(MSTs->getInit());
+			delete initArvore;
+	}*/
 	
-// 	List.desaloca();
-// 	delete MSTs;
-// 	delete vetorParticoes;
-// }
+	List.desaloca();
+	return MSTs.size();
+}
 
 
-// /// END ALGORITMO DA SONRENSEN JANSSENS (2003)
+/// END ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 
 void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
@@ -225,6 +236,179 @@ list<int*> phase1GM(Grafo *g){
 	}
 	return result;
 }
+
+
+//LEMBRAR: Para separar em suportadas e não suportadas, colocar uma variável bool em ElementArvore
+
+
+void phase2KB(Grafo *g, list<int*> &resul){
+	list<int*>::iterator it = resul.begin(); // deve apontar sempre para p
+	int *p = *(it); /*Ponteiro que percorre a lista de soluções suportadas*/
+	int *q = *(++it);
+	it--;
+
+	list<int*>::iterator aux, anti, varre;
+	list<int*> k_best_tree;
+	int k; /*k-ésima melhor árvore*/
+	int cont=0, contMST=0;  /*Futuramente necessários para dados estatísticos*/
+	float a, b; /*Necessário para construir a equação da reta de custo máximo, da forma ax + b = y*/
+	float br, cr;
+	float m; /*coeficiente angular da reta r*/
+	float distancia; /*representa a distância de um ponto e a reta r (custo máximo)*/
+	bool otima, pare;
+	/*!
+  	 * p e q definem um trigângulo. Todas as ávores não-suportadas encontradas são inseridas entre p e q na 	 * lista 'resul'. Para a sub-lista SL = 'p .... q', encontramos a região viável a partir da definição
+  	 * dos triângulos formados entre dois elementos consecutivos u e v de SL. Tais triângulos pelos pontos 
+  	 * u=(ux, uy), v=(vx, vy) e (vx, uy); 
+	 */
+	//while (p->getNext()!=resul->getInit()){
+  	 float yl, yll, xl, xll;
+	while (q!=(*resul.begin())){
+		//q = p->getNext();
+		
+		getXandY(p, g->get_allArestas(), xl, yl);
+		getXandY(q, g->get_allArestas(), xll, yll);	
+		
+		k=1;
+		/* Inicialmente a região viável é o próprio triângulo entre p e q
+		 * A reta de custo máximo, inicialmente, passará pelos pontos (qx, py)
+		 */
+		m = (yl-yll)/(xl-xll); // coeficiente angular da reta de custo máximo
+		b = yl - xll*m; // a reta de custo máximo é paralela à r (entre p e q)
+		a = m; // ax + b = y (reta de custo máximo);
+		
+		br = -1;
+		cr = yll - m*xll; /*Coefieciente lienar da reta r que une p e q*/
+		distancia = abs(a*xll + br*yl + cr)/sqrt(a*a + br*br); // distância de (qx, py) a r
+		pare = false; // false = não para o laço
+		
+		/*! OBS.: O valor passado em AllSpaningTree (útimo parâmetro) é estimado, de modo a diminuir a complexidade do algortimo. LEMBRAR: fazer muitos testes, estimá-lo a partir de k e do número de vértices de G*/
+		//k_best_tree = new ListaArvores();
+		Grafo gg = *g;	
+		
+		//AllSpaningTree(g, k_best_tree,contMST, cont, 100); 
+		AllSpaningTree(g,xl,yl, xll,yll, k_best_tree, contMST, 100);
+	
+		*g = gg;
+		varre = k_best_tree.begin();	
+		do{ 
+			if (pare == false){
+				/*! Testes de dominância*/
+				/*! Verifica se a solução corrent pertence à região viável*/
+				aux = it;
+				anti = it;
+				otima = false; // false = árvore não é ótima
+				float dis, auxb;
+				float maxDistance =0;
+				while ((*aux)!=q){ //varre todos os triângulos
+					float vx, vy, auxx1, auxy1, auxx, auxy;
+					getXandY(*varre, g->get_allArestas(), vx, vy);
+					getXandY(*(++aux), g->get_allArestas(), auxx1, auxy1);
+					aux--;
+					getXandY(*(aux), g->get_allArestas(), auxx, auxy);
+					//if (!maiorIgualQuefloat(varre->getX(), aux->getNext()->getX()) && !maiorIgualQuefloat(varre->getY(), aux->getY())){
+						
+					if (!maiorIgualQuefloat(vx, auxx1) && !maiorIgualQuefloat(vy, auxy)){
+						otima=true;
+						anti = aux;
+					}
+					//dis = abs(a*aux->getNext()->getX() + br*aux->getY() + cr)/sqrt(a*a + br*br);
+					dis = abs(a*auxx1 + br*auxy + cr)/sqrt(a*a + br*br);
+					if (dis>maxDistance){	
+						maxDistance=dis;
+						auxb = auxy - a*auxx1;
+						//auxb = aux->getY() - a*aux->getNext()->getX();
+					}
+					aux++;
+				}
+				if (otima){ //se a solução estiver na região viável
+					
+					aux = --varre;
+					varre++;
+					k_best_tree.remove(*varre);
+
+					/*varre->setNext(anti->getNext());
+					anti->getNext()->setPrevious(varre);
+					anti->setNext(varre);
+					varre->setPrevious(anti);
+					quantArvores++;*/
+				
+					if (resul.end()==anti) resul.push_back(*varre);
+					else {
+
+						resul.insert(++anti, *varre);
+						anti--;
+					}
+					
+					/*! Nova linha de custo máximo*/
+					float antix1, antiy1, antix, antiy,vx1, vy1, auxx1, auxy1, auxx, auxy,vx, vy;
+					getXandY(*(++anti), g->get_allArestas(), antix1, antiy1);
+					anti--;
+					getXandY(*anti, g->get_allArestas(), antix, antiy);
+					getXandY(*(++varre), g->get_allArestas(), vx1, vy1);
+					varre--;
+					getXandY(*(++aux), g->get_allArestas(), auxx1, auxy1);
+					aux--;
+					getXandY(*(aux), g->get_allArestas(), auxx, auxy);
+					getXandY(*varre, g->get_allArestas(), vx, vy);
+					
+					dis = abs(a*antix1 + br*antiy + cr)/sqrt(a*a + br*br); // entre anti e a nova árove
+					if (dis>maxDistance){	
+						maxDistance=dis;
+						auxb = auxy - a*auxx1;
+					} 
+					dis = abs(a*vx1 + br*vy + cr)/sqrt(a*a + br*br); // entre a nova árvore e a próxima
+					if (dis>maxDistance){	
+						maxDistance=dis;
+						auxb = auxy - a*auxx1;
+					}
+					
+					b =  auxb;
+					varre = aux;
+					
+					
+				} else {
+					float vx, vy;
+					getXandY(*varre, g->get_allArestas(), vx, vy);
+					
+					//verificar se o solução corrent está acima ou sobre a reta de custo máximo
+					float y = a*vx + b;
+					if (maiorQuefloat(y, vy)==false) pare = true; /*manda parar*/
+					
+					aux = --varre;
+					varre++;
+					k_best_tree.remove(*varre);
+					//delete[] varre->getArvore();
+					//delete varre;
+					
+					varre = aux; 
+					 	
+				}
+				cout<<k<<endl;		
+			} else {
+				aux = --varre;
+				varre++;
+				k_best_tree.remove(*varre);
+				//delete[] varre->getArvore();
+				//delete varre;
+				varre = aux;
+			} 
+			k++;
+			varre++;
+		//} while (varre!=NULL && k<100);
+		} while (resul.end()!=varre && k<100);
+		//delete k_best_tree;
+		p = q;
+		q = p++;
+		
+	
+		
+	}
+}
+
+
+
+
 int main(){
 	int n;
 	float peso1, peso2;
@@ -249,8 +433,18 @@ int main(){
 	
 
 	list<int*> arvores = phase1GM(&my_grafo);
+	cout<<"saiu1"<<endl;
+	phase2KB(&my_grafo, arvores);
+	
 	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    int i = 1;
+    
+    
+    int i = 1, cont=0;
+    //AllSpaningTree(&my_grafo,0, 1, 0, 0, resul, cont, 20);
+    cout<<"saiu2"<<endl;
+    //cout<<resul.size()<<endl;
+   // list<int*>::iterator it=resul.begin();
+   
     for (list<int*>::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		cout<<"Arvore "<<i<<endl;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
