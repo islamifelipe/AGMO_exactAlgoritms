@@ -80,7 +80,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
 	Grafo P1 = P, P2 = P;
-	cout<<List.getSize()<<endl;
+	//cout<<List.getSize()<<endl;
 	bool res = false;
 	float custo, x, y;
 	Aresta *a; 
@@ -241,10 +241,8 @@ list<int*> phase1GM(Grafo *g){
 # retorna verdadeiro se o ponto kbest está dentro da regiao viável
 # se verdeiro, atualiza a regiao viável
 */	
-bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, int* k_best ){
+bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float x, float y){
 	bool retorno = false; // por default, o ponto nao está na regiao viavel 
-	float x, y;
-	getXandY(k_best, g->get_allArestas(),x, y); 
 	//This check is done by a simple linear search through the list of the consecutive corner points defining the viable region.
 	for (list< pair<float, float> >::iterator it = regiaoViavel.begin(); it!=regiaoViavel.end(); it++){
 		pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
@@ -266,6 +264,19 @@ bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, int* k
 	return retorno;
 }
 
+pair<float, float> getMaiorDistante(float a, float b, float c, list< pair<float, float> > regiaoViavel){
+	pair<float, float>  pontoR = (*regiaoViavel.begin());
+	float max = abs(a*pontoR.first + b*pontoR.second + c)/sqrt(a*a + b*b);
+	for (list< pair<float, float> >::iterator it = regiaoViavel.begin(); it!=regiaoViavel.end(); it++){
+		pair<float, float> ponto = (*it);
+		float distancia = abs(a*ponto.first + b*ponto.second + c)/sqrt(a*a + b*b); // distância de ponto a r
+ 		if (distancia>max){
+ 			max = distancia;
+ 			pontoR = ponto;
+ 		}
+	}
+	return pontoR;
+}
 /* 
 Recebe o grafo e a lista de solucoes soportads (as extremas do eixo convexo) 
 Retorna a lista de solucoes nao-suportadas (aquelas que estao dentro de um triângulo formado por duas soluceos extremas)
@@ -284,6 +295,16 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		getXandY(p, g->get_allArestas(),xp, yp); // p
 	 	getXandY(q, g->get_allArestas(), xq, yq);	 //q
 		regiaoViavel.push_back( make_pair(xq, yp));// inicialmente, a regiao viável é composta por um unico ponto (o âgulo reto do triângulo cuja hipotenusa é a reta entre p-q -- ver algoritmo origial)
+		
+		// determina a reta p-q (hipotenusa)
+		float a, b; // pra determinar a equacao da reta p-q na forma ax+b = y
+		a = (yp-yq)/(xp-xq); // coeficiente angular da reta p-q
+		b = yq - a*xq; // coeficiente linear de p-q
+		pair<float, float> maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
+		//Agora determinamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
+		float bM;
+		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
+
 		list<int*> k_best_tree;
 		int contMST=0;  /*Futuramente necessários para dados estatísticos*/
 
@@ -291,12 +312,15 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		
 		for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
 			int* k_best = *kb_it;
-			if (isInViableRegion(g, regiaoViavel, k_best)){
-		
+			float x, y;
+			getXandY(k_best, g->get_allArestas(),x, y); 
+			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
-			} else {
-				//cout<<"saiu222222"<<endl;
-				//break;
+				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
+				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
+				bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
+			} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
+				break;
 			}
 		}
 		contador++;
@@ -304,177 +328,6 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 	return noSoportadas;
 
 }
-
-// //LEMBRAR: Para separar em suportadas e não suportadas, colocar uma variável bool em ElementArvore
-
-
-// void phase2KB(Grafo *g, list<int*> &resul){
-// 	list<int*>::iterator it = resul.begin(); // deve apontar sempre para p
-// 	int *p = *(it); /*Ponteiro que percorre a lista de soluções suportadas*/
-// 	int *q = *(++it);
-// 	it--;
-
-// 	list<int*>::iterator aux, anti, varre;
-// 	list<int*> k_best_tree;
-// 	int k; /*k-ésima melhor árvore*/
-// 	int cont=0, contMST=0;  /*Futuramente necessários para dados estatísticos*/
-// 	float a, b; /*Necessário para construir a equação da reta de custo máximo, da forma ax + b = y*/
-// 	float br, cr;
-// 	float m; /*coeficiente angular da reta r*/
-// 	float distancia; /*representa a distância de um ponto e a reta r (custo máximo)*/
-// 	bool otima, pare;
-// 	/*!
-//   	 * p e q definem um trigângulo. Todas as ávores não-suportadas encontradas são inseridas entre p e q na 	 * lista 'resul'. Para a sub-lista SL = 'p .... q', encontramos a região viável a partir da definição
-//   	 * dos triângulos formados entre dois elementos consecutivos u e v de SL. Tais triângulos pelos pontos 
-//   	 * u=(ux, uy), v=(vx, vy) e (vx, uy); 
-// 	 */
-// 	//while (p->getNext()!=resul->getInit()){
-//   	 float yl, yll, xl, xll;
-// 	while (q!=(*resul.begin())){
-// 		//q = p->getNext();
-		
-// 		getXandY(p, g->get_allArestas(), xl, yl);
-// 		getXandY(q, g->get_allArestas(), xll, yll);	
-		
-// 		k=1;
-// 		/* Inicialmente a região viável é o próprio triângulo entre p e q
-// 		 * A reta de custo máximo, inicialmente, passará pelos pontos (qx, py)
-// 		 */
-// 		m = (yl-yll)/(xl-xll); // coeficiente angular da reta de custo máximo
-// 		b = yl - xll*m; // a reta de custo máximo é paralela à r (entre p e q)
-// 		a = m; // ax + b = y (reta de custo máximo);
-		
-// 		br = -1;
-// 		cr = yll - m*xll; /*Coefieciente lienar da reta r que une p e q*/
-// 		distancia = abs(a*xll + br*yl + cr)/sqrt(a*a + br*br); // distância de (qx, py) a r
-// 		pare = false; // false = não para o laço
-		
-// 		/*! OBS.: O valor passado em AllSpaningTree (útimo parâmetro) é estimado, de modo a diminuir a complexidade do algortimo. LEMBRAR: fazer muitos testes, estimá-lo a partir de k e do número de vértices de G*/
-// 		//k_best_tree = new ListaArvores();
-// 		Grafo gg = *g;	
-		
-// 		//AllSpaningTree(g, k_best_tree,contMST, cont, 100); 
-// 		cout<<"testeeee"<<endl;
-// 		AllSpaningTree(g,xl,yl, xll,yll, k_best_tree, contMST, 100);
-	
-// 		*g = gg;
-// 		varre = k_best_tree.begin();	
-// 		do{ 
-// 			if (pare == false){
-// 				/*! Testes de dominância*/
-// 				/*! Verifica se a solução corrent pertence à região viável*/
-// 				aux = it;
-// 				anti = it;
-// 				otima = false; // false = árvore não é ótima
-// 				float dis, auxb;
-// 				float maxDistance =0;
-// 				while ((*aux)!=q){ //varre todos os triângulos
-// 					float vx, vy, auxx1, auxy1, auxx, auxy;
-// 					getXandY(*varre, g->get_allArestas(), vx, vy);
-// 					getXandY(*(++aux), g->get_allArestas(), auxx1, auxy1);
-// 					aux--;
-// 					getXandY(*(aux), g->get_allArestas(), auxx, auxy);
-// 					//if (!maiorIgualQuefloat(varre->getX(), aux->getNext()->getX()) && !maiorIgualQuefloat(varre->getY(), aux->getY())){
-						
-// 					if (!maiorIgualQuefloat(vx, auxx1) && !maiorIgualQuefloat(vy, auxy)){
-// 						otima=true;
-// 						anti = aux;
-// 					}
-// 					//dis = abs(a*aux->getNext()->getX() + br*aux->getY() + cr)/sqrt(a*a + br*br);
-// 					dis = abs(a*auxx1 + br*auxy + cr)/sqrt(a*a + br*br);
-// 					if (dis>maxDistance){	
-// 						maxDistance=dis;
-// 						auxb = auxy - a*auxx1;
-// 						//auxb = aux->getY() - a*aux->getNext()->getX();
-// 					}
-// 					aux++;
-// 				}
-// 				if (otima){ //se a solução estiver na região viável
-					
-// 					aux = --varre;
-// 					varre++;
-// 					k_best_tree.remove(*varre);
-
-// 					/*varre->setNext(anti->getNext());
-// 					anti->getNext()->setPrevious(varre);
-// 					anti->setNext(varre);
-// 					varre->setPrevious(anti);
-// 					quantArvores++;*/
-				
-// 					if (resul.end()==anti) resul.push_back(*varre);
-// 					else {
-
-// 						resul.insert(++anti, *varre);
-// 						anti--;
-// 					}
-					
-// 					/*! Nova linha de custo máximo*/
-// 					float antix1, antiy1, antix, antiy,vx1, vy1, auxx1, auxy1, auxx, auxy,vx, vy;
-// 					getXandY(*(++anti), g->get_allArestas(), antix1, antiy1);
-// 					anti--;
-// 					getXandY(*anti, g->get_allArestas(), antix, antiy);
-// 					getXandY(*(++varre), g->get_allArestas(), vx1, vy1);
-// 					varre--;
-// 					getXandY(*(++aux), g->get_allArestas(), auxx1, auxy1);
-// 					aux--;
-// 					getXandY(*(aux), g->get_allArestas(), auxx, auxy);
-// 					getXandY(*varre, g->get_allArestas(), vx, vy);
-					
-// 					dis = abs(a*antix1 + br*antiy + cr)/sqrt(a*a + br*br); // entre anti e a nova árove
-// 					if (dis>maxDistance){	
-// 						maxDistance=dis;
-// 						auxb = auxy - a*auxx1;
-// 					} 
-// 					dis = abs(a*vx1 + br*vy + cr)/sqrt(a*a + br*br); // entre a nova árvore e a próxima
-// 					if (dis>maxDistance){	
-// 						maxDistance=dis;
-// 						auxb = auxy - a*auxx1;
-// 					}
-					
-// 					b =  auxb;
-// 					varre = aux;
-					
-					
-// 				} else {
-// 					float vx, vy;
-// 					getXandY(*varre, g->get_allArestas(), vx, vy);
-					
-// 					//verificar se o solução corrent está acima ou sobre a reta de custo máximo
-// 					float y = a*vx + b;
-// 					if (maiorQuefloat(y, vy)==false) pare = true; /*manda parar*/
-					
-// 					aux = --varre;
-// 					varre++;
-// 					k_best_tree.remove(*varre);
-// 					//delete[] varre->getArvore();
-// 					//delete varre;
-					
-// 					varre = aux; 
-					 	
-// 				}
-// 				cout<<k<<endl;		
-// 			} else {
-// 				aux = --varre;
-// 				varre++;
-// 				k_best_tree.remove(*varre);
-// 				//delete[] varre->getArvore();
-// 				//delete varre;
-// 				varre = aux;
-// 			} 
-// 			k++;
-// 			varre++;
-// 		//} while (varre!=NULL && k<100);
-// 		} while (resul.end()!=varre && k<100);
-// 		//delete k_best_tree;
-// 		p = q;
-// 		q = p++;
-		
-	
-		
-// 	}
-// }
-
-
 
 
 int main(){
@@ -501,17 +354,17 @@ int main(){
 	
 
 	list<int*> arvores = phase1GM(&my_grafo);
-	cout<<"saiu1"<<endl;
+	cout<<"Fim da primeira fase ... "<<endl;
 	list<int*> noSuportadas= phase2KB(&my_grafo, arvores);
-	
+	cout<<"Fim da segunda fase ... "<<endl;
 	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     
     
     int i = 1, cont=0;
-    cout<<"saiu2"<<endl;
+    //cout<<"saiu2"<<endl;
     //cout<<resul.size()<<endl;
    // list<int*>::iterator it=resul.begin();
-   cout<<"SUPORTADAS"<<endl;
+   cout<<"Resultado \n SUPORTADAS"<<endl;
     for (list<int*>::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		cout<<"Arvore "<<i<<endl;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore

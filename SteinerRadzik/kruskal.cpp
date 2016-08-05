@@ -149,7 +149,7 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 		if (g->getStatus(listaAresta[k]->getId())==1){ /*se for obrigatória*/
 		 	
 		 	A[listaAresta[k]->getId()] = 1;
-		 	cout<<"AQUI1"<<endl;
+		
 		 	cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
 		 	conjunto.union1(listaAresta[k]->getOrigem(), listaAresta[k]->getDestino());
 			custo+=listaAresta[k]->getPeso1()*(yl-yll)+listaAresta[k]->getPeso2()*(xll-xl);
