@@ -1,11 +1,12 @@
 /*Heurística para a manipulação de conjuntos. Esta implementação é importante que se saber, por exemplo, se uma aresta que é adcionada gera um grafo cíclico*/
 
-
+#include <iostream>
 #include "Conjunto.h"
 
 using namespace std;
 
-Conjunto::Conjunto(int n){
+Conjunto::Conjunto(int n1){
+	n = n1;
 	pai = new int[n+1];
 	ordem = new int[n+1];
 	for (int i=0; i<=n; i++){
@@ -51,9 +52,35 @@ void Conjunto::union1(int x, int y){
 bool Conjunto::compare(int x, int y){
 	return find_set(x)==find_set(y);
 }
+ 
+
 void Conjunto::desaloca(){
 	delete[] pai;
 	delete[] ordem;
+}
+
+int* Conjunto::getPai(){
+	return pai;
+}
+int* Conjunto::getOrdem(){
+	return ordem;
+}
+int Conjunto::getN(){
+	return n;
+}
+Conjunto& Conjunto::operator=( Conjunto& d){
+	
+	if (this == &d) return *this;
+	n = d.getN();
+	pai = new int[n+1];
+	ordem = new int[n+1];
+	for (int i=0; i<=n; i++){
+
+		pai[i] = (d.getPai())[i];
+		ordem[i] = (d.getOrdem())[i];
+	} 
+
+	return *this;
 }
 
 

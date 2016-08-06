@@ -7,6 +7,7 @@ class Conjunto {
 	private:
 		int *pai;
 		int *ordem;
+		int n;
 	
 	public:
 		void makeSet(int x);
@@ -17,11 +18,14 @@ class Conjunto {
 		
 		Conjunto(int n);
 		void union1(int x, int y);
-	
+		Conjunto& operator=( Conjunto& d);
 		/*A raiz do conjunto o identifica; como a função find_set faz x ter como pai a raiz, e retorna este elemento, basta verificar se o valor
 		 * retornando para a chamada com x e y são iguais.*/
 		bool compare(int x, int y);
 		void desaloca();
+		int* getPai();
+		int* getOrdem();
+		int getN();
 };
 
 #endif

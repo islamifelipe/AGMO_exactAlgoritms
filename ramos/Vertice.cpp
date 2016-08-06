@@ -25,5 +25,8 @@ Aresta* Vertice::getAresta(int i){ /*retorna um ponteiro para a i-ésima aresta i
 int Vertice::getGrau(){ 
 	return adjacentes.size();
 }
+vector<Aresta*> Vertice::getAdjacentes(){
+	return adjacentes;
+}
 
 #endif

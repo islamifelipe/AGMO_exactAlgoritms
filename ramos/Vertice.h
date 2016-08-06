@@ -17,6 +17,8 @@ class Vertice{
 		void adicionaAresta(Aresta *a);
 		
 		Aresta* getAresta(int i);
+
+		vector<Aresta*> getAdjacentes();
 		
 		int getGrau();
 		
