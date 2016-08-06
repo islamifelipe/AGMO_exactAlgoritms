@@ -187,7 +187,7 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list<int*>
 				copie = conjunto;
 				T_aux[e->getId()] = 1;
 				copie.union1(e->getOrigem(), e->getDestino());
-				cout<<step<<endl;
+				
 				if (step+1 == g->getQuantVertices()-1){
 					noSuportadas.push_back(T_aux); // armazena T
 					// TODO :  remove any solutions dominated by T
@@ -306,6 +306,7 @@ int main(){
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
+    	
     	cout<<endl;
     	i++;
 	}
