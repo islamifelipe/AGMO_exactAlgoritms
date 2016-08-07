@@ -23,7 +23,7 @@ bool isEgal(int *t1, int *t2, int size){
 	return true;
 }
 
-bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
+bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t1[i]==1){
@@ -35,7 +35,7 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 			t2_peso2+=arestas[i]->getPeso2();
 		}
 	}
-	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
+	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 ){//&& (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
 		return true;
 	} else return false;
 }
@@ -43,7 +43,7 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 /*retorna true se Tqh1 é dominada por alguma arvore parcial equivalente pertecente à Lq1 
  Tqh1 é um vetor de 0's e 1's com o comprimento igual ao numero de ARESTAS
 */
-bool isDominada(int* Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g){
+bool isDominada(int* Tqh1, vector< pair<int*, int*> > Lq1, Grafo *g){
 	// verificacao se Tqh1 é dominada por alguém
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
@@ -95,7 +95,9 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 						if ((Sq_h.first)[ij->getOrigem()] != (Sq_h.first)[ij->getDestino()]){ // nao gerar ciclo
 							int *Xq1 = new int[n];
 							for (int o=0; o<n; o++) Xq1[o] = (Sq_h.first)[o];
-							ij->getOrigem()==i ? Xq1[ij->getDestino()] = 1 : Xq1[ij->getOrigem()] = 1;
+							//ij->getOrigem()==i ? Xq1[ij->getDestino()] = 1 : Xq1[ij->getOrigem()] = 1;
+							Xq1[ij->getDestino()] = 1;
+							Xq1[ij->getOrigem()] = 1;
 							int *Eqhij = new int[g->getQuantArestas()]; 
 							for (int o=0; o<g->getQuantArestas(); o++) Eqhij[o] = (Sq_h.second)[o];
 							Eqhij[ij->getId()] = 1;
