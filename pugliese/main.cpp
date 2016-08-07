@@ -95,16 +95,16 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 						if ((Sq_h.first)[ij->getOrigem()] != (Sq_h.first)[ij->getDestino()]){ // nao gerar ciclo
 							int *Xq1 = new int[n];
 							for (int o=0; o<n; o++) Xq1[o] = (Sq_h.first)[o];
-							Xq1[j] = 1;
+							ij->getOrigem()==i ? Xq1[ij->getDestino()] = 1 : Xq1[ij->getOrigem()] = 1;
 							int *Eqhij = new int[g->getQuantArestas()]; 
 							for (int o=0; o<g->getQuantArestas(); o++) Eqhij[o] = (Sq_h.second)[o];
 							Eqhij[ij->getId()] = 1;
 							pair<int*, int*> Sq1 = make_pair(Xq1, Eqhij);
 
 							// Teste de dominância 
-							//if (isDominada(Eqhij, L[q+1], g) == false){
+							if (isDominada(Eqhij, L[q+1], g) == false){
 								L[q+1].push_back(Sq1);
-							//}
+							}
 								
 						} 
 					}
@@ -138,10 +138,10 @@ int main(){
 
 	vector< pair<int*, int*> > arvores = algoritmoPD(&my_grafo);
 	 
-    for (int k = 1; k <= arvores.size(); k++){ // cada arvore formada
+    for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	int *arestas  = arvores[k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    	cout<<"Arvore "<<k<<endl;
+    	cout<<"Arvore "<<k+1<<endl;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 			if (arestas[a] == 1){
     			cout<<arestasPtr[a]->getOrigem() << " ";
