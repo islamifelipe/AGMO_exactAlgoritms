@@ -23,6 +23,15 @@ bool isEgal(int *t1, int *t2, int size){
 	return true;
 }
 
+/* Recebe os vetores de vértices
+Determina se eles sao equivalentes
+*/
+bool isEquivalente(int *t1, int *t2, int n){ // 
+	for (int i=0; i<n; i++){
+		if (t1[i]!=t2[i]) return false;
+	}
+	return true;
+}
 bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
 	for (int i=0; i<arestas.size(); i++){
@@ -35,30 +44,33 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
 			t2_peso2+=arestas[i]->getPeso2();
 		}
 	}
-	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 ){//&& (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
+	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
 		return true;
 	} else return false;
 }
 
 /*retorna true se Tqh1 é dominada por alguma arvore parcial equivalente pertecente à Lq1 
  Tqh1 é um vetor de 0's e 1's com o comprimento igual ao numero de ARESTAS
+ Lq1 DEVE SER UMA REFERÊNCIA
 */
-bool isDominada(int* Tqh1, vector< pair<int*, int*> > Lq1, Grafo *g){
+bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g){
 	// verificacao se Tqh1 é dominada por alguém
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
-		if (t1_domina_t2(arvore_parcial, Tqh1, g->get_allArestas())){
+		if (isEquivalente(Tqh1.first,Lq1[t].first, g->getQuantVertices()) && t1_domina_t2(arvore_parcial, Tqh1.second, g->get_allArestas())){
 			return true; // é dominada
 		}
 	} 
 
-	// se Tqh1 nao é dominada por ninguém, entao verificamos se Tqh1 domina algum t em Lq1. Se sim, removemos t de Lq1.
+	// se Tqh1 nao é dominada por ninguém equivalente, entao verificamos se Tqh1 domina algum t em Lq1. Se sim, removemos t de Lq1.
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
-		if (t1_domina_t2(Tqh1, arvore_parcial, g->get_allArestas())){
-			Lq1.erase(Lq1.begin()+t);
+		if ((isEquivalente(Tqh1.first,Lq1[t].first,  g->getQuantVertices()) && t1_domina_t2(Tqh1.second, arvore_parcial, g->get_allArestas())) || isEgal(Tqh1.second, arvore_parcial, g->getQuantArestas())){
+			cout<<"dkfkdjfkjdkfjkdjf"<<endl;
+			Lq1.erase(Lq1.begin()+t); 
+			t--;
 		}
-	}
+	}   
 	return false; // nao é dominada
 	
 }
@@ -79,7 +91,7 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 	int *E = new int[g->getQuantArestas()]; // inicialmente, vazio
 	for (int i=0; i<g->getQuantArestas(); i++) E[i] = 0;
 	pair<int*, int*> S11 = make_pair(X, E); // o primeiro par (o primeiro par do nivel 1) 
-	vector< pair<int*, int*> > L1;// = new vector< pair<int*, int*> >();
+	vector< pair<int*, int*> > L1;
 	L1.push_back(S11);
 	L[1] = L1;
 
@@ -104,7 +116,7 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 							pair<int*, int*> Sq1 = make_pair(Xq1, Eqhij);
 
 							// Teste de dominância 
-							if (isDominada(Eqhij, L[q+1], g) == false){
+							if (isDominada(Sq1, L[q+1], g) == false){
 								L[q+1].push_back(Sq1);
 							}
 								
@@ -117,6 +129,7 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 
 	return L[n];
 }
+
 
 int main(){
 	int n;
@@ -140,7 +153,7 @@ int main(){
 
 	vector< pair<int*, int*> > arvores = algoritmoPD(&my_grafo);
 	 
-    for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
+	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	int *arestas  = arvores[k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     	cout<<"Arvore "<<k+1<<endl;
