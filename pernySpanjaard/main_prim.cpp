@@ -45,35 +45,59 @@ void subtrai(Grafo *relacao,int *grausChegada, int v){
 	}
 }
 
-vector<pair <int *, int*> > krukal_like(Grafo *g, Grafo *relacao){
+void omega(int* vertices, Grafo *my_grafo, Grafo *relacao, int *grausChegada){
+	map <int, Aresta *> arestas = my_grafo->get_allArestas();
+	int *retorno = new int[arestas.size()]; // vetor dos id das arestas
+
+	// primeiramente, seleciona-se as arestas conforme a regra classica de conjunto dijunto de prim   
+
+	for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
+		Aresta *a = arestas[i];
+		if (vertices[a->getOrigem()] != vertices[a->getDestino()]){
+			retorno[a->getId()] = 1; 
+		} else {
+			retorno[a->getId()] = 0; 
+		}
+	}
+
+	// depois verificamos a preferência entre as arestas
+
+	for (int i = 0; i<arestas.size(); i++){ 
+		int v = arestas[i]->getId();
+		if (retorno[v] == 0){
+			grausChegada[v] = -1;
+			for (int j=0; j<relacao->getVertice(v)->getGrau(); j++){
+				grausChegada[relacao->getVertice(v)->getAresta(j)->getId()]--;
+			}
+		}
+	}
+}
+
+vector<pair <int *, int*> > prim_like(Grafo *g, Grafo *relacao){
 	map<int, vector<pair <int *, int*> > > at;
 	/*cada vector<pair <int *, int*> > funciona, na verdade, como uma lista de arvores de tamanho t, onde t é seu indice em map. Portanto, uma lista de arvores da forma T^(t) 
 	I^(t), do algorito original, nada mais é senao os indices do t-ésimo vector do map*/
 	int *grausChegada = new int[relacao->getQuantVertices()];
 	at[0].push_back(make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]));
 	for (int i=0; i<g->getQuantVertices(); i++) (at[0][0].first)[i] = 0;
+	(at[0][0].first)[0] = 1;
 	for (int i=0; i<g->getQuantArestas(); i++) (at[0][0].second)[i] = 0;
 
 	for (int t=1; t<=g->getQuantVertices()-1; t++){
 		vector<pair <int *, int*> > It = at[t-1];
 		for (int i=0; i<It.size(); i++){
 			for (int p=0; p<relacao->getQuantVertices(); p++) grausChegada[p] = relacao->getVertice(p)->getGrau_chegada();
-			for (int p=0; p<g->getQuantArestas(); p++){
-				if ((It[i].second)[p] == 1) subtrai(relacao,grausChegada, p);
-				else if ((It[i].first)[g->get_allArestas()[p]->getOrigem()] ==1 &&  (It[i].first)[g->get_allArestas()[p]->getDestino()] ==1) subtrai(relacao,grausChegada, p);// retira-se tambem as que foram ciclo
-					
-			}
+			omega(It[i].first, g, relacao, grausChegada);
 			vector <Aresta *> max = maximal(g, grausChegada);
+			
 			for (int a=0; a<max.size(); a++){
-				//if ((It[i].first)[max[a]->getOrigem()] != (It[i].first)[max[a]->getDestino()] || ((It[i].first)[max[a]->getOrigem()] == 0 && (It[i].first)[max[a]->getDestino()]==0)){ // nao forma ciclo
-					pair <int *, int*> arvore = make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]);
-					for (int p=0; p<g->getQuantVertices(); p++) (arvore.first)[p] = (It[i].first)[p];
-					for (int p=0; p<g->getQuantArestas(); p++) (arvore.second)[p] = (It[i].second)[p];
-					(arvore.first)[max[a]->getOrigem()] = 1;
-					(arvore.first)[max[a]->getDestino()] = 1;
-					(arvore.second)[max[a]->getId()] = 1;
-					at[t].push_back(arvore);
-				//}
+				pair <int *, int*> arvore = make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]);
+				for (int p=0; p<g->getQuantVertices(); p++) (arvore.first)[p] = (It[i].first)[p];
+				for (int p=0; p<g->getQuantArestas(); p++) (arvore.second)[p] = (It[i].second)[p];
+				(arvore.first)[max[a]->getOrigem()] = 1;
+				(arvore.first)[max[a]->getDestino()] = 1;
+				(arvore.second)[max[a]->getId()] = 1;
+				at[t].push_back(arvore);
 			}   
 		}
 		// retira duplicatas
@@ -123,7 +147,7 @@ int main(){
 		// origem R destino
 	}
 
-	vector<pair <int *, int*> > arvores = krukal_like(&my_grafo, &relacao);
+	vector<pair <int *, int*> > arvores = prim_like(&my_grafo, &relacao);
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	pair <int *, int*>  arestas= arvores[k]; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
