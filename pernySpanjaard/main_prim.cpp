@@ -2,8 +2,11 @@
 #=======================================================================
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
-# This code implements the Perny and Spanjaard's (2003) algorithm (kruskal_like)
+# This code implements the Perny and Spanjaard's (2003) algorithm (prim_like)
 # to resolve the Biobjective Spanning Tree Problem (preference-based approach)
+
+# Apparently, the prim_like algorithm can return disferent results depending on the
+# initital vertice
 #=======================================================================
 */
 
