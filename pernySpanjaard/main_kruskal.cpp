@@ -21,23 +21,6 @@ bool isEgal(int *t1, int *t2, int size){
 	return true;
 }
 
-bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
-	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
-	for (int i=0; i<arestas.size(); i++){
-		if (t1[i]==1){
-			t1_peso1+=arestas[i]->getPeso1();
-			t1_peso2+=arestas[i]->getPeso2();
-		} 
-		if (t2[i]==1){
-			t2_peso1+=arestas[i]->getPeso1();
-			t2_peso2+=arestas[i]->getPeso2();
-		}
-	}
-	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
-		return true;
-	} else return false;
-}
-
 /* recebe um vetor de inteiros, onde o valor do indice i refere-se o grau de chegada do vértice i da relacao
 retorna um vetor de aresta do grafo normal (nao o da relacao)
 */
@@ -77,10 +60,12 @@ vector<pair <int *, int*> > krukal_like(Grafo *g, Grafo *relacao){
 			for (int p=0; p<relacao->getQuantVertices(); p++) grausChegada[p] = relacao->getVertice(p)->getGrau_chegada();
 			for (int p=0; p<g->getQuantArestas(); p++){
 				if ((It[i].second)[p] == 1) subtrai(relacao,grausChegada, p);
+				else if ((It[i].first)[g->get_allArestas()[p]->getOrigem()] ==1 &&  (It[i].first)[g->get_allArestas()[p]->getDestino()] ==1) subtrai(relacao,grausChegada, p);// retira-se tambem as que foram ciclo
+					
 			}
 			vector <Aresta *> max = maximal(g, grausChegada);
 			for (int a=0; a<max.size(); a++){
-				if ((It[i].first)[max[a]->getOrigem()] != (It[i].first)[max[a]->getDestino()] || ((It[i].first)[max[a]->getOrigem()] == 0 && (It[i].first)[max[a]->getDestino()]==0)){ // nao forma ciclo
+				//if ((It[i].first)[max[a]->getOrigem()] != (It[i].first)[max[a]->getDestino()] || ((It[i].first)[max[a]->getOrigem()] == 0 && (It[i].first)[max[a]->getDestino()]==0)){ // nao forma ciclo
 					pair <int *, int*> arvore = make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]);
 					for (int p=0; p<g->getQuantVertices(); p++) (arvore.first)[p] = (It[i].first)[p];
 					for (int p=0; p<g->getQuantArestas(); p++) (arvore.second)[p] = (It[i].second)[p];
@@ -88,8 +73,17 @@ vector<pair <int *, int*> > krukal_like(Grafo *g, Grafo *relacao){
 					(arvore.first)[max[a]->getDestino()] = 1;
 					(arvore.second)[max[a]->getId()] = 1;
 					at[t].push_back(arvore);
-				}
+				//}
 			}   
+		}
+		// retira duplicatas
+		for (int i=0; i<at[t].size(); i++){
+			for (int j=i+1; j<at[t].size(); j++){
+				if (isEgal(at[t][i].second, at[t][j].second, g->getQuantArestas())){
+					at[t].erase(at[t].begin()+j);
+					
+				}
+			}
 		}
 	}
 
@@ -118,7 +112,7 @@ int main(){
 		my_grafo.addAresta(id, origem, destino, peso1, peso2);
 	}
 	int nA = id; // quantidade de arestas do grafo	
-	cout<<m<<endl;
+	//cout<<m<<endl;
 	id = 0;
 	for (int i=0; i<m; i++){ // PADRAO : vértices numerados de 0 à n-1
 		relacao.addVertice(i);
@@ -145,32 +139,5 @@ int main(){
     	cout<<endl;
     }
 
-
-	// // RASCUNHO de TESTES
-	// cout<<"saiu"<<endl;
-	// int *grausChegada = new int[relacao.getQuantVertices()];
-	
-	// for (int i=0; i<relacao.getQuantVertices(); i++) grausChegada[i] = relacao.getVertice(i)->getGrau_chegada();
-	
-	// vector <Aresta *> max = maximal(&my_grafo, grausChegada);
-	// for (int i=0; i<max.size(); i++){
-	// 	cout<<max[i]->getOrigem() << " ";
- //    	cout<<max[i]->getDestino() << " ";
- //    	cout<<max[i]->getPeso1() << " ";
- //    	cout<<max[i]->getPeso2() << endl;
-	// }
-	
-	// subtrai(&relacao, grausChegada, 1);
-	
-	// cout<<"\n\n\n"<<endl;
-	// max = maximal(&my_grafo, grausChegada);
-	// for (int i=0; i<max.size(); i++){
-	// 	cout<<max[i]->getOrigem() << " ";
- //    	cout<<max[i]->getDestino() << " ";
- //    	cout<<max[i]->getPeso1() << " ";
- //    	cout<<max[i]->getPeso2() << endl;
-	// }
-
-   /* */
 	return 0;
 }

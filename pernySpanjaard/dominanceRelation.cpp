@@ -8,6 +8,9 @@
 
 existe (i->j) em E' <----> i domina j 
 
+comentário em Ruzika e Hamacher: no que se refere ao algoritmo para a árvore geradora,
+ esta relacao de preferência não satisfaz o axioma da independência e portanto gera um conjunto aproximado das soluções preferidas.
+
 */
 #include <iostream>
 #include <map> 
