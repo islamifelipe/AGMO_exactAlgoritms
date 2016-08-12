@@ -35,3 +35,20 @@ int Grafo::getQuantArestas(){
 int Grafo::getQuantVertices(){	
 	return n;	
 }
+
+
+int Grafo::getStatus(int i){
+	return particao[i];
+}
+void Grafo::setStatus(int i, int valor){
+	particao[i] = valor;
+}
+Aresta ** Grafo::getAllArestasPtr(){
+	return arestasPtr;
+}
+void Grafo::gerarArestasPtr(){
+	arestasPtr = new Aresta*[lista_allArestas.size()];
+	for (int i=0; i<lista_allArestas.size(); i++){
+		arestasPtr[i] = lista_allArestas[i];
+	}
+}

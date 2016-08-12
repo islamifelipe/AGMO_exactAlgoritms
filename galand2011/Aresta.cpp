@@ -7,7 +7,7 @@ Aresta::Aresta(int id2, int origem1, int destino1, float peso1_1, float peso2_1)
 	peso1 = peso1_1;
 	peso2 = peso2_1;
 	id= id2;
-	//pesoUnique = 0;
+	pesoUnico = -1; // significa que ainda nao foi atribuido peso unico à aresta
 } 
 
 Aresta::Aresta(){}
@@ -35,4 +35,11 @@ void Aresta::setOrigem(int n){
 }
 void Aresta::setDestino(int n){	
 	destino = n;	
+}
+
+float Aresta::getPesoUnico(){
+	return pesoUnico;
+}
+void Aresta::setPesoUnico(float p){
+	pesoUnico = p;
 }

@@ -7,6 +7,7 @@ class Aresta{ //OK
 		int origem, destino; /*se o grafo for não direcionado, não há diferença prática entre os vértices a origem e o destino*/
 		int id; /*identificador da aresta*/
 		float peso1, peso2; /*pesos da aresta*/
+		float pesoUnico; // usado quando devemos encontrar a AGM classica a partir de alguma ponderacao entre peso1 e peso2
 		
 	public:
 		Aresta(int id2, int origem1, int destino1, float peso1_1, float peso2_1); 
@@ -19,6 +20,8 @@ class Aresta{ //OK
 		void setId(int novo);
 		void setOrigem(int n);
 		void setDestino(int n);
+		float getPesoUnico();
+		void setPesoUnico(float p);
 };
 
 #endif
