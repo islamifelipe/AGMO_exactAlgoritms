@@ -144,6 +144,7 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 	Conjunto conjunto(g->getQuantVertices());
 	int cont=0, i=0;
 	//float peso;
+	custo = 0;
 	Aresta **listaAresta = g->getAllArestasPtr();
 	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/
 		if (g->getStatus(listaAresta[k]->getId())==1){ /*se for obrigatória*/

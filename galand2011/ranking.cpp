@@ -57,11 +57,20 @@ using namespace std;
 // 	} else return false;
 // }
 
-
+pair<float, float> arvorePesos(int *t1, map <int, Aresta *> arestas){
+	float t1_peso1=0, t1_peso2=0;
+	for (int i=0; i<arestas.size(); i++){
+		if (t1[i]==1){
+			t1_peso1+=arestas[i]->getPeso1();
+			t1_peso2+=arestas[i]->getPeso2();
+		} 
+	}
+	return make_pair(t1_peso1, t1_peso2);
+}
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
-void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, list <int *> &MSTs, int &cont, list<Grafo> &vetorParticoes){
+void Partition(Grafo P, float lambda1, float lambda2, int *Pa, Heap &List, list <int *> &MSTs, int &cont, list<Grafo> &vetorParticoes){
 	/*Pa = vetor de arestas = correspondente à partição P
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
@@ -84,9 +93,11 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 				P2.setStatus(a->getId(), 1); /*obrigatória*/
 				
 				//custo=0;cout<<"Antes1"<<endl;
-				res = kruskal(&P1, A2, xl, yl, xll, yll,custo, 3);
+				res = kruskal(&P1, A2, lambda1,  lambda2,custo, 3);
+
 				cont++; 
 				if (res){
+					//cout<<custo<<endl;
 					int quantMSTs = MSTs.size();
 					MSTs.push_back(A2);
 					List.insert(quantMSTs, custo); // o valor da variavel "custo" vem do kruskal
@@ -102,14 +113,14 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, int k_best){ 
+int AllSpaningTree(Grafo *g,float lambda1, float lambda2, list<int*> &resul, int &cont, int k_best){ 
 	int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
 	list<int*> MSTs; // usada para lista de árvores
 	float custoMinimo =0, x=0, y=0;
 	Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
 	list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
 	//A estrutura "List" do algortimo original é um heap chamada List
-	bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
+	bool res = kruskal(g, A, lambda1, lambda2, custoMinimo, 3);
 	cont =1;
 	if (res){
 		int contMSTs = MSTs.size();
@@ -136,7 +147,7 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 			//cout<<"Size : "<<List.getSize()<<endl;
 			
 			if (k_best>0){
-				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
+				Partition(Ps, lambda1,  lambda2, *it, List,MSTs, cont,vetorParticoes);
 				resul.push_back(*it);
 			}
 			k_best--;
@@ -162,13 +173,77 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 /// END ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 
+/*
+ * w(x) = x^2
+ * w é a funçao nao utilitaria descrita em Galand et al (2010)
+ * Claro que se quisermos utilisar outra funçao, barta subistui-la
+ */
+float w(float x){
+	return x*x;
+}
+
+float psi(float x1, float x2, float v[4]){
+	x1 = w(x1);
+	x2 = w(x2);
+	float x_1 = x1 <= x2 ? x1 : x2 ; // x_(1)
+	float x_2 = x1 > x2 ? x1 : x2 ; // x_(2)
+	// assert (x_1 <= x_2)
+	float soma = 0;
+	int vi = 3;
+	// i = 1;
+	soma += (x_1 - 0)*v[vi];
+
+	// i = 2
+	vi = 2;
+	if (x2<x_2) vi = 1;
+	soma += (x_2 - x_1)*v[vi];
+
+	return soma;
+
+}
 
 /* 
 Retorna o vetor de m 0's ou 1's
 */
-int * algorithm2(Grafo g, float v[4]){
+int * algorithm2(Grafo *g, float v[4]){
+	pair<float, float> lambda = algorithm1(v);
 
-
+	cout<<lambda.first<<"   "<<lambda.second<<endl;
+	
+	list<int *> result;
+	int cont;
+	int k_best = 500;
+	AllSpaningTree(g, lambda.first, lambda.second, result, cont, k_best); // esse valor de 500 pode variar conforme o tamanho da arvore
+	std::list<int *>::iterator it = result.begin();
+	int *X1 = *it, *Xi, *Xbest = X1;
+	it++;
+	int i = 1;
+	int omegai = 1;
+	pair<float, float> x1 = arvorePesos(X1, g->get_allArestas()), xi;
+	float best = psi(x1.first, x1.second,v);
+	//cout<<best<<endl;
+	do{
+		i = i+1;
+		Xi = *it;
+		it++;
+		xi = arvorePesos(Xi, g->get_allArestas());
+		float psiwx = psi(xi.first, xi.second,v);
+		if (psiwx<best){
+			omegai = i;
+			best = psiwx;
+			Xbest = Xi;
+		} else {
+			//omegai = omegai_1;
+		}
+		//cout<<lambda.first*xi.first+lambda.second*xi.second<<endl;
+		//cout<<w(lambda.first*xi.first+lambda.second*xi.second)<<endl;
+	} while (it != result.end() && w(lambda.first*xi.first+lambda.second*xi.second)<best);
+	cout<<omegai<<"-ésima arvore encontrada"<<endl;
+	if (i>=k_best){
+		cout<<"*** ATENCAO : O ALGORITMO2 VARREU MAIS QUE AS "<<k_best<<" PRIMEIRAS MELHORES ARVORES; TALVEZ PRECISE AUMENTAR ESSE VALOR"<<endl;
+	}
+	cout<<best<<endl;
+	return Xbest;
 }
 int main(){
 	int n, m;
@@ -197,8 +272,27 @@ int main(){
 		v[i] = vi;
 	}
 	my_grafo.gerarArestasPtr();
-	pair<float, float> lambda = algorithm1(v);
+	
+	// pair<float, float> lambda = algorithm1(v);
 
-	cout<<lambda.first<<"   "<<lambda.second<<endl;
+	// cout<<lambda.first<<"   "<<lambda.second<<endl;
+	// list<int *> result;
+	// int cont;
+	// AllSpaningTree(&my_grafo, lambda.first, lambda.second, result, cont, 500);
+	int * arestas = algorithm2(&my_grafo, v);
+	// cout<<"Quantidade de arvores encontradas : "<<result.size()<<endl;
+	// for (std::list<int *>::iterator it = result.begin();  it != result.end(); ++it){
+	// 	int * arestas = *it;
+		for (int j=0; j<my_grafo.getQuantArestas(); j++){
+
+			if (arestas[j] == 1){
+				cout<<my_grafo.get_allArestas()[j]->getOrigem()<<" ";
+				cout<<my_grafo.get_allArestas()[j]->getDestino()<<" ";
+				cout<<my_grafo.get_allArestas()[j]->getPeso1()<<" ";
+				cout<<my_grafo.get_allArestas()[j]->getPeso2()<<endl;
+			}
+		}
+		cout<<endl;
+	// }
 	return 0;
 }
