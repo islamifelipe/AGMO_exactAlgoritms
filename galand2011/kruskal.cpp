@@ -145,7 +145,7 @@ bool kruskal (Grafo *g, int  *A, float lambda1, float lambda2, float &custo, int
 	Aresta **listaAresta = g->getAllArestasPtr();
 	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/
 		if (g->getStatus(listaAresta[k]->getId())==1){ /*se for obrigatória*/
-		 	
+		 	if (conjunto.compare(listaAresta[k]->getOrigem(), listaAresta[k]->getDestino())) return false;
 		 	A[listaAresta[k]->getId()] = 1;
 		
 		 	cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)

@@ -18,44 +18,9 @@
 #include "kruskal.h"
 #include "Heap.h"
 #include <list>
+#include <climits>
 #include "lambda.h"
 using namespace std;
-
-// bool a_domina_b( Aresta *a, Aresta *b){
-// 	if (a->getPeso1() <= b->getPeso1() && a->getPeso2() <= b->getPeso2() && (a->getPeso1() < b->getPeso1() || a->getPeso2() < b->getPeso2())){
-// 		return true;
-// 	} else return false;
-// }
-
-// bool a_domina_fracamente_b( Aresta *a, Aresta *b){
-// 	if (a->getPeso1() <= b->getPeso1() && a->getPeso2() <= b->getPeso2()){
-// 		return true;
-// 	} else return false;
-// }
-
-// bool isEgal(int *t1, int *t2, int size){
-// 	for (int i=0; i<size; i++){
-// 		if (t1[i]!=t2[i]) return false;
-// 	}
-// 	return true;
-// }
-
-// bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
-// 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
-// 	for (int i=0; i<arestas.size(); i++){
-// 		if (t1[i]==1){
-// 			t1_peso1+=arestas[i]->getPeso1();
-// 			t1_peso2+=arestas[i]->getPeso2();
-// 		} 
-// 		if (t2[i]==1){
-// 			t2_peso1+=arestas[i]->getPeso1();
-// 			t2_peso2+=arestas[i]->getPeso2();
-// 		}
-// 	}
-// 	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
-// 		return true;
-// 	} else return false;
-// }
 
 pair<float, float> arvorePesos(int *t1, map <int, Aresta *> arestas){
 	float t1_peso1=0, t1_peso2=0;
@@ -173,39 +138,11 @@ int AllSpaningTree(Grafo *g,float lambda1, float lambda2, list<int*> &resul, int
 /// END ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 
-/*
- * w(x) = x^2
- * w é a funçao nao utilitaria descrita em Galand et al (2010)
- * Claro que se quisermos utilisar outra funçao, barta subistui-la
- */
-float w(float x){
-	return x*x;
-}
 
-float psi(float x1, float x2, float v[4]){
-	x1 = w(x1);
-	x2 = w(x2);
-	float x_1 = x1 <= x2 ? x1 : x2 ; // x_(1)
-	float x_2 = x1 > x2 ? x1 : x2 ; // x_(2)
-	// assert (x_1 <= x_2)
-	float soma = 0;
-	int vi = 3;
-	// i = 1;
-	soma += (x_1 - 0)*v[vi];
-
-	// i = 2
-	vi = 2;
-	if (x2<x_2) vi = 1;
-	soma += (x_2 - x_1)*v[vi];
-
-	return soma;
-
-}
-
-/* 
+/* raking algoritm
 Retorna o vetor de m 0's ou 1's
 */
-int * algorithm2(Grafo *g, float v[4]){
+int * algorithm2(Grafo *g, float v[4], float eplison){
 	pair<float, float> lambda = algorithm1(v);
 
 	cout<<lambda.first<<"   "<<lambda.second<<endl;
@@ -237,13 +174,155 @@ int * algorithm2(Grafo *g, float v[4]){
 		}
 		//cout<<lambda.first*xi.first+lambda.second*xi.second<<endl;
 		//cout<<w(lambda.first*xi.first+lambda.second*xi.second)<<endl;
-	} while (it != result.end() && w(lambda.first*xi.first+lambda.second*xi.second)<best);
+	} while (it != result.end() && !maiorIgualQuefloat((1+eplison)*w(lambda.first*xi.first+lambda.second*xi.second),best));
 	cout<<omegai<<"-ésima arvore encontrada"<<endl;
 	if (i>=k_best){
 		cout<<"*** ATENCAO : O ALGORITMO2 VARREU MAIS QUE AS "<<k_best<<" PRIMEIRAS MELHORES ARVORES; TALVEZ PRECISE AUMENTAR ESSE VALOR"<<endl;
 	}
 	cout<<best<<endl;
 	return Xbest;
+}
+
+int * LB(Grafo *g, float v[4], float &psiMin, float &lb){
+	pair<float, float> lambda = algorithm1(v);
+	int *f0 = new int[g->getQuantArestas()];
+	int *f1 = new int[g->getQuantArestas()];
+	int *f2 = new int[g->getQuantArestas()];
+	for (int i=0; i<g->getQuantArestas(); i++){
+		f0[i] = 0;
+		f1[i] = 0;
+		f2[i] = 0;
+	}
+	float custo = 0;
+	bool a1 = kruskal(g, f0, lambda.first,  lambda.second,custo, 3);
+	bool a2 = kruskal(g, f1, lambda.first,  lambda.second,custo, 1); // lambda indiferente
+	bool a3 = kruskal(g, f2, lambda.first,  lambda.second,custo, 2); // lambda indiferente
+	lb = INT_MAX;
+	if (a1 == true && a2==true && a3 == true){
+		pair<float, float> f0n = arvorePesos(f0, g->get_allArestas());
+		pair<float, float> f1n = arvorePesos(f1, g->get_allArestas());
+		pair<float, float> f2n = arvorePesos(f2, g->get_allArestas());
+		float psiwx = psi(f1n.first, f2n.second, v);
+		cout<<"\nf0 : ";
+		for (int i=0; i<g->getQuantArestas(); i++) cout<<f0[i]<<" ";
+		cout<<"\nf1 : ";
+		for (int i=0; i<g->getQuantArestas(); i++) cout<<f1[i]<<" ";
+		cout<<"\nf2 : ";
+		for (int i=0; i<g->getQuantArestas(); i++) cout<<f2[i]<<" ";
+		float wf0 = w(lambda.first*f0n.first + lambda.second*f0n.second);
+		if (maiorQuefloat(psiwx,wf0)) lb = psiwx;
+		else lb = wf0;
+
+
+		float melhor = psi(f1n.first, f1n.second, v);
+		int *bestT = f1;
+		float psiwv = psi(f2n.first, f2n.second, v);
+		if (!maiorIgualQuefloat(psiwv,melhor)) {
+			bestT = f2;
+			melhor = psiwv;
+		}
+		psiwv = psi(f0n.first, f0n.second, v);
+		if (!maiorIgualQuefloat(psiwv,melhor)) {
+			bestT = f0;
+			melhor = psiwv;
+		}
+		psiMin = melhor;
+		return bestT;
+
+	}
+		
+		
+	//cout<<"psiwx : "<<psiwx<<endl;
+	//cout<<"wf0 : "<<wf0<<endl;
+	// delete[] f1;
+	// delete[] f2;
+	// delete[] f0;
+	return NULL;
+}
+
+
+
+
+float BB_recursive(Grafo g, float UB, int in_size, int *resul, float v[4]){
+	/* Bounding here */
+	float auxUB;
+	float lb;
+	cout<<"\n\nUB = "<<UB<<" ";
+	int *bestT = LB(&g, v, auxUB,lb);
+	//cout<<"\nbestT : ";
+	//for (int i=0; i<g.getQuantArestas(); i++) cout<<bestT[i]<<" ";
+	
+	cout<<"\nLB = "<<lb<<endl;
+	for (int i=0; i<g.getQuantArestas(); i++) cout<<g.getStatus(i)<<" ";
+	cout<<endl;
+	if (!maiorQuefloat(lb, UB)){
+		cout<<in_size<<endl;
+		if (in_size == g.getQuantVertices() - 1){
+			float peso1 = 0, peso2 = 0;
+
+			for (int i=0; i<g.getQuantArestas(); i++){
+				if (g.getStatus(g.get_allArestas()[i]->getId()) == 1){
+
+					peso1 += g.get_allArestas()[i]->getPeso1();
+					peso2 += g.get_allArestas()[i]->getPeso2();
+					resul[g.get_allArestas()[i]->getId()] = 1;
+				}
+				else resul[g.get_allArestas()[i]->getId()] = 0;
+			}
+			UB = psi(peso1, peso2, v);
+			return UB;
+		} else if ((!equalfloat(lb, UB))){
+			pair<float, float> lambda = algorithm1(v);
+			/* Updating the incumbent */
+			if (!maiorIgualQuefloat(auxUB, UB)){ UB = auxUB;}
+			/* Branching */
+			//pair<float, float> lambda = algorithm1(v);
+			float min = INT_MAX;
+			int min_i;
+			cout<<endl;
+			for (int i=0; i<g.getQuantArestas(); i++){
+				if (bestT[i] == 1 && g.getStatus(g.get_allArestas()[i]->getId()) != 1 && g.getStatus(g.get_allArestas()[i]->getId()) != 2){ // se a aresta nao for nem obrigatoria nem proibida
+					float ll = (g.get_allArestas()[i]->getPeso1()*lambda.first + g.get_allArestas()[i]->getPeso2()*lambda.second);
+					cout<<min_i<<" "<<min<<" "<<ll<<endl;
+					if (!maiorIgualQuefloat(ll,min)){
+						min = ll;
+						min_i = g.get_allArestas()[i]->getId();
+					}
+				}
+			}
+			g.setStatus(min_i, 1); // seta a aresta como obrigatoria
+			float best = BB_recursive(g, UB, in_size+1, resul, v);
+			
+			if (!maiorIgualQuefloat(best,UB)) UB = best;
+
+			g.setStatus(min_i, 2); // seta a aresta como proibida
+			best = BB_recursive(g, UB, in_size, resul, v);
+			g.setStatus(min_i, 0); 
+			
+			//delete[] f1;
+
+			//delete[] f2;
+
+			if (!maiorIgualQuefloat(best,UB)) return best;
+			else return UB;
+		}
+	}
+	
+	return UB;
+	
+}
+
+int *BB(Grafo g, float v[4], float eplison){
+	int * first_tree = algorithm2(&g, v, eplison);
+	pair<float, float> f0n = arvorePesos(first_tree, g.get_allArestas());
+	float UB = psi(f0n.first,  f0n.second, v);
+	cout<<"\ninicial : ";
+	for (int i=0; i<g.getQuantArestas(); i++) cout<<first_tree[i]<<" ";
+	cout<<endl;
+	cout<<"UB inicial = "<<UB<<endl;
+	BB_recursive (g, UB, 0, first_tree, v);
+	return first_tree;
+
 }
 int main(){
 	int n, m;
@@ -279,12 +358,12 @@ int main(){
 	// list<int *> result;
 	// int cont;
 	// AllSpaningTree(&my_grafo, lambda.first, lambda.second, result, cont, 500);
-	int * arestas = algorithm2(&my_grafo, v);
+	int * arestas = BB(my_grafo, v, 0.6);//// algorithm2(&my_grafo, v,0.0);
 	// cout<<"Quantidade de arvores encontradas : "<<result.size()<<endl;
 	// for (std::list<int *>::iterator it = result.begin();  it != result.end(); ++it){
 	// 	int * arestas = *it;
 		for (int j=0; j<my_grafo.getQuantArestas(); j++){
-
+			
 			if (arestas[j] == 1){
 				cout<<my_grafo.get_allArestas()[j]->getOrigem()<<" ";
 				cout<<my_grafo.get_allArestas()[j]->getDestino()<<" ";
@@ -294,5 +373,6 @@ int main(){
 		}
 		cout<<endl;
 	// }
+
 	return 0;
 }

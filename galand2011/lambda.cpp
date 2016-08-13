@@ -84,3 +84,33 @@ pair<float , float> algorithm1(float v[4]){
 	return ret;
 	
 }
+
+
+/*
+ * w(x) = x^2
+ * w é a funçao nao utilitaria descrita em Galand et al (2010)
+ * Claro que se quisermos utilisar outra funçao, barta subistui-la
+ */
+float w(float x){
+	return x*x;
+}
+
+float psi(float x1, float x2, float v[4]){
+	x1 = w(x1);
+	x2 = w(x2);
+	float x_1 = x1 <= x2 ? x1 : x2 ; // x_(1)
+	float x_2 = x1 > x2 ? x1 : x2 ; // x_(2)
+	// assert (x_1 <= x_2)
+	float soma = 0;
+	int vi = 3;
+	// i = 1;
+	soma += (x_1 - 0)*v[vi];
+
+	// i = 2
+	vi = 2;
+	if (x2<x_2) vi = 1;
+	soma += (x_2 - x_1)*v[vi];
+
+	return soma;
+
+}
