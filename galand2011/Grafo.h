@@ -12,7 +12,7 @@ class Grafo{
 		Vertice **lista_vertices; /*Lista (fixa) de vértice. É um vetor de ponteiros. Cada vértice possui uma lista de arestas adjacentes.*/
 		map <int, Aresta *> lista_allArestas; /*lista de todas as arestas do Grafo. É um vetor de ponteiros*/
 		Aresta ** arestasPtr;
-		int particao[MAX1]; // vetor alocado dinamicamente no construtor. Size: quantidade de arestas 
+		int particao[MAX1]; // Size: quantidade de arestas 
 		/*Este vetor (partição) é construído e interpretado da seguinte maneira:
 			particao[i] = 0  ---> indica que a aresta de id=i é opcional (open)
 			particao[i] = 1  ---> indica que a aresta de id=i é obrigatória 
