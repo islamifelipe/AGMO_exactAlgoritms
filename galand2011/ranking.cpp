@@ -171,12 +171,10 @@ int * algorithm2(Grafo *g, float v[4], float eplison){
 			omegai = i;
 			best = psiwx;
 			Xbest = Xi;
-		} else {
-			//omegai = omegai_1;
-		}
+		} 
 		//cout<<lambda.first*xi.first+lambda.second*xi.second<<endl;
 		//cout<<w(lambda.first*xi.first+lambda.second*xi.second)<<endl;
-	} while (it != result.end() && !maiorIgualQuefloat((1+eplison)*w(lambda.first*xi.first+lambda.second*xi.second),best));
+	} while (it != result.end() && !maiorIgualQuefloat((1.0+eplison)*w(lambda.first*xi.first+lambda.second*xi.second),best));
 	cout<<omegai<<"-ésima arvore encontrada"<<endl;
 	if (i>=k_best){
 		cout<<"*** ATENCAO : O ALGORITMO2 VARREU MAIS QUE AS "<<k_best<<" PRIMEIRAS MELHORES ARVORES; TALVEZ PRECISE AUMENTAR ESSE VALOR"<<endl;
@@ -205,12 +203,7 @@ int * LB(Grafo *g, float v[4], float &psiMin, float &lb){
 		pair<float, float> f1n = arvorePesos(f1, g->get_allArestas());
 		pair<float, float> f2n = arvorePesos(f2, g->get_allArestas());
 		float psiwx = psi(f1n.first, f2n.second, v);
-		// cout<<"\nf0 : ";
-		// for (int i=0; i<g->getQuantArestas(); i++) cout<<f0[i]<<" ";
-		// cout<<"\nf1 : ";
-		// for (int i=0; i<g->getQuantArestas(); i++) cout<<f1[i]<<" ";
-		// cout<<"\nf2 : ";
-		// for (int i=0; i<g->getQuantArestas(); i++) cout<<f2[i]<<" ";
+		
 		float wf0 = w(lambda.first*f0n.first + lambda.second*f0n.second);
 		if (maiorQuefloat(psiwx,wf0)) lb = psiwx;
 		else lb = wf0;
@@ -240,17 +233,8 @@ int * LB(Grafo *g, float v[4], float &psiMin, float &lb){
 		
 	}
 		
-		
-	//cout<<"psiwx : "<<psiwx<<endl;
-	//cout<<"wf0 : "<<wf0<<endl;
-	// delete[] f1;
-	// delete[] f2;
-	// delete[] f0;
 	return NULL;
 }
-
-
-
 
 // float BB_recursive(Grafo g, float UB, int in_size, int *resul, float v[4]){
 // 	/* Bounding here */
@@ -332,21 +316,12 @@ int *BB(Grafo g, float v[4], float eplison){
 	float UB = psi(f0n.first,  f0n.second, v);
 	int in_size  = 0;
 	
-	//BB_recursive (g, UB, 0, first_tree, v);
-
-	/* Bounding here */
 	float auxUB;
 	float lb;
-	//cout<<"\n\nUB = "<<UB<<" ";
 	
-	//cout<<"\nbestT : ";
-	//for (int i=0; i<g.getQuantArestas(); i++) cout<<bestT[i]<<" ";
 	stack<pair <Grafo, int> >  pilha; // o grafo, e o in_size
 	stack<float> pilhaUB;
-	bool avanca = true;
-	//cout<<"\nLB = "<<lb<<endl;
-	//for (int i=0; i<g.getQuantArestas(); i++) cout<<g.getStatus(i)<<" ";
-	//cout<<endl;
+	
 	pair <Grafo, int> S0 = make_pair(g, 0);
 	pilha.push(S0);
 	pilhaUB.push(UB);
@@ -357,55 +332,45 @@ int *BB(Grafo g, float v[4], float eplison){
 		pilha.pop();
 		pilhaUB.pop();
 		float auxUB4;
-		g = s2.first;
-		//for (int i=0; i<g.getQuantArestas(); i++) cout<<g.getStatus(i)<<" ";
-		//cout<<endl;
+		Grafo g1 = s2.first;
 		in_size = s2.second;
-		cout<<in_size<<endl;
-		int *bestT = LB(&g, v, auxUB4,lb);
-		cout<<"UB = "<<UB<<endl;
-		cout<<"LB = "<<lb<<endl;
+		int *bestT = LB(&g1, v, auxUB4,lb);
 		if (!maiorQuefloat(lb, UB)){
-			float peso1 = 0, peso2 = 0;
-			if (in_size == g.getQuantVertices() - 1){
-				for (int i=0; i<g.getQuantArestas(); i++){
-					if (g.getStatus(g.get_allArestas()[i]->getId()) == 1){
+			if (in_size == g1.getQuantVertices() - 1){
+				float peso1 = 0, peso2 = 0;
+				for (int i=0; i<g1.getQuantArestas(); i++){
+					if (g1.getStatus(g1.get_allArestas()[i]->getId()) == 1){
 
-						peso1 += g.get_allArestas()[i]->getPeso1();
-						peso2 += g.get_allArestas()[i]->getPeso2();
-						first_tree[g.get_allArestas()[i]->getId()] = 1;
+						peso1 += g1.get_allArestas()[i]->getPeso1();
+						peso2 += g1.get_allArestas()[i]->getPeso2();
+						first_tree[g1.get_allArestas()[i]->getId()] = 1;
 					}
-					else first_tree[g.get_allArestas()[i]->getId()] = 0;
+					else first_tree[g1.get_allArestas()[i]->getId()] = 0;
 				}
-				float auxUB2 = psi(peso1, peso2, v);
-				if (auxUB2<UB) UB = auxUB2;
-				//pilha.pop();
+				UB = psi(peso1, peso2, v);
 			} else if ((!equalfloat(lb, UB))){
 				pair<float, float> lambda = algorithm1(v);
-				/* Updating the incumbent */
+				
 				if (!maiorIgualQuefloat(auxUB4, UB)){ UB = auxUB4;}
-				/* Branching */
+				
 				//pair<float, float> lambda = algorithm1(v);
 				float min = INT_MAX;
 				int min_i;
 
-				for (int i=0; i<g.getQuantArestas(); i++){
-					if (bestT[i] == 1 && g.getStatus(g.get_allArestas()[i]->getId()) != 1 && g.getStatus(g.get_allArestas()[i]->getId()) != 2){ // se a aresta nao for nem obrigatoria nem proibida
-						float ll = (g.get_allArestas()[i]->getPeso1()*lambda.first + g.get_allArestas()[i]->getPeso2()*lambda.second);
-						//cout<<min_i<<" "<<min<<" "<<ll<<endl;
+				for (int i=0; i<g1.getQuantArestas(); i++){
+					if (bestT[i] == 1 && g1.getStatus(g1.get_allArestas()[i]->getId()) != 1 && g1.getStatus(g1.get_allArestas()[i]->getId()) != 2){ // se a aresta nao for nem obrigatoria nem proibida
+						float ll = (g1.get_allArestas()[i]->getPeso1()*lambda.first + g1.get_allArestas()[i]->getPeso2()*lambda.second);
 						if (!maiorIgualQuefloat(ll,min)){
 							min = ll;
-							min_i = g.get_allArestas()[i]->getId();
+							min_i = g1.get_allArestas()[i]->getId();
 						}
 					}
 				}
 				
-				//for (int i=0; i<g.getQuantArestas(); i++) cout<<g.getStatus(i)<<" ";
-	
-				g.setStatus(min_i, 1); // seta a aresta como obrigatoria
-				pair <Grafo, int> avec = make_pair (g, in_size+1);
-				g.setStatus(min_i, 2); // seta a aresta como proibida
-				pair <Grafo, int> sans = make_pair (g, in_size);
+				g1.setStatus(min_i, 1); // seta a aresta como obrigatoria
+				pair <Grafo, int> avec = make_pair (g1, in_size+1);
+				g1.setStatus(min_i, 2); // seta a aresta como proibida
+				pair <Grafo, int> sans = make_pair (g1, in_size);
 				
 				pilha.push(sans);
 				pilhaUB.push(UB);
@@ -446,16 +411,7 @@ int main(){
 	}
 	my_grafo.gerarArestasPtr();
 	
-	// pair<float, float> lambda = algorithm1(v);
-
-	// cout<<lambda.first<<"   "<<lambda.second<<endl;
-	// list<int *> result;
-	// int cont;
-	// AllSpaningTree(&my_grafo, lambda.first, lambda.second, result, cont, 500);
-	int * arestas = BB(my_grafo, v, 0.3);//// algorithm2(&my_grafo, v,0.3);
-	// cout<<"Quantidade de arvores encontradas : "<<result.size()<<endl;
-	// for (std::list<int *>::iterator it = result.begin();  it != result.end(); ++it){
-	// 	int * arestas = *it;
+	int * arestas = BB(my_grafo, v, 0.4);//// algorithm2(&my_grafo, v,0.3);
 		for (int j=0; j<my_grafo.getQuantArestas(); j++){
 			
 			if (arestas[j] == 1){
