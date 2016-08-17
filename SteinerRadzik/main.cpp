@@ -130,7 +130,6 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 	bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
 	cont =1;
 	if (res){
-		cout<<"custoMinimo : "<<custoMinimo<<endl;
 		int contMSTs = MSTs.size();
 		MSTs.push_back(A);
 		List.insert(contMSTs, custoMinimo);
@@ -154,14 +153,7 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 			//cout<<"Size : "<<List.getSize()<<endl;
 			
 			List.extract();
-			//cout<<"Size : "<<List.getSize()<<endl;
-			if (id==0) {
-				float x, y;
-				getXandY(*it, g->get_allArestas(),x, y); 
-				cout<<"xl = "<<xl<<" yl = "<<yl<<" xll = "<<xll<<" yll = "<<yll<<endl;
-				cout<<"FFJFFFFFFFF ("<<x<<", "<<y<<") = "<<x*(yl-yll)+y*(xll-xl)<<endl;;
-		
-			}
+			
 			if (k_best>0){
 				resul.push_back(*it);
 				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
@@ -317,17 +309,16 @@ list<int*> phase1GM(Grafo *g){
 bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float x, float y){
 	bool retorno = false; // por default, o ponto nao está na regiao viavel 
 	//This check is done by a simple linear search through the list of the consecutive corner points defining the viable region.
-	cout<<"\nkbest = ("<<x<<"'"<<y<<")"<<endl;
+	//cout<<"\nkbest = ("<<x<<"'"<<y<<")"<<endl;
 	for (list< pair<float, float> >::iterator it = regiaoViavel.begin(); it!=regiaoViavel.end(); it++){
 		pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
 		float ponto_x = ponto.first, ponto_y = ponto.second;
 		/* o k_best_x deve ser menor que o ponto_x   E   o k_best_y deve ser menor que o ponto_y  
 		caso isso nao seja verdadeiro para nenhum ponto, entao o kbest nao está na regiao viavel*/ 
 
-		cout<<"corner = ("<<ponto_x<<"'"<<ponto_y<<")"<<endl;
+		//cout<<"corner = ("<<ponto_x<<"'"<<ponto_y<<")"<<endl;
 		
 		if (x<ponto_x && y<ponto_y){//caso o ponto esteja na regiao viavel, atualizamos-a imediatamente
-			cout<<"entrou"<<endl;
 			pair<float, float> ponto1 = make_pair(x, ponto_y);
 			pair<float, float> ponto2 = make_pair(ponto_x, y);
 			regiaoViavel.insert(it, ponto1);
@@ -379,23 +370,18 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		b = yq - a*xq; // coeficiente linear de p-q
 		pair<float, float> maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
 		//Agora determinamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
-		cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
+		//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
 		float bM;
 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 
 		list<int*> k_best_tree;
 		int contMST=0;  /*Futuramente necessários para dados estatísticos*/
 
-		AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, 400);  // k-best
-		cout<<"AllSpaningTree "<<endl;
-		cout<<"xl = "<<xp<<" yl = "<<yp<<" xll = "<<xq<<" yll = "<<yq<<endl;
+		AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, 10000);  // k-best
+		//cout<<"AllSpaningTree "<<endl;
+		//cout<<"xl = "<<xp<<" yl = "<<yp<<" xll = "<<xq<<" yll = "<<yq<<endl;
 				
-		for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
-			int* k_best = *kb_it;
-			float x, y;
-			getXandY(k_best, g->get_allArestas(),x, y); 
-			cout<<"("<<x<<", "<<y<<") = "<<x*(yp-yq)+y*(xq-xp)<<endl;;
-		}
+		
 		for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
 			int* k_best = *kb_it;
 			float x, y;
@@ -403,12 +389,11 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
 				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
-				cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
+				//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
 		
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
 				bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 			} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
-				cout<<"break"<<endl;
 				break;
 			}
 		}

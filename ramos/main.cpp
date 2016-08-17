@@ -193,7 +193,6 @@ list<int*> phase1GM(Grafo *g){
 # se verdeiro, atualiza a regiao viável
 */	
 bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float x, float y, list< pair<float, float> >::iterator &it){
-	bool retorno = false; // por default, o ponto (x,y) nao está na regiao viavel 
 	
 	for ( it = regiaoViavel.begin(); it!=regiaoViavel.end(); it++){
 		pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
@@ -203,11 +202,10 @@ bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float 
 		//cout<<"corner = ("<<ponto_x<<"'"<<ponto_y<<")"<<endl;
 		//cout<<"kbest = ("<<x<<"'"<<y<<")"<<endl;
 		if (x<ponto_x && y<ponto_y){//caso o ponto esteja na regiao viavel, atualizamos-a imediatamente
-			retorno = true;
-			break; // se o ponto está regiao viavel, nao há mais rezao para percorrer-la 
+			return true;
 		}
 	}
-	return retorno;
+	return false;
 }
 
 
@@ -221,6 +219,20 @@ pair<float, float> min_f_g(vector<Aresta*> adjacentes){ // retorna f barra e g b
 	pair<float, float> result = make_pair(f, g); //{x,y} <--> {f, g} 
 	return result;
 }
+
+void retiraDominadas(list<int*> &noSuportadas, int* T, Grafo *g){
+	
+	for (std::list<int*>::iterator it=noSuportadas.begin(); it != noSuportadas.end(); ++it){
+		if (t1_domina_t2(T, *it, g->get_allArestas())){
+			it = noSuportadas.erase(it);
+			it--;
+		} else if (t1_domina_t2(*it, T, g->get_allArestas())){
+			noSuportadas.remove(T);
+			return;
+		}
+	}
+}
+
 /* O parâmetro conjunto serve para detectar a formaçao de possíveis ciclo em T
 cada vertice de T, deve também pertencer ao conjunto.
 OBS.: na volta das chamadas recursivas, o conjunto deve readequirir seu estado anterior
@@ -228,7 +240,7 @@ ou seja, fora da chamada da funcao, o conjunto deve permanecer inalterado
 */
 void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list<int*> &noSuportadas, Conjunto conjunto, list< pair<float, float> > &regiaoViavel){
 	vector<Aresta*> Astep = g->getVertice(step)->getAdjacentes();
-
+	//cout<<fBound<<", "<<gBound<<endl;
 	for (int a=0; a<Astep.size(); a++){
 		Aresta *e = Astep[a];
 		//cout<<T[e->getId()]<<"   "<< conjunto.compare(e->getOrigem(), e->getDestino())<<endl;
@@ -244,10 +256,9 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list<int*>
 				copie = conjunto;
 				T_aux[e->getId()] = 1;
 				copie.union1(e->getOrigem(), e->getDestino());
-				
 				if (step+1 == g->getQuantVertices()-1){
 					noSuportadas.push_back(T_aux); // armazena T
-					// TODO :  remove any solutions dominated by T
+					retiraDominadas(noSuportadas, T_aux, g); //remove any solutions dominated by T
 					
 					// atualiza a regiao viavel
 					pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
