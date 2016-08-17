@@ -31,6 +31,7 @@ class Grafo{
 		int getQuantVertices();
 		int getStatus(int i);
 		void setStatus(int i, int valor);
+		Grafo& operator=( Grafo& d);
 
 };
 

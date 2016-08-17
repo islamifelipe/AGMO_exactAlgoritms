@@ -53,3 +53,13 @@ int Grafo::getStatus(int i){
 void Grafo::setStatus(int i, int valor){
 	particao[i] = valor;
 }
+
+Grafo& Grafo::operator=( Grafo& d){
+	
+	if (this == &d) return *this;
+	//n = d.getQuantVertices();
+	for (int i=0; i<lista_allArestas.size(); i++){
+		particao[i] = d.getStatus(i);
+	}
+	return *this;
+}

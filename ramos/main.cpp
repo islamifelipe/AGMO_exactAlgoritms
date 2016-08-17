@@ -70,6 +70,7 @@ void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
 	}
 }
 
+
 void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
 	/* it = interator da lista
 	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
@@ -79,35 +80,89 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 	int *s1 = sl;
 	int *s2 = sll;
 	int * A2;
-	stack<int* >  pilha;
-	bool avanca = true;
+	stack<pair<int*,int*> >  pilha;
+	stack<pair<int,list<int*>::iterator> >  pilhaIt; // 1 : antes ; 2 : depois
 	float xl, yl, xll, yll;
-	do{
+
+	pilha.push(make_pair(s1, s2));
+	pilhaIt.push(make_pair(2, resul.begin()));
+
+
+	while (pilha.size()!=0){
+		pair<int*,int*> sols = pilha.top();
+		pilha.pop();
+		s1 = sols.first;
+		s2 = sols.second;
+		pair<int,list<int*>::iterator> it = pilhaIt.top();
+		pilhaIt.pop();
+
 		getXandY(s1, g->get_allArestas(), xl, yl);
 		getXandY(s2, g->get_allArestas(), xll, yll);
 		A2 = new int[g->getQuantArestas()];
+		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
 		float cont; // nao utilisazado nesse caso
 		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
-		
+		//cout<<pilha.size()<<endl;
 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
-			pilha.push(s2);
-			s2 = A2;
-			avanca = true;
-		} else {
-			if (pilha.size()==0){ //se pilha está fazia
-				avanca = false;
-			} else {
-				avanca = true;
-				s1 = s2;
-				resul.push_back(s2);
-				s2 = pilha.top();
-				pilha.pop();
+			if (it.first == 1){ // antes
+				resul.insert(it.second, A2); 
+				it.second--;// it agora aponta para o item  A2
+			} else if (it.first == 2) { // depois
+				it.second++;
+				resul.insert(it.second, A2);
+				it.second--;// it agora aponta para o item  A2
 			}
-			//delete[] A2;
-		}	
-	} while (avanca);
+
+			pilha.push(make_pair(A2, s2)); // L''
+			pilhaIt.push(make_pair(2,it.second)); 
+			pilha.push(make_pair(s1, A2));  // L'
+			pilhaIt.push(make_pair(1,it.second)); 
+			
+		}
+	
+	}
 }
 
+
+// void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
+// 	/* it = interator da lista
+// 	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
+// 	* sl = s'
+// 	* sll = s''
+// 	**/
+// 	int *s1 = sl;
+// 	int *s2 = sll;
+// 	int * A2;
+// 	stack<int* >  pilha;
+// 	bool avanca = true;
+// 	float xl, yl, xll, yll;
+// 	do{
+// 		getXandY(s1, g->get_allArestas(), xl, yl);
+// 		getXandY(s2, g->get_allArestas(), xll, yll);
+// 		A2 = new int[g->getQuantArestas()];
+// 		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
+// 		float cont; // nao utilisazado nesse caso
+// 		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
+		
+// 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
+// 			pilha.push(s2);
+// 			s2 = A2;
+// 			avanca = true;
+// 		} else {
+// 			if (pilha.size()==0){ //se pilha está fazia
+// 				avanca = false;
+// 			} else {
+// 				avanca = true;
+// 				s1 = s2;
+// 				resul.push_back(s2);
+// 				s2 = pilha.top();
+// 				pilha.pop();
+// 				//if (pilha.size()==0) avanca = false;
+// 			}
+// 			//delete[] A2;
+// 		}	
+// 	} while (avanca);
+// }
 
 /*
 #### Primeira fase ####
@@ -119,10 +174,12 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 list<int*> phase1GM(Grafo *g){
 	list<int*> result;
 	int *s1 = new int[g->getQuantArestas()];
+	for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
 	float cont; // nao utilisazado nesse caso
 	kruskal(g, s1, 0, 0, 0, 0,cont, 1); // arvore para o primeiro objetivo
 	result.push_back(s1);
 	int* s2 = new int[g->getQuantArestas()];
+	for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
 	kruskal(g, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
 	list<int*>::iterator it = result.end();
 	if (isEgalObjetive(s1, s2,g->get_allArestas())==false){
@@ -221,6 +278,7 @@ list<int*> efficientBiobjectiveSTinENB(Grafo *g, list<int*> extremas){
 		gBound+= fg.second;
 	}
 	int *T = new int[g->getQuantArestas()];
+	for (int i=0; i<g->getQuantArestas(); i++) T[i] = 0;
 	list<int*> noSuportadas;
 	Conjunto conjunto(g->getQuantVertices());
 	// Calcular a regiao viavel inicial (delimitada somente pelos pontos suportados)
@@ -281,35 +339,41 @@ int main(){
    cout<<"Resultado \n SUPORTADAS"<<endl;
     for (list<int*>::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		cout<<"Arvore "<<i<<endl;
+    	float cont1 = 0, cont2 = 0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 		
 			if ((*it)[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
-    	cout<<endl;
+    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
     	i++;
 	}
 
-	cout<<"\nNAO SUPORTADAS"<<endl;
-    for (list<int*>::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
+	cout<<"Nao Suportada"<<endl;
+
+	for (list<int*>::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
 		cout<<"Arvore "<<i<<endl;
+		float cont1 = 0, cont2 = 0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 		
 			if ((*it)[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
+				
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
-    	
-    	cout<<endl;
+    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
     	i++;
 	}
-
 	return 0;
 }

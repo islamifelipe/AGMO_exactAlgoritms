@@ -23,6 +23,7 @@
 #include <utility>      // std::pair
 #include "Grafo.h"
 #include <cmath>
+#include "Conjunto.h"
 using namespace std;
 
 
@@ -49,14 +50,13 @@ bool atendeCriterios(int size, int *solucao, map<int, float*> criterios){
 		for (int j =0; j<size-1; j++){ // para cada variavel (aresta) 
 			sum += solucao[j]*criterios[i][j]; 
 		}
-		cout<<sum<<endl;
 		if (!(sum >= criterios[i][size-1])) return false; // esse >= é padrao para o caso particular da AGM-bi e para todos os critérios adcionados a cada iteracao (segundo Lokman and Koksalan)
 	}
 	return true;
 }
 
 //retorna a solucao que *** maximiza *** o modelo pnm 
-int *branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float> > objetivo){
+pair <bool, int *>branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float> > objetivo){
 	/* IMPORTANTE : 
 	Lokman and Koksalan trantam do problema de maximizacao. 
 	Como a AGM-Bi é de minimizacao, esta funcao BB supõe que os coeficientes da funcao objetivo foram todos multiplicado por -1
@@ -72,6 +72,8 @@ int *branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float
 
 	stack< pair<int, float > > nivelUB; // int = nivel da arvore de busca; float : valor de UB
 	
+	stack< Conjunto > ciclo; // cada (sub)arvore terá um registro dos seus vertices para que possamos verificar os ciclos  
+	Conjunto conjunto(g.getQuantVertices());
 	int *melhorSolucao = new int[g.getQuantArestas()];
 	int *sol = new int[g.getQuantArestas()];
 	for (int j=0; j<g.getQuantArestas(); j++) {
@@ -80,7 +82,8 @@ int *branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float
 	}
 	pilha.push(make_pair(0, sol));
 	nivelUB.push(make_pair(0,UB));
-	
+	ciclo.push(conjunto);
+	bool ok = false;
 	while (pilha.size()!=0){
 		pair<int, float > nivelUBp = nivelUB.top();
 		nivelUB.pop();
@@ -90,6 +93,8 @@ int *branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float
 		pilha.pop();
 		int sizeSolucao = s.first;
 		int* solucao = s.second;
+		conjunto = ciclo.top();
+		ciclo.pop();
 		
 		/*estimando UB : pega os maiores coeficientes de cuja variavais sao diferente de 1*/
 		int cont=sizeSolucao;
@@ -101,16 +106,14 @@ int *branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float
 			}
 		}
 
-		if (UBestimado>LB){ // senao, poda...
-			cout<<"Aqui1"<<endl;
+		if (UBestimado>LB){ // senao, poda..
 			if (sizeSolucao == g.getQuantVertices()-1 && atendeCriterios(g.getQuantArestas()+1, solucao, criterios)){ // solucao otima por momento
-				cout<<"Aqui2"<<endl;
 				LB = UBestimado;
 				for (int j=0; j<g.getQuantArestas(); j++) melhorSolucao[j] = solucao[j];
+				ok = true;
 			} else{
-				cout<<nivel<<endl;
 				if ( nivel<g.getQuantArestas()) { // veficiamos se os criterios sao atendiddos
-					cout<<"Aqui4"<<endl;
+					
 					/* a cada iteracao, verificamos a aresta que tem id = nivel*/
 					int *avec = new int[g.getQuantArestas()];
 					int *sans = new int[g.getQuantArestas()];
@@ -120,37 +123,32 @@ int *branchAndBound(Grafo &g, map<int, float*> criterios, vector< pair<int,float
 						avec[j] = solucao[j];
 						sans[j] = solucao[j];
 					}
-					avec[nivel] = 1;
+
 					sans[nivel] = 0;
 					nivelUB.push(make_pair(nivel+1, UBaux)); // sans
 					pilha.push(make_pair(sizeSolucao, sans)); //sans
+					Conjunto c_avec(g.getQuantVertices());
+					c_avec = conjunto;
+					ciclo.push(conjunto);
 
-					nivelUB.push(make_pair(nivel+1, UBaux+coef)); // avec
-					pilha.push(make_pair(sizeSolucao+1, avec)); // avec
+					if (!c_avec.compare(g.get_allArestas()[nivel]->getOrigem(),g.get_allArestas()[nivel]->getDestino())){
+						
+						avec[nivel] = 1;
+						c_avec.union1(g.get_allArestas()[nivel]->getOrigem(),g.get_allArestas()[nivel]->getDestino());
+						ciclo.push(c_avec);
+						nivelUB.push(make_pair(nivel+1, UBaux+coef)); // avec
+						pilha.push(make_pair(sizeSolucao+1, avec)); // avec
+
+					}
 
 				}
 				 // se nao atende aos critérios, o presente nó de busca nao é expandido
 			}
 		}
+		//conjunto.desaloca();
 		delete[] solucao;
 	}
-
-	return melhorSolucao;
-}
-
-map<int, float*> initialization(Grafo &g){
-	map<int, float*> criterios; // embora no inicio os coeficientes sejam inteiros (0 ou 1), depois outros critérios serao adicionandos com coneficientes reais
-	for (int i=0; i<g.getQuantVertices(); i++){
-		float *vi = new float[g.getQuantArestas()+1]; // a1 ... am >= 1 onde m = |E|
-		Vertice *v = g.getVertice(i);
-		for (int j=0; j<g.getQuantArestas()+1; j++) vi[j] = 0.0;
-		for (int j=0; j<v->getGrau(); j++){
-			vi[v->getAresta(j)->getId()] = 1.0;
-		}
-		vi[g.getQuantArestas()] = 1;
-		criterios[i] = vi;
-	}
-	return criterios;
+	return make_pair(ok, melhorSolucao);
 }
 
 
@@ -165,6 +163,43 @@ vector < pair<int,float> > getObjectiveFonction(Grafo &g, float epslon){ // cons
 	return objetivo;
 
 }
+
+/* 
+* Algoritmo 1 de Lokman and Koksalan 	
+*/
+vector <int *> algorithm1(Grafo &g,map<int, float*> criterios, vector< pair<int,float> > objetivo){
+	vector <int *> resul;
+
+	map <int, Aresta *> arestas = g.get_allArestas();
+	pair<bool, int *> sol;
+	do{
+		sol = branchAndBound(g, criterios, objetivo);
+		if (sol.first == true){
+			resul.push_back(sol.second);
+			int novo = criterios.size();
+			criterios[novo] = new float[g.getQuantArestas()+1];
+			float sum = 1;
+			for (int j=0; j<g.getQuantArestas(); j++){
+				criterios[novo][j] = arestas[j]->getPeso1()*(-1); // como m = 2, entao j ! = 2
+				sum+=((arestas[j]->getPeso1()*sol.second[j])*(-1));
+				
+			}
+			criterios[novo][g.getQuantArestas()] = sum;
+			
+			// for (int i=0; i<criterios.size(); i++){ // para cada critério
+			// 	cout<<i<<" = "<<criterios[i]<<endl;
+			// 	for (int j=0; j<g.getQuantArestas(); j++){ // para cada variavel (aresta) 
+			// 		cout<<criterios[i][j]<<" ";
+			// 	}
+			// 	cout<<criterios[i][g.getQuantArestas()]<<endl;
+			// }
+			// cout<<endl;
+
+		}
+	}while(sol.first == true);
+	return resul;
+} 
+
 int main(){
 	int n;
 	float peso1, peso2;
@@ -195,21 +230,18 @@ int main(){
     vector < pair<int,float> > objetivo = getObjectiveFonction(my_grafo, epslon); 
     // por que um vector de pair? porque o int deve ser o id do coeficiente (igual ao id da aresta) e o float é peso da aresta + epson (ou seja, o coeficiente propriamente dito)
 
-	criterios = initialization(my_grafo);
-
 	std::sort (objetivo.begin(), objetivo.end(), comp); // O(nlogn)
-	// for (int j=0; j<my_grafo.getQuantArestas(); j++){
-	// 	cout<<"("<< objetivo[j].first<<", "<< objetivo[j].second<<") ";
-	// }
-	// cout<<endl;
+	
+	 vector<int *> sol = algorithm1(my_grafo, criterios, objetivo);
+    
 
-	int *sol = branchAndBound(my_grafo, criterios, objetivo);
-
-
-	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    	
+	 cout<<"Finalizado!! Resultado : "<<endl;
+	 map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
+    for (int k = 0; k < sol.size(); k++){ // cada arvore formada
+    	int *arestas  = sol[k]; 
+    	cout<<"Arvore "<<k+1<<endl;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-			if (sol[a] == 1){
+			if (arestas[a] == 1){
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
@@ -217,22 +249,6 @@ int main(){
     		}   
     	}
     	cout<<endl;
-    
-
-
-   //  for (int k = 1; k <= m[n]; k++){ // cada arvore formada
-   //  	int *arestas  = A[n][k]; 
-   //  	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-   //  	cout<<"Arvore "<<k<<endl;
-   //  	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-			// if (arestas[a] == 1){
-   //  			cout<<arestasPtr[a]->getOrigem() << " ";
-   //  			cout<<arestasPtr[a]->getDestino() << " ";
-   //  			cout<<arestasPtr[a]->getPeso1() << " ";
-   //  			cout<<arestasPtr[a]->getPeso2() << endl;
-   //  		}   
-   //  	}
-   //  	cout<<endl;
-   //  }
+    }
 	return 0;
 }

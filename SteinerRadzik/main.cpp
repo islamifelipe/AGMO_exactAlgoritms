@@ -94,11 +94,13 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
 				//A2 = new Aresta*[P.getQuantVertices()-1];
 				A2 = new int[allArestas.size()];
+				for(int mmm = 0; mmm<allArestas.size(); mmm++) A2[mmm] = 0;
 				P1.setStatus(a->getId(), 2); /*proibida*/
 				P2.setStatus(a->getId(), 1); /*obrigatória*/
 				
-				//custo=0;cout<<"Antes1"<<endl;
+				custo=0;//cout<<"Antes1"<<endl;
 				res = kruskal(&P1, A2, xl, yl, xll, yll,custo, 3);
+
 				cont++; 
 				if (res){
 					int quantMSTs = MSTs.size();
@@ -118,6 +120,8 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 
 int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, int k_best){ 
 	int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
+	for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
+				
 	list<int*> MSTs; // usada para lista de árvores
 	float custoMinimo =0, x=0, y=0;
 	Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
@@ -126,6 +130,7 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 	bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
 	cont =1;
 	if (res){
+		cout<<"custoMinimo : "<<custoMinimo<<endl;
 		int contMSTs = MSTs.size();
 		MSTs.push_back(A);
 		List.insert(contMSTs, custoMinimo);
@@ -136,22 +141,31 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 			int id = List.getId();
 			//ElementGrafo *init = vetorParticoes->getInit();
 			//ElementArvore *initArvore = MSTs->getInit();
-			list<int*>::iterator it;
+			list<int*>::iterator it = MSTs.begin();
 			list<Grafo>::iterator itg = vetorParticoes.begin();
 			int k=0;
-			for (it=MSTs.begin(); k<id; ++it){
-				k++;
+			while (k<id && k<MSTs.size()){
+				it++;
 				itg++;
+				k++;
 			}
+			
 			Grafo Ps = *itg;
 			//cout<<"Size : "<<List.getSize()<<endl;
 			
 			List.extract();
 			//cout<<"Size : "<<List.getSize()<<endl;
-			
+			if (id==0) {
+				float x, y;
+				getXandY(*it, g->get_allArestas(),x, y); 
+				cout<<"xl = "<<xl<<" yl = "<<yl<<" xll = "<<xll<<" yll = "<<yll<<endl;
+				cout<<"FFJFFFFFFFF ("<<x<<", "<<y<<") = "<<x*(yl-yll)+y*(xll-xl)<<endl;;
+		
+			}
 			if (k_best>0){
-				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
 				resul.push_back(*it);
+				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
+				
 			}
 			k_best--;
 			
@@ -176,6 +190,7 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 /// END ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 
+
 void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
 	/* it = interator da lista
 	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
@@ -185,34 +200,90 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 	int *s1 = sl;
 	int *s2 = sll;
 	int * A2;
-	stack<int* >  pilha;
-	bool avanca = true;
+	stack<pair<int*,int*> >  pilha;
+	stack<pair<int,list<int*>::iterator> >  pilhaIt; // 1 : antes ; 2 : depois
 	float xl, yl, xll, yll;
-	do{
+
+	pilha.push(make_pair(s1, s2));
+	pilhaIt.push(make_pair(2, resul.begin()));
+
+
+	while (pilha.size()!=0){
+		pair<int*,int*> sols = pilha.top();
+		pilha.pop();
+		s1 = sols.first;
+		s2 = sols.second;
+		pair<int,list<int*>::iterator> it = pilhaIt.top();
+		pilhaIt.pop();
+
 		getXandY(s1, g->get_allArestas(), xl, yl);
 		getXandY(s2, g->get_allArestas(), xll, yll);
 		A2 = new int[g->getQuantArestas()];
+		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
 		float cont; // nao utilisazado nesse caso
 		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
-		
+		//cout<<pilha.size()<<endl;
 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
-			pilha.push(s2);
-			s2 = A2;
-			avanca = true;
-		} else {
-			if (pilha.size()==0){ //se pilha está fazia
-				avanca = false;
-			} else {
-				avanca = true;
-				s1 = s2;
-				resul.push_back(s2);
-				s2 = pilha.top();
-				pilha.pop();
+			if (it.first == 1){ // antes
+				resul.insert(it.second, A2); 
+				it.second--;// it agora aponta para o item  A2
+			} else if (it.first == 2) { // depois
+				it.second++;
+				resul.insert(it.second, A2);
+				it.second--;// it agora aponta para o item  A2
 			}
-			//delete[] A2;
-		}	
-	} while (avanca);
+
+			pilha.push(make_pair(A2, s2)); // L''
+			pilhaIt.push(make_pair(2,it.second)); 
+			pilha.push(make_pair(s1, A2));  // L'
+			pilhaIt.push(make_pair(1,it.second)); 
+			
+		}
+	
+	}
 }
+
+
+
+// void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
+// 	/* it = interator da lista
+// 	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
+// 	* sl = s'
+// 	* sll = s''
+// 	**/
+// 	int *s1 = sl;
+// 	int *s2 = sll;
+// 	int * A2;
+// 	stack<int* >  pilha;
+// 	bool avanca = true;
+// 	float xl, yl, xll, yll;
+// 	do{
+// 		getXandY(s1, g->get_allArestas(), xl, yl);
+// 		getXandY(s2, g->get_allArestas(), xll, yll);
+// 		A2 = new int[g->getQuantArestas()];
+// 		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
+// 		float cont; // nao utilisazado nesse caso
+// 		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
+// 		//cout<<pilha.size()<<endl;
+// 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
+// 			pilha.push(s2);
+// 			s2 = A2;
+// 			avanca = true;
+// 		} else {
+// 			if (pilha.size()==0){ //se pilha está fazia
+// 				avanca = false;
+// 			} else {
+// 				avanca = true;
+// 				s1 = s2;
+// 				resul.push_back(s2);
+// 				s2 = pilha.top();
+// 				pilha.pop();
+// 				//if (pilha.size()==0) avanca = false;
+// 			}
+// 			//delete[] A2;
+// 		}	
+// 	} while (avanca);
+// }
 
 
 /*
@@ -225,10 +296,12 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 list<int*> phase1GM(Grafo *g){
 	list<int*> result;
 	int *s1 = new int[g->getQuantArestas()];
+	for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
 	float cont; // nao utilisazado nesse caso
 	kruskal(g, s1, 0, 0, 0, 0,cont, 1); // arvore para o primeiro objetivo
 	result.push_back(s1);
 	int* s2 = new int[g->getQuantArestas()];
+	for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
 	kruskal(g, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
 	list<int*>::iterator it = result.end();
 	if (isEgalObjetive(s1, s2,g->get_allArestas())==false){
@@ -244,14 +317,17 @@ list<int*> phase1GM(Grafo *g){
 bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float x, float y){
 	bool retorno = false; // por default, o ponto nao está na regiao viavel 
 	//This check is done by a simple linear search through the list of the consecutive corner points defining the viable region.
+	cout<<"\nkbest = ("<<x<<"'"<<y<<")"<<endl;
 	for (list< pair<float, float> >::iterator it = regiaoViavel.begin(); it!=regiaoViavel.end(); it++){
 		pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
 		float ponto_x = ponto.first, ponto_y = ponto.second;
 		/* o k_best_x deve ser menor que o ponto_x   E   o k_best_y deve ser menor que o ponto_y  
 		caso isso nao seja verdadeiro para nenhum ponto, entao o kbest nao está na regiao viavel*/ 
-		//cout<<"corner = ("<<ponto_x<<"'"<<ponto_y<<")"<<endl;
-		//cout<<"kbest = ("<<x<<"'"<<y<<")"<<endl;
+
+		cout<<"corner = ("<<ponto_x<<"'"<<ponto_y<<")"<<endl;
+		
 		if (x<ponto_x && y<ponto_y){//caso o ponto esteja na regiao viavel, atualizamos-a imediatamente
+			cout<<"entrou"<<endl;
 			pair<float, float> ponto1 = make_pair(x, ponto_y);
 			pair<float, float> ponto2 = make_pair(ponto_x, y);
 			regiaoViavel.insert(it, ponto1);
@@ -284,7 +360,6 @@ Assim, teremos separadas as solucoes suportadas e nao suportadas
 */
 list<int*> phase2KB(Grafo *g, list<int*> extremas){
 	list<int*> noSoportadas; // resultado a ser retornado
-	list< pair<float, float> > regiaoViavel; // lista de pontos que delimitam a regiao viável.
 	list<int*>::iterator it = extremas.begin(); 
 	int contador = 0;
 	int size = extremas.size();
@@ -292,6 +367,8 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		int *p = *(it); 
 		int *q = *(++it);
 		float yp, yq, xp, xq;
+		list< pair<float, float> > regiaoViavel; // lista de pontos que delimitam a regiao viável.
+	
 		getXandY(p, g->get_allArestas(),xp, yp); // p
 	 	getXandY(q, g->get_allArestas(), xq, yq);	 //q
 		regiaoViavel.push_back( make_pair(xq, yp));// inicialmente, a regiao viável é composta por um unico ponto (o âgulo reto do triângulo cuja hipotenusa é a reta entre p-q -- ver algoritmo origial)
@@ -302,14 +379,23 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		b = yq - a*xq; // coeficiente linear de p-q
 		pair<float, float> maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
 		//Agora determinamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
+		cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
 		float bM;
 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 
 		list<int*> k_best_tree;
 		int contMST=0;  /*Futuramente necessários para dados estatísticos*/
 
-		AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, 100);  // k-best
-		
+		AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, 400);  // k-best
+		cout<<"AllSpaningTree "<<endl;
+		cout<<"xl = "<<xp<<" yl = "<<yp<<" xll = "<<xq<<" yll = "<<yq<<endl;
+				
+		for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
+			int* k_best = *kb_it;
+			float x, y;
+			getXandY(k_best, g->get_allArestas(),x, y); 
+			cout<<"("<<x<<", "<<y<<") = "<<x*(yp-yq)+y*(xq-xp)<<endl;;
+		}
 		for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
 			int* k_best = *kb_it;
 			float x, y;
@@ -317,9 +403,12 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
 				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
+				cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
+		
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
 				bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 			} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
+				cout<<"break"<<endl;
 				break;
 			}
 		}
@@ -355,7 +444,7 @@ int main(){
 
 	list<int*> arvores = phase1GM(&my_grafo);
 	cout<<"Fim da primeira fase ... "<<endl;
-	list<int*> noSuportadas= phase2KB(&my_grafo, arvores);
+	list<int*> noSuportadas = phase2KB(&my_grafo, arvores);
 	cout<<"Fim da segunda fase ... "<<endl;
 	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     
@@ -367,16 +456,19 @@ int main(){
    cout<<"Resultado \n SUPORTADAS"<<endl;
     for (list<int*>::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		cout<<"Arvore "<<i<<endl;
+    	float cont1 = 0, cont2 = 0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 		
 			if ((*it)[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
-    	cout<<endl;
+    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
     	i++;
 	}
 
@@ -384,16 +476,20 @@ int main(){
 
 	for (list<int*>::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
 		cout<<"Arvore "<<i<<endl;
+		float cont1 = 0, cont2 = 0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 		
 			if ((*it)[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
+				
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
-    	cout<<endl;
+    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
     	i++;
 	}
 	return 0;
