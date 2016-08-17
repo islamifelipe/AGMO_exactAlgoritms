@@ -121,6 +121,7 @@ int main(){
 
 
      X[1][1] = new int[n];
+     for (int mmm=0; mmm<n; mmm++)X[1][1][mmm] = 0; // by felipe
      X[1][1][0] = 1; 
      /* primeiro inidce r = 1 
         segundo indice k = 1
@@ -128,6 +129,7 @@ int main(){
      */ 
 
     A[1][1] = new int[nA];
+    for (int mmm=0; mmm<nA; mmm++)A[1][1][mmm] = 0; // by felipe
 
     for (int r = 1; r<n; r++){
     	map<int, int* > Wr; 
@@ -172,15 +174,22 @@ int main(){
 								m[r+1]-=1;
 							} else if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
 								m[r+1]-=1;
-							} /*else if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){//Necessario?
-								int *aux = A[r+1][k]; // a dominada vai pra ultima posicao
+							} else if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
+								//cout<<"AQQQQQQQQQQQQQQQUUUUUUUUIIIII"<<endl;
+								for (int mmm=k; mmm<m[r+1]; mmm++){
+									A[r+1][mmm] = A[r+1][mmm+1];
+									X[r+1][mmm] = X[r+1][mmm+1];
+								}
+								m[r+1]-=1;
+								k--;
+								/*int *aux = A[r+1][k]; // a dominada vai pra ultima posicao
 								A[r+1][k] = A[r+1][m[r+1]-1];
 								A[r+1][m[r+1]-1] = A[r+1][m[r+1]];
 								A[r+1][m[r+1]] = aux;
 								// se a nova arvore (parcial) domina alguma ja encontrada, entao, transferimos a dominada para a posicao m[r+1]
 								m[r+1]-=1;
-								k--;
-							}*/
+								k--;*/
+							}
 
 						}
 					}
@@ -190,16 +199,20 @@ int main(){
     }
     for (int k = 1; k <= m[n]; k++){ // cada arvore formada
     	int *arestas  = A[n][k]; 
+    	float cont1 = 0, cont2 = 0;
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     	cout<<"Arvore "<<k<<endl;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 			if (arestas[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
+    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
     	cout<<endl;
     }
 	return 0;
