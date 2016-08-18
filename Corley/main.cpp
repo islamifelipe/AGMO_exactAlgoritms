@@ -169,28 +169,28 @@ int main(){
 					X[r+1][m[r+1]][q] = 1;
 					A[r+1][m[r+1]][j] = 1;
 					if (m[r+1] != 1){ //precisa incluir um teste de dominância nos testes em k do passo 6
+						bool l = false;
 						for (int k = 1; k<=m[r+1]-1; k++){
 							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
 								m[r+1]-=1;
-							} else if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
+								l = true;
+								break;
+							} else if (r+1 == n && t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
 								m[r+1]-=1;
-							} else if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
-								//cout<<"AQQQQQQQQQQQQQQQUUUUUUUUIIIII"<<endl;
+								l = true;
+								break;
+							}
+						}
+
+						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
+						 	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
 								for (int mmm=k; mmm<m[r+1]; mmm++){
 									A[r+1][mmm] = A[r+1][mmm+1];
 									X[r+1][mmm] = X[r+1][mmm+1];
 								}
 								m[r+1]-=1;
 								k--;
-								/*int *aux = A[r+1][k]; // a dominada vai pra ultima posicao
-								A[r+1][k] = A[r+1][m[r+1]-1];
-								A[r+1][m[r+1]-1] = A[r+1][m[r+1]];
-								A[r+1][m[r+1]] = aux;
-								// se a nova arvore (parcial) domina alguma ja encontrada, entao, transferimos a dominada para a posicao m[r+1]
-								m[r+1]-=1;
-								k--;*/
 							}
-
 						}
 					}
 	     		}
