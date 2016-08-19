@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o Conjunto.o algoritm1
+all: Aresta.o Vertice.o Grafo.o Conjunto.o Heap.o algoritm1 lokmanKoksalanWithBB
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -12,10 +12,18 @@ Grafo.o : Grafo.cpp Grafo.h
 	
 Conjunto.o : Conjunto.cpp Conjunto.h
 	g++ -g -c Conjunto.cpp
+
+Heap.o : Heap.cpp Heap.h
+	g++ -g -c Heap.cpp
 	
 lokmanKoksalan.o : lokmanKoksalan.cpp
 	g++ -g -c  lokmanKoksalan.cpp
+
+lokmanKoksalanWithBB.o : lokmanKoksalanWithBB.cpp
+	g++ -g -c lokmanKoksalanWithBB.cpp
 		
-algoritm1 : lokmanKoksalan.o  Grafo.o Vertice.o Aresta.o  Conjunto.o 
-	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o lokmanKoksalan.o -lm -o algoritm1
-	
+algoritm1 : lokmanKoksalan.o  Grafo.o Vertice.o Aresta.o  Heap.o Conjunto.o 
+	g++ -g  Aresta.o  Vertice.o Grafo.o Heap.o Conjunto.o  lokmanKoksalan.o -lm -o algoritm1
+
+lokmanKoksalanWithBB : lokmanKoksalanWithBB.o  Grafo.o Vertice.o Aresta.o  Conjunto.o
+	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o lokmanKoksalanWithBB.o -lm -o lokmanKoksalanWithBB
