@@ -5,7 +5,8 @@
 
 using namespace std;
 
-Conjunto::Conjunto(int n){
+Conjunto::Conjunto(int n1){
+	n = n1;
 	pai = new int[n+1];
 	ordem = new int[n+1];
 	for (int i=0; i<=n; i++){
@@ -56,7 +57,6 @@ void Conjunto::desaloca(){
 	delete[] ordem;
 }
 
-
 int* Conjunto::getPai(){
 	return pai;
 }
@@ -81,4 +81,5 @@ Conjunto& Conjunto::operator=( Conjunto& d){
 
 	return *this;
 }
+
 

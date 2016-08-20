@@ -16,30 +16,7 @@
 #include "Grafo.h"
 using namespace std;
 
-bool isEgal(int *t1, int *t2, int size){
-	for (int i=0; i<size; i++){
-		if (t1[i]!=t2[i]) return false;
-	}
-	return true;
-}
 
-
-
-// /* Usada para subtrair um vertice v do grafo relacao, bem como seus graus de chegada e saida
-// */
-// void subtrai(Grafo *relacao,int *grausChegada, int v){
-// 	grausChegada[v] = -1;
-// 	Vertice *vertice = relacao->getVertice(v);
-// 	for (int i=0; i<vertice->getGrau(); i++){
-// 		Aresta *a = vertice->getAresta(i);
-// 		grausChegada[a->getDestino()]--;
-// 	}
-// }
-
-/* recebe um vetor de inteiros, onde o valor do indice i refere-se o grau de chegada do vértice i da relacao
-retorna um vetor de aresta do grafo normal (nao o da relacao)
-*/
-//semelhante ao Perny and Spanjaard 
 vector <Aresta *> maximal(int* S, Grafo *my_grafo,vector<pair<int, int> > relacao2){
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
 	int *retorno = new int[arestas.size()]; // vetor dos id das arestas
@@ -88,7 +65,7 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 		initT[i] =0; // tudo vazio
 		index[i] = 0; 
 	}	
-	initV[1] = 1; // vertice inicial v2;
+	initV[0] = 1; // vertice inicial v1;
 
 	pilha.push(make_pair(initV, initT));
 	pilha_level.push(0); // inicialmente, o level é zero
