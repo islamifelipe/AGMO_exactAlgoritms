@@ -40,7 +40,7 @@ bool isEgal(int *t1, int *t2, int size){
 retorna um vetor de aresta do grafo normal (nao o da relacao)
 */
 //semelhante ao Perny and Spanjaard 
-vector <Aresta *> maximal(int* S, Grafo *my_grafo, Grafo *relacao, int *grausChegada,vector<pair<int, int> > relacao2){
+vector <Aresta *> maximal(int* S, Grafo *my_grafo,vector<pair<int, int> > relacao2){
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
 	int *retorno = new int[arestas.size()]; // vetor dos id das arestas
 	
@@ -48,7 +48,7 @@ vector <Aresta *> maximal(int* S, Grafo *my_grafo, Grafo *relacao, int *grausChe
 		Aresta *a = arestas[i];
 		if (S[a->getOrigem()] != S[a->getDestino()]){
 			retorno[a->getId()] = 1; 
-			cout<<"("<<a->getOrigem()+1<<", "<<a->getDestino()+1<<")"<<endl;
+		//	cout<<"("<<a->getOrigem()+1<<", "<<a->getDestino()+1<<")"<<endl;
 		} else {
 			retorno[a->getId()] = 0; 
 		}
@@ -68,43 +68,12 @@ vector <Aresta *> maximal(int* S, Grafo *my_grafo, Grafo *relacao, int *grausChe
 			}
 		}
 	}
-	// // primeiramente, seleciona-se as arestas conforme a regra classica de conjunto dijunto de prim   
-
-	// for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
-	// 	Aresta *a = arestas[i];
-	// 	if (S[a->getOrigem()] != S[a->getDestino()]){
-	// 		retorno[a->getId()] = 1; 
-	// 		cout<<"("<<a->getOrigem()+1<<", "<<a->getDestino()+1<<")"<<endl;
-	// 	} else {
-	// 		retorno[a->getId()] = 0; 
-	// 	}
-	// }
-
-	// // depois verificamos a preferência entre as arestas
-
-	// for (int i = 0; i<arestas.size(); i++){ 
-	// 	int v = arestas[i]->getId();
-	// 	if (retorno[v] == 0){
-	// 		grausChegada[v] = -1; // a aresta v, que nao vai estar no corte SS', é carta fora do baralho
-	// 		for (int j=0; j<relacao->getVertice(v)->getGrau(); j++){ // LEMBRE SEMPRE : as arestas de G sao vertices em RELACAO. Entao, para cada vertice adjacente a v em relacao ...
-	// 			grausChegada[relacao->getVertice(v)->getAresta(j)->getId()]--; // v nao contará mais na dominacao de j. Pois v está dentro do grafo 
-	// 		}
-	// 	}
-	// }
-	// vector <Aresta *> ret;
-	// for (int i=0; i<my_grafo->getQuantArestas(); i++){
-	// 	if(i==6) cout<<"kfnnvnfvfnv = "<<grausChegada[i]<<endl;
-	// 	if (grausChegada[i]==0){
-	// 		ret.push_back((my_grafo->get_allArestas())[i]);
-	// 	}
-	// }
 	return ret;
 }
 
 
-vector<pair <int *, int*> > optimalcutset_P(Grafo *g, Grafo *relacao,vector< pair<int, int> > relacao2){
+vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > relacao2){
 	vector<pair <int *, int*> > OptCUT;
-	int *grausChegada = new int[relacao->getQuantVertices()];
 	int *index = new int[g->getQuantArestas()]; //index é um vetor, onde cada indice representa o id da aresta, e o valor representa o level
 	
 	stack <pair <int*, int*> > pilha; // para simular a recursao. Primeiro elemento é o vetor de vertices (id's) e o segundo de arestas
@@ -133,17 +102,11 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g, Grafo *relacao,vector< pai
 		pilha_level.pop();
 		pilha.pop();
 		sizeT.pop();
-		cout<<"size = "<<size<<endl;
-		for (int p=0; p<relacao->getQuantVertices(); p++){
-
-			grausChegada[p] = relacao->getVertice(p)->getGrau_chegada();
-			if(p==6) cout<<"kfnnvnfvfnv = "<<grausChegada[p]<<endl;
-		}
-		vector<Aresta *> E0 =  maximal(S, g, relacao, grausChegada, relacao2);
-		cout<<"E0.size() = "<<E0.size()<<endl;
+		
+		vector<Aresta *> E0 =  maximal(S, g, relacao2);
 		int level0 = level;
-		for (int oo=0; oo<g->getQuantArestas(); oo++) cout<<T[oo]<<" ";
-					cout<<endl;
+		//for (int oo=0; oo<g->getQuantArestas(); oo++) cout<<T[oo]<<" ";
+		//			cout<<endl;
 		for (int i=0; i<E0.size(); i++){ // por cada e in E0 ...
 			
 			Aresta *e = E0[i];
@@ -162,7 +125,6 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g, Grafo *relacao,vector< pai
 				}
 			}
 			if (index[e->getId()] > max || size == 0){
-				cout<<"e = "<<e->getId()<<endl;
 				int * newS = new int[g->getQuantVertices()];
 				for (int oo=0; oo<g->getQuantVertices(); oo++)newS[oo] =S[oo];
 				int * newT = new int[g->getQuantArestas()];
@@ -221,7 +183,7 @@ int main(){
 	}
 
 
-	vector<pair <int *, int*> > arvores = optimalcutset_P(&my_grafo, &relacao,relacao2);
+	vector<pair <int *, int*> > arvores = optimalcutset_P(&my_grafo, relacao2);
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	float cont1 = 0, cont2 = 0;
     	pair <int *, int*>  arestas= arvores[k]; 
