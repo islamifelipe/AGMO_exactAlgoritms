@@ -66,7 +66,7 @@ bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
 		if ((isEquivalente(Tqh1.first,Lq1[t].first,  g->getQuantVertices()) && t1_domina_t2(Tqh1.second, arvore_parcial, g->get_allArestas())) || isEgal(Tqh1.second, arvore_parcial, g->getQuantArestas())){
-			cout<<"dkfkdjfkjdkfjkdjf"<<endl;
+			
 			Lq1.erase(Lq1.begin()+t); 
 			t--;
 		}
@@ -157,14 +157,18 @@ int main(){
     	int *arestas  = arvores[k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     	cout<<"Arvore "<<k+1<<endl;
+    	float cont1 = 0, cont2=0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 			if (arestas[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
+    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
     	cout<<endl;
     }
 	return 0;
