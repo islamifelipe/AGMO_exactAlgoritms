@@ -79,8 +79,17 @@ void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Ar
 				}
 			}
 		} else {
-			peso_i=v[i]->getPeso1()*(yl-yll)+v[i]->getPeso2()*(xll-xl);
-			peso_j=v[j]->getPeso1()*(yl-yll)+v[j]->getPeso2()*(xll-xl);
+			//peso_i=v[i]->getPeso1()*(yl-yll)+v[i]->getPeso2()*(xll-xl); //Steiner and Radzik
+			//peso_j=v[j]->getPeso1()*(yl-yll)+v[j]->getPeso2()*(xll-xl); //Steiner and Radzik
+			//peso_i = (v[i]->getPeso1()*(xll - xl)-v[i]->getPeso2()*(yll-yl)); // ramos algoritmo
+			//peso_j = (v[j]->getPeso1()*(xll - xl)-v[j]->getPeso2()*(yll-yl));
+			peso_i = (-1)*(v[i]->getPeso1()*(yll - yl)-v[i]->getPeso2()*(xll-xl)); // ramos texto
+			peso_j = (-1)*(v[j]->getPeso1()*(yll - yl)-v[j]->getPeso2()*(xll-xl));
+			//peso_i=(v[i]->getPeso1()*(yl-yll)-v[i]->getPeso2()*(xll-xl)); //Monteiro ERRADO (deve ser +)
+			//peso_j=(v[j]->getPeso1()*(yl-yll)-v[j]->getPeso2()*(xll-xl)); //Monteiro ERRADO (deve ser +)
+			//peso_i = v[i]->getPeso1()*(abs(yll - yl))+v[i]->getPeso2()*(abs(xll-xl)); // Beth OK
+			//peso_j = v[j]->getPeso1()*(abs(yll - yl))+v[j]->getPeso2()*(abs(xll-xl));
+			
 			if (!maiorIgualQuefloat(peso_i,peso_j)) {
 				w[k] = v[i];
 				i++;

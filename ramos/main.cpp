@@ -71,7 +71,7 @@ void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
 }
 
 
-void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
+void UniobjectiveSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
 	/* it = interator da lista
 	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
 	* sl = s'
@@ -89,6 +89,7 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 
 
 	while (pilha.size()!=0){
+		cout<<"size = "<<pilha.size()<<endl;
 		pair<int*,int*> sols = pilha.top();
 		pilha.pop();
 		s1 = sols.first;
@@ -103,6 +104,24 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 		float cont; // nao utilisazado nesse caso
 		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
 		//cout<<pilha.size()<<endl;
+
+		// if (it.first == 1){ // antes
+		// 		resul.insert(it.second, A2); 
+		// 		it.second--;// it agora aponta para o item  A2
+		// 	} else if (it.first == 2) { // depois
+		// 		it.second++;
+		// 		resul.insert(it.second, A2);
+		// 		it.second--;// it agora aponta para o item  A2
+		// 	}
+
+		// if( !( isEgalObjetive(A2, s2, g->get_allArestas()))) {
+		// 		pilha.push(make_pair(A2, s2)); // L''
+		// 	pilhaIt.push(make_pair(2,it.second)); 
+		// }
+		// if( !( isEgalObjetive(A2, s1, g->get_allArestas()))) {
+		// 		pilha.push(make_pair(s1, A2));  // L'
+		// 	pilhaIt.push(make_pair(1,it.second)); 
+		// }
 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
 			if (it.first == 1){ // antes
 				resul.insert(it.second, A2); 
@@ -119,7 +138,6 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 			pilhaIt.push(make_pair(1,it.second)); 
 			
 		}
-	
 	}
 }
 
@@ -166,12 +184,12 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 
 /*
 #### Primeira fase ####
-# A funcao phase1GM retorna a lista de arvores (elementos do espaço de decisao)
+# A funcao E􏳇cffientBiobjectiveSTinEB retorna a lista de arvores (elementos do espaço de decisao)
 # Cada arvore é representada simplismente como um vetor de 0s ou 1s.
 # Se o i-ésimo elemento do vetor é 1, entao a aresta de id=i está presente na arvore. Sera 0 caso contrario 
 # Portanto, retorna uma lista de inteiros
 */
-list<int*> phase1GM(Grafo *g){
+list<int*> efficientBiobjectiveSTinEB(Grafo *g){
 	list<int*> result;
 	int *s1 = new int[g->getQuantArestas()];
 	for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
@@ -183,7 +201,7 @@ list<int*> phase1GM(Grafo *g){
 	kruskal(g, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
 	list<int*>::iterator it = result.end();
 	if (isEgalObjetive(s1, s2,g->get_allArestas())==false){
-		borderSearch(g, result, s1, s2);
+		UniobjectiveSearch(g, result, s1, s2);
 		result.push_back(s2);
 	}
 	return result;
@@ -338,7 +356,7 @@ int main(){
 	my_grafo.gerarArestasPtr();
 	
 
-	list<int*> arvores = phase1GM(&my_grafo);
+	list<int*> arvores = efficientBiobjectiveSTinEB(&my_grafo);
 	cout<<"Fim da primeira fase ... "<<endl;
 	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     list<int*> noSuportadas = efficientBiobjectiveSTinENB(&my_grafo, arvores);
