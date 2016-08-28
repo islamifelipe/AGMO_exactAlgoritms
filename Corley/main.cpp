@@ -4,6 +4,7 @@
 #-----------------------------------------------------------------------
 # This code implements the Corley's (1985) algorithm 
 # to resolve the Biobjective Spanning Tree Problem
+# The user time is returned;
 #=======================================================================
 */
 
@@ -11,6 +12,8 @@
 #include <map> 
 #include <string>
 #include "Grafo.h"
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 bool a_domina_b( Aresta *a, Aresta *b){
@@ -83,6 +86,9 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 	} else return false;
 }
 int main(){
+	struct tms tempsInit, tempsFinal; // para medir o tempo
+	times(&tempsInit);  // pega o tempo do clock inical
+		
 	int n;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -197,6 +203,22 @@ int main(){
 	     	}
 	    }
     }
+    
+    /* OUTPUT : 
+    	Clokcs
+    	Time (in seconds)
+    	number of solutions 
+
+    	the trees
+    	cost
+    */
+
+    times(&tempsFinal);   /* current time */ // clock final
+	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+	cout<<user_time<<endl;
+	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	cout<<m[n]<<endl;
+   	cout<<endl;
     for (int k = 1; k <= m[n]; k++){ // cada arvore formada
     	int *arestas  = A[n][k]; 
     	float cont1 = 0, cont2 = 0;
