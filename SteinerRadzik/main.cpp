@@ -406,7 +406,7 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 			vetorParticoes.push_back(*g);
 		}
 
-		for (int k = 1; k<10000 && List.getSize()!=0; k++){
+		for (int k = 1; k<30000 && List.getSize()!=0; k++){
 			list<int*> k_best_tree;
 		
 			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, List,MSTs, vetorParticoes);  // k-best
