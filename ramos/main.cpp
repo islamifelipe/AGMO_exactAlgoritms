@@ -4,6 +4,7 @@
 #-----------------------------------------------------------------------
 # This code implements the Ramos et al's (1998) algorithm 
 # to resolve the Biobjective Spanning Tree Problem
+# The user time is returned;
 #=======================================================================
 */
 
@@ -14,6 +15,8 @@
 #include <cmath>
 #include <stack>   
 #include <utility>      // std::pair
+#include <sys/times.h>
+#include <unistd.h>
 #include "Grafo.h"
 #include "Conjunto.h"
 #include "kruskal.h"
@@ -89,7 +92,7 @@ void UniobjectiveSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 
 
 	while (pilha.size()!=0){
-		cout<<"size = "<<pilha.size()<<endl;
+		//cout<<"size = "<<pilha.size()<<endl;
 		pair<int*,int*> sols = pilha.top();
 		pilha.pop();
 		s1 = sols.first;
@@ -334,6 +337,9 @@ list<int*> efficientBiobjectiveSTinENB(Grafo *g, list<int*> extremas){
 
 
 int main(){
+	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+	times(&tempsInit);  // pega o tempo do clock inical
+	
 	int n;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -358,9 +364,23 @@ int main(){
 
 	list<int*> arvores = efficientBiobjectiveSTinEB(&my_grafo);
 	cout<<"Fim da primeira fase ... "<<endl;
+	times(&tempsFinal1);   /* current time */ // clock final
+	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time1<<endl;
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	times(&tempsInit);
+
 	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     list<int*> noSuportadas = efficientBiobjectiveSTinENB(&my_grafo, arvores);
     cout<<"Fim da segunda fase ... "<<endl;
+    times(&tempsFinal2);   /* current time */ // clock final
+	clock_t user_time2 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
+	cout<<user_time2<<endl;
+	cout<<(float) user_time2 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+	cout<<"Total ..."<<endl;
+	cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
+
+
     int i = 1, cont=0;
     //cout<<"saiu2"<<endl;
     //cout<<resul.size()<<endl;

@@ -20,6 +20,8 @@
 #include "Conjunto.h"
 #include "kruskal.h"
 #include "Heap.h"
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 #define MAX1 20000 // TODO : Aumentar
@@ -118,25 +120,26 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, int k_best){ 
-	int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
-	for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
+int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, Heap &List, list<int*> &MSTs, list<Grafo> &vetorParticoes){ 
+	//int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
+	//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 				
-	list<int*> MSTs; // usada para lista de árvores
-	float custoMinimo =0, x=0, y=0;
-	Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
-	list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+	//list<int*> MSTs; // usada para lista de árvores
+	//float custoMinimo =0;
+	//Heap List(40000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
+	//list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
 	//A estrutura "List" do algortimo original é um heap chamada List
-	bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
+	// bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
 	cont =1;
-	if (res){
-		int contMSTs = MSTs.size();
-		MSTs.push_back(A);
-		List.insert(contMSTs, custoMinimo);
-		vetorParticoes.push_back(*g);
-	}
-	do{ //List.getChave()<=custoMinimo
-		if (List.getSize()>0){
+	// if (res){
+	// 	//cout<<"custoMinimo : "<<custoMinimo<<endl;
+	// 	int contMSTs = MSTs.size();
+	// 	MSTs.push_back(A);
+	// 	List.insert(contMSTs, custoMinimo);
+	// 	vetorParticoes.push_back(*g);
+	// }
+	//do{ //List.getChave()<=custoMinimo
+		//if (List.getSize()>0){
 			int id = List.getId();
 			//ElementGrafo *init = vetorParticoes->getInit();
 			//ElementArvore *initArvore = MSTs->getInit();
@@ -153,16 +156,23 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 			//cout<<"Size : "<<List.getSize()<<endl;
 			
 			List.extract();
-			
-			if (k_best>0){
+			//cout<<"Size : "<<List.getSize()<<endl;
+			// if (id==0) {
+			// 	float x, y;
+			// 	getXandY(*it, g->get_allArestas(),x, y); 
+			// 	//cout<<"xl = "<<xl<<" yl = "<<yl<<" xll = "<<xll<<" yll = "<<yll<<endl;
+			// 	//cout<<"FFJFFFFFFFF ("<<x<<", "<<y<<") = "<<x*(yl-yll)+y*(xll-xl)<<endl;;
+		
+			// }
+			//if (k_best>0){
 				resul.push_back(*it);
 				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
 				
-			}
-			k_best--;
+			//}
+			//k_best--;
 			
-		}
-	}while (List.getSize()>0);
+		//}
+	//}while (List.getSize()>0);
 	//cout<<"Quantidade de vezes que o Kruskal foi invocado: "<<cont<<endl;
 	//cout<<"Quantidade de árvores criadas e armazenadas de fato: "<<contMSTs<<endl;
 	//cout<<contMSTs<<endl;
@@ -174,7 +184,7 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 			delete initArvore;
 	}*/
 	
-	List.desaloca();
+	//List.desaloca();
 	return MSTs.size();
 }
 
@@ -374,18 +384,36 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		float bM;
 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 
-		list<int*> k_best_tree;
 		int contMST=0;  /*Futuramente necessários para dados estatísticos*/
-
-		AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, 10000);  // k-best
-		//cout<<"AllSpaningTree "<<endl;
-		//cout<<"xl = "<<xp<<" yl = "<<yp<<" xll = "<<xq<<" yll = "<<yq<<endl;
-				
 		
-		for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
-			int* k_best = *kb_it;
+		Heap List(40000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
+		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+		list<int*> MSTs; // usada para lista de árvores
+		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
+		for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
+		
+		float custoMinimo = 0;
+		//int cont =1;
+		/**init **/
+		bool res = kruskal(g, A, xp,yp, xq,yq, custoMinimo, 3);
+		
+		
+		if (res){
+			//cout<<"custoMinimo : "<<custoMinimo<<endl;
+			int contMSTs = MSTs.size();
+			MSTs.push_back(A);
+			List.insert(contMSTs, custoMinimo);
+			vetorParticoes.push_back(*g);
+		}
+
+		for (int k = 1; k<10000 && List.getSize()!=0; k++){
+			list<int*> k_best_tree;
+		
+			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, List,MSTs, vetorParticoes);  // k-best
+			int* k_best = *(k_best_tree.begin());
 			float x, y;
 			getXandY(k_best, g->get_allArestas(),x, y); 
+
 			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
 				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
@@ -394,9 +422,34 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
 				bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 			} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
+				//cout<<"break"<<endl;
 				break;
 			}
+		
 		}
+			
+		// for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
+		// 	int* k_best = *kb_it;
+		// 	float x, y;
+		// 	getXandY(k_best, g->get_allArestas(),x, y); 
+		// 	//cout<<"("<<x<<", "<<y<<") = "<<x*(yp-yq)+y*(xq-xp)<<endl;;
+		// }
+		// for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
+		// 	int* k_best = *kb_it;
+		// 	float x, y;
+		// 	getXandY(k_best, g->get_allArestas(),x, y); 
+		// 	if (isInViableRegion(g, regiaoViavel, x, y)){
+		// 		noSoportadas.push_back(k_best);
+		// 		maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
+		// 		//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
+		
+		// 		//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
+		// 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
+		// 	} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
+		// 		//cout<<"break"<<endl;
+		// 		break;
+		// 	}
+		// }
 		contador++;
 	}
 	return noSoportadas;
@@ -405,6 +458,8 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 
 
 int main(){
+	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+	
 	int n;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -429,8 +484,27 @@ int main(){
 
 	list<int*> arvores = phase1GM(&my_grafo);
 	cout<<"Fim da primeira fase ... "<<endl;
+
+	times(&tempsFinal1);   /* current time */ // clock final
+	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time1<<endl;
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	times(&tempsInit);
+
+
 	list<int*> noSuportadas = phase2KB(&my_grafo, arvores);
+	
+
 	cout<<"Fim da segunda fase ... "<<endl;
+
+	times(&tempsFinal2);   /* current time */ // clock final
+	clock_t user_time2 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
+	cout<<user_time2<<endl;
+	cout<<(float) user_time2 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+	cout<<"Total ..."<<endl;
+	cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
+
+
 	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     
     

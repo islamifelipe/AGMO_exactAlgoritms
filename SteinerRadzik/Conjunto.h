@@ -5,6 +5,7 @@
 /*Heurística para a manipulação de conjuntos. Esta implementação é importante que se saber, por exemplo, se uma aresta que é adcionada gera um grafo cíclico*/
 class Conjunto {
 	private:
+		int n;
 		int *pai;
 		int *ordem;
 	
@@ -21,7 +22,12 @@ class Conjunto {
 		/*A raiz do conjunto o identifica; como a função find_set faz x ter como pai a raiz, e retorna este elemento, basta verificar se o valor
 		 * retornando para a chamada com x e y são iguais.*/
 		bool compare(int x, int y);
-		void desaloca();
-};
+		 void desaloca();
 
+		// int* getPai();
+		// int* getOrdem();
+		// int getN();
+
+		// Conjunto& operator=( Conjunto& d);
+};
 #endif
