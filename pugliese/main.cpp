@@ -4,6 +4,7 @@
 #-----------------------------------------------------------------------
 # This code implements the Pugliese et al's (2014) algorithm 
 # to resolve the Biobjective Spanning Tree Problem
+# The user time is returned (in seconds)
 #=======================================================================
 */
 
@@ -13,6 +14,8 @@
 #include <utility>      // std::pair
 #include <string>
 #include "Grafo.h"
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 
@@ -132,6 +135,9 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 
 
 int main(){
+	struct tms tempsInit, tempsFinal; // para medir o tempo
+	times(&tempsInit);  // pega o tempo do clock inical
+	
 	int n;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -153,6 +159,12 @@ int main(){
 
 	vector< pair<int*, int*> > arvores = algoritmoPD(&my_grafo);
 	 
+
+	times(&tempsFinal);   /* current time */ // clock final
+	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+	cout<<user_time<<endl;
+	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	 
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	int *arestas  = arvores[k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
