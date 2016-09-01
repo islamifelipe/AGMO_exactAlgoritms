@@ -27,6 +27,8 @@ using namespace std;
 #define MAX1 20000 // TODO : Aumentar
 
 int idMST = 0;
+map <int, Aresta *> arestas;
+Aresta ** arestasPtr;
 
 bool isEgal(int *t1, int *t2, int size){
 	for (int i=0; i<size; i++){
@@ -35,7 +37,7 @@ bool isEgal(int *t1, int *t2, int size){
 	return true;
 }
 
-bool isEgalObjetive(int *t1, int *t2, map <int, Aresta *> arestas){
+bool isEgalObjetive(int *t1, int *t2){
 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t1[i]==1){
@@ -50,7 +52,7 @@ bool isEgalObjetive(int *t1, int *t2, map <int, Aresta *> arestas){
 	return equalfloat(t1_peso1,t2_peso1) && equalfloat(t2_peso2,t1_peso2);
 
 }
-bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
+bool t1_domina_t2(int *t1, int *t2){
 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t1[i]==1){
@@ -67,7 +69,7 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 	} else return false;
 }
 
-void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
+void getXandY(int *t, float &X, float &Y ){
 	X = 0; Y = 0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t[i]==1){
@@ -79,7 +81,7 @@ void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
-void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, map<int, int* > &MSTs, int &cont, map<int, Grafo > &vetorParticoes){
+void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, map<int, int* > &MSTs,map<int, Grafo > &vetorParticoes){
 	/*Pa = vetor de arestas = correspondente à partição P
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
@@ -89,23 +91,21 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 	float custo, x, y;
 	Aresta *a; 
 	int *A2;
-	map <int, Aresta *> allArestas = P.get_allArestas();
+	//map <int, Aresta *> allArestas = P.get_allArestas();
 	//for (int i=0; i<P.getQuantVertices()-1; i++){
-	
-	for (int i=0; i<allArestas.size(); i++){
+	int m = P.getQuantArestas();
+	for (int i=0; i<m; i++){
 		if (Pa[i]==1){
-			a = allArestas[i];	
+			a = P.getArestas(i);	
 			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
 				//A2 = new Aresta*[P.getQuantVertices()-1];
-				A2 = new int[allArestas.size()];
-				for(int mmm = 0; mmm<allArestas.size(); mmm++) A2[mmm] = 0;
+				A2 = new int[m];
+				//for(int mmm = 0; mmm<m; mmm++) A2[mmm] = 0;
 				P1.setStatus(a->getId(), 2); /*proibida*/
 				P2.setStatus(a->getId(), 1); /*obrigatória*/
 				
-				custo=0;//cout<<"Antes1"<<endl;
-				res = kruskal(&P1, A2, xl, yl, xll, yll,custo, 3);
+				res = kruskal(&P1, arestasPtr,A2, xl, yl, xll, yll,custo, 3);
 
-				cont++; 
 				if (res){
 					MSTs[idMST] = A2;
 					List.insert(idMST, custo); // o valor da variavel "custo" vem do kruskal
@@ -114,20 +114,15 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 				} else {
 					delete[] A2;
 				}
-				//cout<<"Depois1  "<<List.getSize()<<"   "<<res<<endl;// estatístico
-				
 				P1 = P2;
 			}
 		}
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, Heap &List, map<int, int* > &MSTs, map<int, Grafo > &vetorParticoes){ 
-	cont =1;
+int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, Heap &List, map<int, int* > &MSTs, map<int, Grafo > &vetorParticoes){ 
 	
 			int id = List.getId();
-			//ElementGrafo *init = vetorParticoes->getInit();
-			//ElementArvore *initArvore = MSTs->getInit();
 			int* it = MSTs[id];
 			Grafo Ps = vetorParticoes[id];
 			
@@ -135,7 +130,7 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*>
 			resul.push_back(it);
 			//MSTs.erase(id);
 			//vetorParticoes.erase(id);
-			Partition(Ps,xl, yl, xll, yll, it, List,MSTs, cont,vetorParticoes);
+			Partition(Ps,xl, yl, xll, yll, it, List,MSTs,vetorParticoes);
 				
 
 	
@@ -173,14 +168,14 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 		pair<int,list<int*>::iterator> it = pilhaIt.top();
 		pilhaIt.pop();
 
-		getXandY(s1, g->get_allArestas(), xl, yl);
-		getXandY(s2, g->get_allArestas(), xll, yll);
+		getXandY(s1, xl, yl);
+		getXandY(s2, xll, yll);
 		A2 = new int[g->getQuantArestas()];
-		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
+		//for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
 		float cont; // nao utilisazado nesse caso
-		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
+		kruskal(g, arestasPtr,A2, xl, yl, xll, yll,cont, 3);
 		//cout<<pilha.size()<<endl;
-		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
+		if( !( (isEgalObjetive(A2, s1)) || (isEgalObjetive(A2, s2)) ) ){
 			if (it.first == 1){ // antes
 				resul.insert(it.second, A2); 
 				it.second--;// it agora aponta para o item  A2
@@ -211,15 +206,15 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 list<int*> phase1GM(Grafo *g){
 	list<int*> result;
 	int *s1 = new int[g->getQuantArestas()];
-	for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
+	//for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
 	float cont; // nao utilisazado nesse caso
-	kruskal(g, s1, 0, 0, 0, 0,cont, 1); // arvore para o primeiro objetivo
+	kruskal(g, arestasPtr,s1, 0, 0, 0, 0,cont, 1); // arvore para o primeiro objetivo
 	result.push_back(s1);
 	int* s2 = new int[g->getQuantArestas()];
-	for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
-	kruskal(g, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
+	//for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
+	kruskal(g, arestasPtr, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
 	list<int*>::iterator it = result.end();
-	if (isEgalObjetive(s1, s2,g->get_allArestas())==false){
+	if (isEgalObjetive(s1, s2)==false){
 		borderSearch(g, result, s1, s2);
 		result.push_back(s2);
 	}
@@ -283,8 +278,8 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		float yp, yq, xp, xq;
 		list< pair<float, float> > regiaoViavel; // lista de pontos que delimitam a regiao viável.
 	
-		getXandY(p, g->get_allArestas(),xp, yp); // p
-	 	getXandY(q, g->get_allArestas(), xq, yq);	 //q
+		getXandY(p,xp, yp); // p
+	 	getXandY(q,xq, yq);	 //q
 		regiaoViavel.push_back( make_pair(xq, yp));// inicialmente, a regiao viável é composta por um unico ponto (o âgulo reto do triângulo cuja hipotenusa é a reta entre p-q -- ver algoritmo origial)
 		
 		// determina a reta p-q (hipotenusa)
@@ -297,18 +292,16 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		float bM;
 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 
-		int contMST=0;  /*Futuramente necessários para dados estatísticos*/
-		
 		Heap List(10000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
 		map<int, Grafo >vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
 		map<int, int* >MSTs; // usada para lista de árvores
 		idMST = 0;
 		//cout<<"REDEFINIU"<<endl;
 		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
-		for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
+		//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 		
 		float custoMinimo = 0;
-		bool res = kruskal(g, A, xp,yp, xq,yq, custoMinimo, 3);
+		bool res = kruskal(g, arestasPtr, A, xp,yp, xq,yq, custoMinimo, 3);
 		if (res){
 			MSTs[idMST] = A;
 			List.insert(idMST, custoMinimo);
@@ -319,10 +312,10 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		for (int k = 1; k<10000 && List.getSize()!=0; k++){
 			list<int*> k_best_tree;
 		
-			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, List,MSTs, vetorParticoes);  // k-best
+			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes);  // k-best
 			int* k_best = *(k_best_tree.begin());
 			float x, y;
-			getXandY(k_best, g->get_allArestas(),x, y); 
+			getXandY(k_best,x, y); 
 
 			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
@@ -368,8 +361,10 @@ int main(){
 	}
 
 	int nA = id; // quantidade de arestas do grafo	
-	my_grafo.gerarArestasPtr();
+	//my_grafo.gerarArestasPtr();
 	
+	arestas = my_grafo.get_allArestas();
+	arestasPtr = my_grafo.getAllArestasPtr();
 
 	list<int*> arvores = phase1GM(&my_grafo);
 	cout<<"Fim da primeira fase ... "<<endl;
@@ -393,10 +388,7 @@ int main(){
 	cout<<"Total ..."<<endl;
 	cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
 
-
-	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    
-    
+	
     int i = 1, cont=0;
     //cout<<"saiu2"<<endl;
     //cout<<resul.size()<<endl;
@@ -408,12 +400,12 @@ int main(){
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 		
 			if ((*it)[a] == 1){
-				cont1+=arestasPtr[a]->getPeso1();
-				cont2+=arestasPtr[a]->getPeso2();
-    			cout<<arestasPtr[a]->getOrigem() << " ";
-    			cout<<arestasPtr[a]->getDestino() << " ";
-    			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
+				cont1+=my_grafo.getArestas(a)->getPeso1();
+				cont2+=my_grafo.getArestas(a)->getPeso2();
+    			cout<<my_grafo.getArestas(a)->getOrigem() << " ";
+    			cout<<my_grafo.getArestas(a)->getDestino() << " ";
+    			cout<<my_grafo.getArestas(a)->getPeso1() << " ";
+    			cout<<my_grafo.getArestas(a)->getPeso2() << endl;
     		}
     	}
     	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
@@ -428,13 +420,13 @@ int main(){
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 		
 			if ((*it)[a] == 1){
-				cont1+=arestasPtr[a]->getPeso1();
-				cont2+=arestasPtr[a]->getPeso2();
+				cont1+=arestas[a]->getPeso1();
+				cont2+=arestas[a]->getPeso2();
 				
-    			cout<<arestasPtr[a]->getOrigem() << " ";
-    			cout<<arestasPtr[a]->getDestino() << " ";
-    			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
+    			cout<<arestas[a]->getOrigem() << " ";
+    			cout<<arestas[a]->getDestino() << " ";
+    			cout<<arestas[a]->getPeso1() << " ";
+    			cout<<arestas[a]->getPeso2() << endl;
     		}
     	}
     	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;

@@ -15,7 +15,7 @@ int Vertice::getId(){
 	return id;
 }
 void Vertice::adicionaAresta(Aresta *a){
-	adjacentes.push_back(a);			
+	adjacentes[adjacentes.size()] = a;			
 }
 		
 Aresta* Vertice::getAresta(int i){ /*retorna um ponteiro para a i-ésima aresta insidente no vértice*/

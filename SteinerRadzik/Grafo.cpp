@@ -29,25 +29,33 @@ Aresta *Grafo::addAresta(int id, int origem, int destino, float peso1, float pes
 	return nova;
 }
 
-map <int, Aresta *> Grafo::get_allArestas(){ /*retorna a primeira posição do vetor lista_allArestas*/
-	return lista_allArestas;
+Aresta * Grafo::getArestas(int i){ /*retorna a primeira posição do vetor lista_allArestas*/
+	return lista_allArestas[i];
 }
 int Grafo::getQuantArestas(){
 	return lista_allArestas.size();
+}
+map <int, Aresta *> Grafo::get_allArestas(){
+	return lista_allArestas;
+
 }
 
 int Grafo::getQuantVertices(){	
 	return n;	
 }
 Aresta ** Grafo::getAllArestasPtr(){
-	return arestasPtr;
-}
-void Grafo::gerarArestasPtr(){
-	arestasPtr = new Aresta*[lista_allArestas.size()];
+	Aresta **arestasPtr = new Aresta*[lista_allArestas.size()];
 	for (int i=0; i<lista_allArestas.size(); i++){
 		arestasPtr[i] = lista_allArestas[i];
 	}
+	return arestasPtr;
 }
+// void Grafo::gerarArestasPtr(){
+// 	Aresta **arestasPtr = new Aresta*[lista_allArestas.size()];
+// 	for (int i=0; i<lista_allArestas.size(); i++){
+// 		arestasPtr[i] = lista_allArestas[i];
+// 	}
+// }
 int Grafo::getStatus(int i){
 	return particao[i];
 }
@@ -61,11 +69,11 @@ Grafo& Grafo::operator=( Grafo& d){
 	n = d.getQuantVertices();
 	//lista_allArestas = d.lista_allArestas;
 	//lista_vertices = d.lista_vertices;
-	arestasPtr = new Aresta*[d.lista_allArestas.size()];
+	//arestasPtr = new Aresta*[d.lista_allArestas.size()];
 	for (int i=0; i<d.lista_allArestas.size(); i++){
 		particao[i] = d.getStatus(i);
 	}
-	arestasPtr = d.arestasPtr;
+	//arestasPtr = d.arestasPtr;
 	lista_allArestas = d.lista_allArestas;
 	return *this;
 	// if (this == &d) return *this;
