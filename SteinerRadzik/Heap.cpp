@@ -1,4 +1,4 @@
- 
+
 
 #include "Heap.h"
 #include "kruskal.h"
@@ -56,7 +56,7 @@ void  Heap::descer(int i){
 	}
 
 bool  Heap::insert (int id, float chave){ /*insere no final e sobe o elemento*/
-	if (size+1<maximo && auxHeap[auxID[id]]!=id){
+	if (size+1<maximo && id<maximo && auxID[id]<maximo && auxHeap[auxID[id]]!=id){
 		heap[size+1]=chave;
 		auxHeap[size+1] = id;
 		size++;

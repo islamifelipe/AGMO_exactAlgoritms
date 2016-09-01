@@ -21,6 +21,7 @@ class Grafo{
 		*/
 	public:
 		Grafo(int n1);
+		Grafo();
 		void addVertice(int id); // lista_vertices[id] = vertice de identificador id (entre 0 e n-1)
 		Vertice *getVertice(int id);
 		Aresta *addAresta(int id, int origem, int destino, float peso1, float peso2);

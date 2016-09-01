@@ -26,6 +26,8 @@ using namespace std;
 
 #define MAX1 20000 // TODO : Aumentar
 
+int idMST = 0;
+
 bool isEgal(int *t1, int *t2, int size){
 	for (int i=0; i<size; i++){
 		if (t1[i]!=t2[i]) return false;
@@ -77,7 +79,7 @@ void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
-void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, list <int *> &MSTs, int &cont, list<Grafo> &vetorParticoes){
+void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, map<int, int* > &MSTs, int &cont, map<int, Grafo > &vetorParticoes){
 	/*Pa = vetor de arestas = correspondente à partição P
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
@@ -105,10 +107,10 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 
 				cont++; 
 				if (res){
-					int quantMSTs = MSTs.size();
-					MSTs.push_back(A2);
-					List.insert(quantMSTs, custo); // o valor da variavel "custo" vem do kruskal
-					vetorParticoes.push_back(P1);
+					MSTs[idMST] = A2;
+					List.insert(idMST, custo); // o valor da variavel "custo" vem do kruskal
+					vetorParticoes[idMST++] = P1;
+				//	cout<<"size = "<<idMST<<endl;
 				} else {
 					delete[] A2;
 				}
@@ -120,69 +122,22 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, Heap &List, list<int*> &MSTs, list<Grafo> &vetorParticoes){ 
-	//int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
-	//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
-				
-	//list<int*> MSTs; // usada para lista de árvores
-	//float custoMinimo =0;
-	//Heap List(40000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
-	//list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
-	//A estrutura "List" do algortimo original é um heap chamada List
-	// bool res = kruskal(g, A, xl, yl, xll, yll, custoMinimo, 3);
+int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, int &cont, Heap &List, map<int, int* > &MSTs, map<int, Grafo > &vetorParticoes){ 
 	cont =1;
-	// if (res){
-	// 	//cout<<"custoMinimo : "<<custoMinimo<<endl;
-	// 	int contMSTs = MSTs.size();
-	// 	MSTs.push_back(A);
-	// 	List.insert(contMSTs, custoMinimo);
-	// 	vetorParticoes.push_back(*g);
-	// }
-	//do{ //List.getChave()<=custoMinimo
-		//if (List.getSize()>0){
+	
 			int id = List.getId();
 			//ElementGrafo *init = vetorParticoes->getInit();
 			//ElementArvore *initArvore = MSTs->getInit();
-			list<int*>::iterator it = MSTs.begin();
-			list<Grafo>::iterator itg = vetorParticoes.begin();
-			int k=0;
-			while (k<id && k<MSTs.size()){
-				it++;
-				itg++;
-				k++;
-			}
-			
-			Grafo Ps = *itg;
-			//cout<<"Size : "<<List.getSize()<<endl;
+			int* it = MSTs[id];
+			Grafo Ps = vetorParticoes[id];
 			
 			List.extract();
-			//cout<<"Size : "<<List.getSize()<<endl;
-			// if (id==0) {
-			// 	float x, y;
-			// 	getXandY(*it, g->get_allArestas(),x, y); 
-			// 	//cout<<"xl = "<<xl<<" yl = "<<yl<<" xll = "<<xll<<" yll = "<<yll<<endl;
-			// 	//cout<<"FFJFFFFFFFF ("<<x<<", "<<y<<") = "<<x*(yl-yll)+y*(xll-xl)<<endl;;
-		
-			// }
-			//if (k_best>0){
-				resul.push_back(*it);
-				Partition(Ps,xl, yl, xll, yll, *it, List,MSTs, cont,vetorParticoes);
+			resul.push_back(it);
+			//MSTs.erase(id);
+			//vetorParticoes.erase(id);
+			Partition(Ps,xl, yl, xll, yll, it, List,MSTs, cont,vetorParticoes);
 				
-			//}
-			//k_best--;
-			
-		//}
-	//}while (List.getSize()>0);
-	//cout<<"Quantidade de vezes que o Kruskal foi invocado: "<<cont<<endl;
-	//cout<<"Quantidade de árvores criadas e armazenadas de fato: "<<contMSTs<<endl;
-	//cout<<contMSTs<<endl;
-	/*for (int i=0; i<vetorParticoes.size(); i++){ TODO
-		
-			vetorParticoes->remove(vetorParticoes->getInit());
-			ElementArvore *initArvore = MSTs->getInit();
-			MSTs->remove(MSTs->getInit());
-			delete initArvore;
-	}*/
+
 	
 	//List.desaloca();
 	return MSTs.size();
@@ -244,48 +199,6 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 	
 	}
 }
-
-
-
-// void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){ 
-// 	/* it = interator da lista
-// 	* Os novos elementos (arvores) devem ser inseridos entre it-1 e it
-// 	* sl = s'
-// 	* sll = s''
-// 	**/
-// 	int *s1 = sl;
-// 	int *s2 = sll;
-// 	int * A2;
-// 	stack<int* >  pilha;
-// 	bool avanca = true;
-// 	float xl, yl, xll, yll;
-// 	do{
-// 		getXandY(s1, g->get_allArestas(), xl, yl);
-// 		getXandY(s2, g->get_allArestas(), xll, yll);
-// 		A2 = new int[g->getQuantArestas()];
-// 		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
-// 		float cont; // nao utilisazado nesse caso
-// 		kruskal(g, A2, xl, yl, xll, yll,cont, 3);
-// 		//cout<<pilha.size()<<endl;
-// 		if( !( (isEgalObjetive(A2, s1, g->get_allArestas())) || (isEgalObjetive(A2, s2, g->get_allArestas())) ) ){
-// 			pilha.push(s2);
-// 			s2 = A2;
-// 			avanca = true;
-// 		} else {
-// 			if (pilha.size()==0){ //se pilha está fazia
-// 				avanca = false;
-// 			} else {
-// 				avanca = true;
-// 				s1 = s2;
-// 				resul.push_back(s2);
-// 				s2 = pilha.top();
-// 				pilha.pop();
-// 				//if (pilha.size()==0) avanca = false;
-// 			}
-// 			//delete[] A2;
-// 		}	
-// 	} while (avanca);
-// }
 
 
 /*
@@ -386,27 +299,24 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 
 		int contMST=0;  /*Futuramente necessários para dados estatísticos*/
 		
-		Heap List(40000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
-		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
-		list<int*> MSTs; // usada para lista de árvores
+		Heap List(10000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
+		map<int, Grafo >vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+		map<int, int* >MSTs; // usada para lista de árvores
+		idMST = 0;
+		//cout<<"REDEFINIU"<<endl;
 		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
 		for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 		
 		float custoMinimo = 0;
-		//int cont =1;
-		/**init **/
 		bool res = kruskal(g, A, xp,yp, xq,yq, custoMinimo, 3);
-		
-		
 		if (res){
-			//cout<<"custoMinimo : "<<custoMinimo<<endl;
-			int contMSTs = MSTs.size();
-			MSTs.push_back(A);
-			List.insert(contMSTs, custoMinimo);
-			vetorParticoes.push_back(*g);
+			MSTs[idMST] = A;
+			List.insert(idMST, custoMinimo);
+			vetorParticoes[idMST++] = *g;
+			//cout<<"size = "<<idMST<<endl;
 		}
 
-		for (int k = 1; k<30000 && List.getSize()!=0; k++){
+		for (int k = 1; k<10000 && List.getSize()!=0; k++){
 			list<int*> k_best_tree;
 		
 			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, contMST, List,MSTs, vetorParticoes);  // k-best
@@ -428,28 +338,7 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		
 		}
 			
-		// for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
-		// 	int* k_best = *kb_it;
-		// 	float x, y;
-		// 	getXandY(k_best, g->get_allArestas(),x, y); 
-		// 	//cout<<"("<<x<<", "<<y<<") = "<<x*(yp-yq)+y*(xq-xp)<<endl;;
-		// }
-		// for (list<int*>::iterator kb_it = k_best_tree.begin(); kb_it!=k_best_tree.end();  kb_it++){
-		// 	int* k_best = *kb_it;
-		// 	float x, y;
-		// 	getXandY(k_best, g->get_allArestas(),x, y); 
-		// 	if (isInViableRegion(g, regiaoViavel, x, y)){
-		// 		noSoportadas.push_back(k_best);
-		// 		maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
-		// 		//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
 		
-		// 		//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
-		// 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
-		// 	} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
-		// 		//cout<<"break"<<endl;
-		// 		break;
-		// 	}
-		// }
 		contador++;
 	}
 	return noSoportadas;

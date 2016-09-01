@@ -1,0 +1,1 @@
+Testes executados antes da modificacao do MST e vetorParticoes
