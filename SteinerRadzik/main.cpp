@@ -25,7 +25,7 @@
 #include <unistd.h>
 using namespace std;
 
-#define MAX1 20000 // TODO : Aumentar
+#define MAX2 4000 // TODO : Aumentar
 
 int idMST = 0;
 map <int, Aresta *> arestas;
@@ -42,34 +42,7 @@ bool isEgal(int *t1, int *t2, int size){
 bool isEgalObjetive(float t1_peso1, float t1_peso2, float t2_peso1, float t2_peso2){
 	return equalfloat(t1_peso1,t2_peso1) && equalfloat(t2_peso2,t1_peso2);
 }
-// bool t1_domina_t2(int *t1, int *t2){
-// 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
-// 	for (int i=0; i<arestas.size(); i++){
-// 		if (t1[i]==1){
-// 			t1_peso1+=arestas[i]->getPeso1();
-// 			t1_peso2+=arestas[i]->getPeso2();
-// 		} 
-// 		if (t2[i]==1){
-// 			t2_peso1+=arestas[i]->getPeso1();
-// 			t2_peso2+=arestas[i]->getPeso2();
-// 		}
-// 	}
-// 	++contAux;
-// 	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
-// 		return true;
-// 	} else return false;
-// }
 
-// void getXandY(int *t, float &X, float &Y ){
-// 	++contAux2;
-// 	X = 0; Y = 0;
-// 	for (int i=0; i<arestas.size(); i++){
-// 		if (t[i]==1){
-// 			X+=arestas[i]->getPeso1();
-// 			Y+=arestas[i]->getPeso2();
-// 		} 
-// 	}
-// }
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
@@ -77,6 +50,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	/*Pa = vetor de arestas = correspondente à partição P
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
+	contAux++;
 	Grafo P1 = P, P2 = P;
 	//cout<<List.getSize()<<endl;
 	bool res = false;
@@ -86,7 +60,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	//map <int, Aresta *> allArestas = P.get_allArestas();
 	//for (int i=0; i<P.getQuantVertices()-1; i++){
 	int m = P.getQuantArestas();
-	for (int i=0; i<m; i++){
+	for (int i=0; i<m && List.getSize()<MAX2; i++){
 		if (Pa[i]==1){
 			a = P.getArestas(i);	
 			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
@@ -97,7 +71,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 				P2.setStatus(a->getId(), 1); /*obrigatória*/
 				float x, y;
 				res = kruskal(&P1, arestasPtr,A2, x, y);
-				custo +=x*(yl-yll)+y*(xll-xl);
+				custo =x*(yl-yll)+y*(xll-xl);
 			
 				//map<int, pair<int*, list<Grafo>::iterator > > 
 				if (res){
@@ -274,11 +248,11 @@ bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float 
 
 pair<float, float> getMaiorDistante(float a, float b, float c, list< pair<float, float> > regiaoViavel){
 	pair<float, float>  pontoR = (*regiaoViavel.begin());
-	float max = abs(a*pontoR.first + b*pontoR.second + c)/sqrt(a*a + b*b);
+	float max = ((float)abs(a*pontoR.first + b*pontoR.second + c))/((float) sqrt(a*a + b*b));
 	for (list< pair<float, float> >::iterator it = regiaoViavel.begin(); it!=regiaoViavel.end(); it++){
 		pair<float, float> ponto = (*it);
 		float distancia = abs(a*ponto.first + b*ponto.second + c)/sqrt(a*a + b*b); // distância de ponto a r
- 		if (distancia>max){
+ 		if (maiorQuefloat(distancia,max)){
  			max = distancia;
  			pontoR = ponto;
  		}
@@ -313,15 +287,14 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 		
 		// determina a reta p-q (hipotenusa)
 		float a, b; // pra determinar a equacao da reta p-q na forma ax+b = y
-		a = (yp-yq)/(xp-xq); // coeficiente angular da reta p-q
+		a = ((float)(yp-yq))/((float) (xp-xq)); // coeficiente angular da reta p-q
 		b = yq - a*xq; // coeficiente linear de p-q
 		pair<float, float> maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
 		//Agora determinamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
 		//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
-		float bM;
-		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
+		float bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 
-		Heap List(10000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
+		Heap List(MAX2); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE UM VALOR
 		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
 		map<int, pair<pair<int*, pair<float, float> >, list<Grafo>::iterator > > MSTs; // usada para lista de árvores
 		idMST = 0;
@@ -339,32 +312,30 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 			itt--;
 			MSTs[idMST] = make_pair(make_pair(A, make_pair(x, y)),itt);//A2;
 			List.insert(idMST++, custoMinimo); // o valor da variavel "custo" vem do kruskal
-				
-			
 		}
 
-		for (int k = 1; k<10000 && List.getSize()!=0; k++){
+		for (int k = 1; k<MAX2 && List.getSize()!=0; k++){
 			list<pair<int*, pair<float, float> > > k_best_tree;
 		
 			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes);  // k-best
 			pair<int*, pair<float, float> >  k_best = *(k_best_tree.begin());
-			float x = k_best.second.first, y= k_best.second.second;
+			float x = k_best.second.first;
+			float y= k_best.second.second;
 
 			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
 				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
-				//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
-		
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
-				bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
-			} else if ( y>=(a*x+bM)) { //s on or past maximum cost line 
-				//cout<<"break"<<endl;
+				bM = (float)maisDistante.second - (float)a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
+				
+			} else if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
+				//cout<<"K = "<<k<<endl;
 				break;
 			}
-		
 		}
 			
-		
+		//cout<<"RV = "<<regiaoViavel.size()<<endl;
+				
 		contador++;
 	}
 	return noSoportadas;
@@ -398,6 +369,7 @@ int main(){
 	
 	arestas = my_grafo.get_allArestas();
 	arestasPtr = my_grafo.getAllArestasPtr();
+ 	times(&tempsInit);
 
 	 list <pair<int*, pair<float, float> > > arvores = phase1GM(&my_grafo);
 	cout<<"Fim da primeira fase ... "<<endl;
@@ -483,5 +455,6 @@ int main(){
 	// }
 	//cout<<"pega valor = "<<contAux2<<endl;
 	//cout<<"Dominancia ou igualdade = "<<contAux<<endl;
+	cout<<"Partition = "<<contAux<<endl;
 	return 0;
 }

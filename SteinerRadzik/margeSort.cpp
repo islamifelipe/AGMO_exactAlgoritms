@@ -1,5 +1,4 @@
 #include "Conjunto.h"
-#include "kruskal.h"
 #include "Grafo.h"
 #include "margeSort.h"
 #include <iostream>
