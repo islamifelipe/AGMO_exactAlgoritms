@@ -20,6 +20,7 @@
 #include "Conjunto.h"
 #include "kruskal.h"
 #include "Heap.h"
+#include "margeSort.h"
 #include <sys/times.h>
 #include <unistd.h>
 using namespace std;
@@ -29,6 +30,7 @@ using namespace std;
 int idMST = 0;
 map <int, Aresta *> arestas;
 Aresta ** arestasPtr;
+int contAux = 0, contAux2=0;
 
 bool isEgal(int *t1, int *t2, int size){
 	for (int i=0; i<size; i++){
@@ -38,6 +40,7 @@ bool isEgal(int *t1, int *t2, int size){
 }
 
 bool isEgalObjetive(int *t1, int *t2){
+	++contAux;
 	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t1[i]==1){
@@ -64,12 +67,14 @@ bool t1_domina_t2(int *t1, int *t2){
 			t2_peso2+=arestas[i]->getPeso2();
 		}
 	}
+	++contAux;
 	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
 		return true;
 	} else return false;
 }
 
 void getXandY(int *t, float &X, float &Y ){
+	++contAux2;
 	X = 0; Y = 0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t[i]==1){
@@ -81,7 +86,7 @@ void getXandY(int *t, float &X, float &Y ){
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
-void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, map<int, int* > &MSTs,map<int, Grafo > &vetorParticoes){
+void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap &List, map<int, pair<int*, list<Grafo>::iterator > > &MSTs,list <Grafo > &vetorParticoes){
 	/*Pa = vetor de arestas = correspondente à partição P
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
@@ -104,27 +109,33 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll, int *Pa, Heap 
 				P1.setStatus(a->getId(), 2); /*proibida*/
 				P2.setStatus(a->getId(), 1); /*obrigatória*/
 				
-				res = kruskal(&P1, arestasPtr,A2, xl, yl, xll, yll,custo, 3);
-
+				res = kruskal(&P1, arestasPtr,A2, xl,  yl,  xll,  yll,custo);
+				//map<int, pair<int*, list<Grafo>::iterator > > 
 				if (res){
-					MSTs[idMST] = A2;
-					List.insert(idMST, custo); // o valor da variavel "custo" vem do kruskal
-					vetorParticoes[idMST++] = P1;
+					vetorParticoes.push_back(P1);
+					list<Grafo>::iterator itt = vetorParticoes.end();
+					itt--;
+					MSTs[idMST] = make_pair(A2,itt);//A2;
+					List.insert(idMST++, custo); // o valor da variavel "custo" vem do kruskal
+					//vetorParticoes[idMST++] = P1;
 				//	cout<<"size = "<<idMST<<endl;
 				} else {
 					delete[] A2;
 				}
-				P1 = P2;
+				P1.setStatus(a->getId(), 1); 
+				//P1 = P2;
 			}
 		}
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, Heap &List, map<int, int* > &MSTs, map<int, Grafo > &vetorParticoes){ 
+int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list<int*> &resul, Heap &List, map<int, pair<int*, list<Grafo>::iterator > > &MSTs, list <Grafo > &vetorParticoes){ 
 	
 			int id = List.getId();
-			int* it = MSTs[id];
-			Grafo Ps = vetorParticoes[id];
+			pair<int*, list<Grafo>::iterator > par = MSTs[id];
+				
+			int* it = par.first;//MSTs[id];
+			Grafo Ps = *par.second;
 			
 			List.extract();
 			resul.push_back(it);
@@ -173,8 +184,9 @@ void borderSearch(Grafo *g, list<int*> &resul, int * sl, int *sll){
 		A2 = new int[g->getQuantArestas()];
 		//for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
 		float cont; // nao utilisazado nesse caso
-		kruskal(g, arestasPtr,A2, xl, yl, xll, yll,cont, 3);
-		//cout<<pilha.size()<<endl;
+		mergesort(xl, yl, xll, yll, arestasPtr, g->getQuantArestas(),3);
+	
+		kruskal(g, arestasPtr,A2,xl, yl, xll, yll, cont);
 		if( !( (isEgalObjetive(A2, s1)) || (isEgalObjetive(A2, s2)) ) ){
 			if (it.first == 1){ // antes
 				resul.insert(it.second, A2); 
@@ -208,11 +220,15 @@ list<int*> phase1GM(Grafo *g){
 	int *s1 = new int[g->getQuantArestas()];
 	//for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
 	float cont; // nao utilisazado nesse caso
-	kruskal(g, arestasPtr,s1, 0, 0, 0, 0,cont, 1); // arvore para o primeiro objetivo
+	mergesort(0, 0, 0, 0, arestasPtr, g->getQuantArestas(),1);
+	kruskal(g, arestasPtr,s1,0,0,0,0,cont); // arvore para o primeiro objetivo
 	result.push_back(s1);
 	int* s2 = new int[g->getQuantArestas()];
 	//for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
-	kruskal(g, arestasPtr, s2, 0, 0, 0, 0,cont, 2); // arvore para o segundo objetivo
+	mergesort(0, 0, 0, 0, arestasPtr, g->getQuantArestas(),2);
+	
+	kruskal(g, arestasPtr, s2,0,0,0,0,cont); // arvore para o segundo objetivo
+	
 	list<int*>::iterator it = result.end();
 	if (isEgalObjetive(s1, s2)==false){
 		borderSearch(g, result, s1, s2);
@@ -293,20 +309,29 @@ list<int*> phase2KB(Grafo *g, list<int*> extremas){
 		bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 
 		Heap List(10000); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
-		map<int, Grafo >vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
-		map<int, int* >MSTs; // usada para lista de árvores
+		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+		map<int, pair<int*, list<Grafo>::iterator > > MSTs; // usada para lista de árvores
 		idMST = 0;
 		//cout<<"REDEFINIU"<<endl;
 		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
 		//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 		
 		float custoMinimo = 0;
-		bool res = kruskal(g, arestasPtr, A, xp,yp, xq,yq, custoMinimo, 3);
+		
+		mergesort(xp,yp, xq,yq, arestasPtr, g->getQuantArestas(),3);
+	
+		bool res = kruskal(g, arestasPtr, A,xp,yp, xq,yq,custoMinimo);
 		if (res){
-			MSTs[idMST] = A;
-			List.insert(idMST, custoMinimo);
-			vetorParticoes[idMST++] = *g;
-			//cout<<"size = "<<idMST<<endl;
+			vetorParticoes.push_back(*g);
+					list<Grafo>::iterator itt = vetorParticoes.end();
+					itt--;
+					MSTs[idMST] = make_pair(A,itt);//A2;
+					List.insert(idMST++, custoMinimo); // o valor da variavel "custo" vem do kruskal
+				
+			// MSTs[idMST] = A;
+			// List.insert(idMST, custoMinimo);
+			// vetorParticoes[idMST++] = *g;
+			// //cout<<"size = "<<idMST<<endl;
 		}
 
 		for (int k = 1; k<10000 && List.getSize()!=0; k++){
@@ -432,5 +457,7 @@ int main(){
     	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
     	i++;
 	}
+	cout<<"pega valor = "<<contAux2<<endl;
+	cout<<"Dominancia ou igualdade = "<<contAux<<endl;
 	return 0;
 }

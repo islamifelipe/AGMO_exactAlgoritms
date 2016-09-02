@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o Heap.o steinerRadzik
+all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o Heap.o margeSort.o steinerRadzik
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -19,9 +19,12 @@ kruskal.o : kruskal.cpp kruskal.h
 Heap.o : Heap.cpp Heap.h
 	g++ -g -c Heap.cpp
 
+margeSort.o : margeSort.cpp margeSort.h
+	g++ -g -c margeSort.cpp
+
 main.o : main.cpp
 	g++ -g -c  main.cpp
 		
-steinerRadzik : main.o  Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o Heap.o  
-	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o Heap.o main.o -lm -o steinerRadzik
+steinerRadzik : main.o  Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o margeSort.o Heap.o  
+	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o Heap.o margeSort.o main.o -lm -o steinerRadzik
 	
