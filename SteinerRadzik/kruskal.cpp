@@ -14,12 +14,12 @@ using namespace std;
 
 
 
-bool kruskal (Grafo *g, Aresta **listaAresta,  int  *A, float xl, float yl, float xll, float yll,float &custo){
+bool kruskal (Grafo *g, Aresta **listaAresta,  int  *A, float &x, float &y){
 	
 	Conjunto conjunto(g->getQuantVertices());
 	int cont=0, i=0;
 	//float peso;
-	custo = 0;
+	x=0;y=0;
 	//Aresta **listaAresta = g->getAllArestasPtr();
 	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/
 		if (g->getStatus(listaAresta[k]->getId())==1){ /*se for obrigatória*/
@@ -28,7 +28,9 @@ bool kruskal (Grafo *g, Aresta **listaAresta,  int  *A, float xl, float yl, floa
 		
 		 	cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
 		 	conjunto.union1(listaAresta[k]->getOrigem(), listaAresta[k]->getDestino());
-			custo+=listaAresta[k]->getPeso1()*(yl-yll)+listaAresta[k]->getPeso2()*(xll-xl);
+			//custo+=listaAresta[k]->getPeso1()*(yl-yll)+listaAresta[k]->getPeso2()*(xll-xl);
+			x+=listaAresta[k]->getPeso1();
+			y+=listaAresta[k]->getPeso2();
 		}else A[listaAresta[k]->getId()] = 0;
 	}
 	//mergesort(xl, yl, xll, yll, listaAresta, g->getQuantArestas(), direto);
@@ -41,8 +43,9 @@ bool kruskal (Grafo *g, Aresta **listaAresta,  int  *A, float xl, float yl, floa
 			cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
 			A[listaAresta[i]->getId()] = 1;
 			conjunto.union1(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino());
-			custo+=listaAresta[i]->getPeso1()*(yl-yll)+listaAresta[i]->getPeso2()*(xll-xl);
-		
+			//custo+=listaAresta[i]->getPeso1()*(yl-yll)+listaAresta[i]->getPeso2()*(xll-xl);
+			x+=listaAresta[i]->getPeso1();
+			y+=listaAresta[i]->getPeso2();
 		}
 		i++;
 	}
