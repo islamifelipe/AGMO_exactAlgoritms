@@ -25,7 +25,7 @@
 #include <unistd.h>
 using namespace std;
 
-#define MAX2 4000 // TODO : Aumentar
+#define MAX2 2000 // TODO : Aumentar
 
 int idMST = 0;
 map <int, Aresta *> arestas;
@@ -61,8 +61,9 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	//for (int i=0; i<P.getQuantVertices()-1; i++){
 	int m = P.getQuantArestas();
 	for (int i=0; i<m && List.getSize()<MAX2; i++){
-		if (Pa[i]==1){
-			a = P.getArestas(i);	
+		a = arestasPtr[i];
+		if (Pa[a->getId()]==1){
+			//a = P.getArestas(i);	
 			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
 				//A2 = new Aresta*[P.getQuantVertices()-1];
 				A2 = new int[m];
@@ -92,7 +93,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair<int*, pair<float, float> > > &resul, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs, list <Grafo > &vetorParticoes){ 
+int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair<int*, pair<float, float> > > &resul, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs, list <Grafo > &vetorParticoes, float a, float bM, int k){ 
 	
 			int id = List.getId();
 			pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > par = MSTs[id];
@@ -104,7 +105,16 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair
 			resul.push_back(it);
 			//MSTs.erase(id);
 			//vetorParticoes.erase(id);
-			Partition(Ps,xl, yl, xll, yll, it.first, List,MSTs,vetorParticoes);
+			float x = it.second.first;
+			float y = it.second.second;
+			
+			if (maiorIgualQuefloat(y,(a*x+bM))==false){ //k<363 &&  // Caso o ponto minimo passa da linha maxima, nao precisa calcular novamente
+				
+				Partition(Ps,xl, yl, xll, yll, it.first, List,MSTs,vetorParticoes);
+			
+			}
+
+			
 				
 
 	
@@ -317,7 +327,7 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 		for (int k = 1; k<MAX2 && List.getSize()!=0; k++){
 			list<pair<int*, pair<float, float> > > k_best_tree;
 		
-			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes);  // k-best
+			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes,a, bM, k);  // k-best
 			pair<int*, pair<float, float> >  k_best = *(k_best_tree.begin());
 			float x = k_best.second.first;
 			float y= k_best.second.second;
@@ -327,13 +337,13 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
 				bM = (float)maisDistante.second - (float)a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
-				
+				//cout<<"k add = "<<k<<endl;
 			} else if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
-				//cout<<"K = "<<k<<endl;
+				//cout<<"K break = "<<k<<endl;
 				break;
 			}
 		}
-			
+		//cout<<"List size final = "<<List.getSize()<<endl;	
 		//cout<<"RV = "<<regiaoViavel.size()<<endl;
 				
 		contador++;
