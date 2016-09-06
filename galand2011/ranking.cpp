@@ -152,6 +152,7 @@ int * algorithm2(Grafo *g, float v[4], float eplison){
 	list<int *> result;
 	int cont;
 	int k_best = 500;
+	// Otimizar
 	AllSpaningTree(g, lambda.first, lambda.second, result, cont, k_best); // esse valor de 500 pode variar conforme o tamanho da arvore
 	std::list<int *>::iterator it = result.begin();
 	int *X1 = *it, *Xi, *Xbest = X1;

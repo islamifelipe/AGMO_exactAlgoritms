@@ -1,0 +1,15 @@
+/*
+#=======================================================================
+# Islame Felipe DA COSTA FERNANDES --- Copyright 2016
+#-----------------------------------------------------------------------
+# This code implements the Knowles's (2002) graph generator, 
+# to generate the correlated and anticorrelated grid graphs  
+#=======================================================================
+*/
+
+#include <iostream>
+using namespace std;
+
+int main(){
+	return 0;
+}
