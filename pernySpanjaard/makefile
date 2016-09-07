@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o dominanceRelation kruskal prim
+all: Aresta.o Vertice.o Grafo.o dominanceRelation lexicographicRelation kruskal prim
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -16,6 +16,9 @@ main_kruskal.o : main_kruskal.cpp
 dominanceRelation.o : dominanceRelation.cpp
 	g++ -g -c dominanceRelation.cpp
 
+lexicographicRelation.o : lexicographicRelation.cpp
+	g++ -g -c lexicographicRelation.cpp
+
 main_prim.o : main_prim.cpp
 	g++ -g -c main_prim.cpp
 
@@ -27,3 +30,6 @@ prim : main_prim.o  Grafo.o Vertice.o Aresta.o
 
 dominanceRelation : dominanceRelation.o Grafo.o Vertice.o Aresta.o 
 	g++ -g  Aresta.o  Vertice.o Grafo.o dominanceRelation.o -lm -o dominanceRelation
+
+lexicographicRelation : lexicographicRelation.o Grafo.o Vertice.o Aresta.o 
+	g++ -g  Aresta.o  Vertice.o Grafo.o lexicographicRelation.o -lm -o lexicographicRelation

@@ -15,6 +15,8 @@
 #include <string>
 #include <utility>
 #include "Grafo.h"
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 bool isEgal(int *t1, int *t2, int size){
@@ -104,7 +106,8 @@ vector<pair <int *, int*> > prim_like(Grafo *g, vector<pair<int, int> > relacao2
 
 	for (int t=1; t<=g->getQuantVertices()-1; t++){
 		vector<pair <int *, int*> > It = at[t-1];
-		for (int i=0; i<It.size(); i++){
+		for (int i=0; i<1/*It.size()*/; i++){
+			
 			int *arestas = omega(It[i].first, g);
 			vector <Aresta *> max = maximal(g, arestas, relacao2);
 			
@@ -134,6 +137,8 @@ vector<pair <int *, int*> > prim_like(Grafo *g, vector<pair<int, int> > relacao2
 }
 
 int main(){
+	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+	
 	int n, m;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -166,8 +171,15 @@ int main(){
 		relacao2.push_back(make_pair(origem, destino));
 		// origem R destino
 	}
+	times(&tempsInit);
 
 	vector<pair <int *, int*> > arvores = prim_like(&my_grafo, relacao2);
+	
+	times(&tempsFinal1);   /* current time */ // clock final
+	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time1<<endl;
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	pair <int *, int*>  arestas= arvores[k]; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
