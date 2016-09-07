@@ -24,31 +24,46 @@ bool isEgal(int *t1, int *t2, int size){
 	return true;
 }
 
-/* recebe um vetor de inteiros, onde o valor do indice i refere-se o grau de chegada do vértice i da relacao
-retorna um vetor de aresta do grafo normal (nao o da relacao)
+/* recebe um vetor de inteiros, onde o valor do indice i é 1 se a aresta de id=i deve ser contabilizada
+retorna um vetor de aresta do grafo normal 
 */
-vector <Aresta *> maximal(Grafo *g, int *grausChegada){ // g é o grafo normal (nao o da relacao)
+vector <Aresta *> maximal(Grafo *g, int *arestas, vector<pair<int, int> > relacao2){ 
 	vector <Aresta *> retorno;
 	for (int i=0; i<g->getQuantArestas(); i++){
-		if (grausChegada[i]==0){
-			retorno.push_back((g->get_allArestas())[i]);
+		Aresta *aresta = (g->get_allArestas())[i];
+		if (arestas[aresta->getId()]==1){
+			bool esta = false;
+			for (int j=0; j<relacao2.size(); j++){
+				if (relacao2[j].second == aresta->getId() && arestas[relacao2[j].first] == 1) {
+					esta = true;
+					break;
+				}
+			}
+			if (esta == false){
+				retorno.push_back(aresta);
+			}
 		}
 	}
+	// for (int i=0; i<g->getQuantArestas(); i++){
+	// 	if (grausChegada[i]==0){
+	// 		retorno.push_back((g->get_allArestas())[i]);
+	// 	}
+	// }
 	return retorno;
 }
 
-/* Usada para subtrair um vertice v do grafo relacao, bem como seus graus de chegada e saida
-*/
-void subtrai(Grafo *relacao,int *grausChegada, int v){
-	grausChegada[v] = -1;
-	Vertice *vertice = relacao->getVertice(v);
-	for (int i=0; i<vertice->getGrau(); i++){
-		Aresta *a = vertice->getAresta(i);
-		grausChegada[a->getDestino()]--;
-	}
-}
+// /* Usada para subtrair um vertice v do grafo relacao, bem como seus graus de chegada e saida
+// */
+// void subtrai(Grafo *relacao,int *grausChegada, int v){
+// 	grausChegada[v] = -1;
+// 	Vertice *vertice = relacao->getVertice(v);
+// 	for (int i=0; i<vertice->getGrau(); i++){
+// 		Aresta *a = vertice->getAresta(i);
+// 		grausChegada[a->getDestino()]--;
+// 	}
+// }
 
-void omega(int* vertices, Grafo *my_grafo, Grafo *relacao, int *grausChegada){
+int *omega(int* vertices, Grafo *my_grafo){
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
 	int *retorno = new int[arestas.size()]; // vetor dos id das arestas
 
@@ -62,25 +77,26 @@ void omega(int* vertices, Grafo *my_grafo, Grafo *relacao, int *grausChegada){
 			retorno[a->getId()] = 0; 
 		}
 	}
+	return retorno;
+	// // depois verificamos a preferência entre as arestas
 
-	// depois verificamos a preferência entre as arestas
-
-	for (int i = 0; i<arestas.size(); i++){ 
-		int v = arestas[i]->getId();
-		if (retorno[v] == 0){
-			grausChegada[v] = -1;
-			for (int j=0; j<relacao->getVertice(v)->getGrau(); j++){
-				grausChegada[relacao->getVertice(v)->getAresta(j)->getId()]--;
-			}
-		}
-	}
+	// for (int i = 0; i<arestas.size(); i++){ 
+	// 	int v = arestas[i]->getId();
+	// 	if (retorno[v] == 0){
+	// 		grausChegada[v] = -1;
+	// 		for (int j=0; j<relacao->getVertice(v)->getGrau(); j++){
+	// 			grausChegada[relacao->getVertice(v)->getAresta(j)->getId()]--;
+	// 		}
+	// 	}
+	// }
 }
 
-vector<pair <int *, int*> > prim_like(Grafo *g, Grafo *relacao){
+vector<pair <int *, int*> > prim_like(Grafo *g, vector<pair<int, int> > relacao2){
 	map<int, vector<pair <int *, int*> > > at;
 	/*cada vector<pair <int *, int*> > funciona, na verdade, como uma lista de arvores de tamanho t, onde t é seu indice em map. Portanto, uma lista de arvores da forma T^(t) 
 	I^(t), do algorito original, nada mais é senao os indices do t-ésimo vector do map*/
-	int *grausChegada = new int[relacao->getQuantVertices()];
+	//int *grausChegada = new int[relacao->getQuantVertices()];
+	
 	at[0].push_back(make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]));
 	for (int i=0; i<g->getQuantVertices(); i++) (at[0][0].first)[i] = 0;
 	(at[0][0].first)[0] = 1;
@@ -89,9 +105,8 @@ vector<pair <int *, int*> > prim_like(Grafo *g, Grafo *relacao){
 	for (int t=1; t<=g->getQuantVertices()-1; t++){
 		vector<pair <int *, int*> > It = at[t-1];
 		for (int i=0; i<It.size(); i++){
-			for (int p=0; p<relacao->getQuantVertices(); p++) grausChegada[p] = relacao->getVertice(p)->getGrau_chegada();
-			omega(It[i].first, g, relacao, grausChegada);
-			vector <Aresta *> max = maximal(g, grausChegada);
+			int *arestas = omega(It[i].first, g);
+			vector <Aresta *> max = maximal(g, arestas, relacao2);
 			
 			for (int a=0; a<max.size(); a++){
 				pair <int *, int*> arvore = make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]);
@@ -144,13 +159,15 @@ int main(){
 	for (int i=0; i<m; i++){ // PADRAO : vértices numerados de 0 à n-1
 		relacao.addVertice(i);
 	}
+	vector< pair<int, int> > relacao2; // primeira aresta domina a segunda
 	while (cin>>origem){
 		cin>>destino;
 		relacao.addArestaDirecionada(id++, origem, destino); // nao nos preocupamos com os pesos para o grafo relacao
+		relacao2.push_back(make_pair(origem, destino));
 		// origem R destino
 	}
 
-	vector<pair <int *, int*> > arvores = prim_like(&my_grafo, &relacao);
+	vector<pair <int *, int*> > arvores = prim_like(&my_grafo, relacao2);
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	pair <int *, int*>  arestas= arvores[k]; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
