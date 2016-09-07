@@ -14,21 +14,125 @@
 #include <string>
 #include <utility>
 #include <stack>
+#include <list>
+#include <queue>          // std::queue
 #include "Grafo.h"
 #include "Conjunto.h"
+#include "Kruskal.h"
 using namespace std;
 
 
-vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair<int, int> > relacao2){
+int idMST = 0;
+Aresta ** arestasPtr;
+
+///ALGORITMO DA SONRENSEN JANSSENS (2003)
+
+void Partition(Grafo P, int* Pa, map<int, pair< pair<int*, Conjunto >, list<Grafo>::iterator > > &MSTs,list <Grafo > &vetorParticoes, queue<int> &fila,int k0){
+	/*Pa = vetor de arestas = correspondente à partição P
+	*/
+	Grafo P1 = P, P2 = P;
+	//cout<<List.getSize()<<endl;
+	bool res = false;
+	float custo;
+	Aresta *a; 
+	int *A2;
+	//map <int, Aresta *> allArestas = P.get_allArestas();
+	//for (int i=0; i<P.getQuantVertices()-1; i++){
+	int m = P.getQuantArestas();
+	for (int i=0; i<m; i++){
+		a = arestasPtr[i];
+		if (Pa[a->getId()]==1){
+			//a = P.getArestas(i);	
+			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
+				Conjunto conjunto(P1.getQuantVertices());
+		
+				A2 = new int[m];
+				//for(int mmm = 0; mmm<m; mmm++) A2[mmm] = 0;
+				P1.setStatus(a->getId(), 2); /*proibida*/
+				P2.setStatus(a->getId(), 1); /*obrigatória*/
+				float x, y;
+				res = kruskal(&P1, arestasPtr,A2, x, y,k0,conjunto);
+				//custo =x*(yl-yll)+y*(xll-xl);
+			
+				if (res){
+					vetorParticoes.push_back(P1);
+					list<Grafo>::iterator itt = vetorParticoes.end();
+					itt--;
+					MSTs[idMST] = make_pair(make_pair(A2,conjunto),itt);//A2;
+					fila.push(idMST++);
+				 } else {
+				 	delete[] A2;
+				 }
+				P1.setStatus(a->getId(), 1); 
+				//P1 = P2;
+			}
+		}
+	}
+}
+
+int AllSpaningTree(Grafo *g,list< pair<int*, Conjunto > > &resul, int k0){ 
+	
+
+		queue<int> fila;
+		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+		map<int, pair< pair<int*, Conjunto>, list<Grafo>::iterator > > MSTs; // usada para lista de árvores
+		idMST = 0;
+		//cout<<"REDEFINIU"<<endl;
+		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
+		float x, y;
+		Conjunto conjunto(g->getQuantVertices());
+		bool res = kruskal(g, arestasPtr, A,x, y,k0,conjunto);
+		
+		if (res){
+			vetorParticoes.push_back(*g);
+			list<Grafo>::iterator itt = vetorParticoes.end();
+			itt--;
+			MSTs[idMST] = make_pair(make_pair(A, conjunto),itt);//A2;
+			fila.push(idMST++);
+		}
+
+		while (!fila.empty()){	
+			//cout<<"size = "<<fila.size()<<endl;
+			int id = fila.front();
+			fila.pop();
+			pair< pair<int*, Conjunto >, list<Grafo>::iterator > par = MSTs[id];
+				
+			pair<int*, Conjunto > it = par.first;//MSTs[id];
+			Grafo Ps = *par.second;
+			
+			resul.push_back(it);
+			//MSTs.erase(id);
+			//vetorParticoes.erase(id);
+			Partition(Ps,it.first, MSTs,vetorParticoes,fila,k0);
+		}	
+	//List.desaloca();
+	return MSTs.size();
+}
+
+
+vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair<int, int> > relacao2, int &k0){
+	int aux[my_grafo->getQuantVertices()];
+	for (int i=0; i<my_grafo->getQuantVertices(); i++) aux[i] =0; 
+
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
 	int *forComparaison = new int[arestas.size()]; // vetor dos id das arestas
 	vector <Aresta *> ret;
 	for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
 		Aresta *e = arestas[i];
-		if (T[e->getId()]==0 && conjunto.compare(e->getDestino(), e->getOrigem()))
+		if (T[e->getId()]==0 && !conjunto.compare(e->getDestino(), e->getOrigem()))
 			forComparaison[e->getId()] = 1;
-		else 
+		else {
 			forComparaison[e->getId()] = 0;
+			if (T[e->getId()]==1){
+				if (aux[e->getOrigem()]==0) k0++;
+				if (aux[e->getDestino()]==0) k0++;
+				aux[e->getOrigem()]=1;
+				aux[e->getDestino()] = 1;
+			 	my_grafo->setStatus(e->getId(), 1);// se a restas estah em T, entao ela é obrigatoria
+			}
+			else my_grafo->setStatus(e->getId(), 2);
+		}
+
 	}
 	for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
 		int id = arestas[i]->getId();
@@ -41,6 +145,13 @@ vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair
 			}
 			if (dominada==false){
 				ret.push_back(arestas[i]);
+				if (aux[arestas[i]->getOrigem()]==0) k0++;
+				if (aux[arestas[i]->getDestino()]==0) k0++;
+				aux[arestas[i]->getOrigem()]=1;
+				aux[arestas[i]->getDestino()] = 1;
+				my_grafo->setStatus(arestas[i]->getId(), 0);// se está na lista de maximais, é opcional 
+			} else {
+				my_grafo->setStatus(arestas[i]->getId(), 2);
 			}
 
 		}
@@ -62,25 +173,44 @@ vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
 		pilhaT.pop();
 		int *T = s.first;
 		Conjunto c = s.second;
-
-		vector <Aresta *> E0 = maximal(T, c, g, relacao2);
+		int k1 = 0;
+		vector <Aresta *> E0 = maximal(T, c, g, relacao2,k1);
 		
-		Conjunto copie(g->getQuantVertices());
-		copie = c;
+		// Conjunto copie(g->getQuantVertices());
+		// copie = c;
+		list< pair<int*, Conjunto > > resul2;
 
-		// T U E0
-		for (int i=0; i<E0.size(); i++) copie.union1(g->get_allArestas()[i]->getOrigem(), g->get_allArestas()[i]->getDestino());
-		int aux[g->getQuantVertices()];
-		int k0 = 0;
-		for (int i=0; i<g->getQuantVertices(); i++) aux[i] =0; 
-		for (int i=0; i<g->getQuantVertices(); i++){
-			if (aux[copie.find_set(i)]!=1){
-				k0++;
-				aux[copie.find_set(i)] = 1; // um conjunto diferente
+		AllSpaningTree(g,resul2,k1);
+	
+		//cout<<"K1 = "<<k1<<endl;
+		for (list<pair<int*, Conjunto > >::iterator itnt = resul2.begin(); itnt!=resul2.end(); itnt++){
+			if (k1==g->getQuantVertices()){
+				resul.push_back(itnt->first);
+			}else{
+				
+				pilhaT.push(make_pair(itnt->first, itnt->second));
 			}
+		}
 
-		} 
-		cout<<"k0 = "<<k0<<endl;
+
+		//
+		// // T U E0
+		// for (int i=0; i<E0.size(); i++){
+		// 	copie.union1(E0[i]->getOrigem(), E0[i]->getDestino());
+		// }
+		
+		// int aux[g->getQuantVertices()];
+		// int k0 = 0;
+		// for (int i=0; i<g->getQuantVertices(); i++) aux[i] =0; 
+		// for (int i=0; i<g->getQuantVertices(); i++){
+		// 	if (aux[copie.find_set(i)]!=1){
+		// 		k0++;
+		// 		aux[copie.find_set(i)] = 1; // um conjunto diferente
+		// 	}
+
+		// } 
+		// cout<<"k0 = "<<k0<<endl;
+		// 
 	
 		
 
@@ -122,8 +252,29 @@ int main(){
 		// origem R destino
 	}
 
-
+	arestasPtr = my_grafo.getAllArestasPtr();
 	vector<int* > arvores = optimalcutset_K(&my_grafo, relacao2);
-	
+	map <int, Aresta *> arestas = my_grafo.get_allArestas();
+    	
+	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
+    	float cont1 = 0, cont2 = 0;
+    	int * arvore= arvores[k]; 
+    	cout<<"Arvore "<<k+1<<endl;
+    	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
+			if (arvore[a] == 1){
+				cont1+=arestas[a]->getPeso1();
+				cont2+=arestas[a]->getPeso2();
+
+    			cout<<arestas[a]->getOrigem() << " ";
+    			cout<<arestas[a]->getDestino() << " ";
+    			cout<<arestas[a]->getPeso1() << " ";
+    			cout<<arestas[a]->getPeso2() << endl;
+    		}
+    	}
+
+    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
+    	cout<<endl;
+    }
+
 	return 0;
 }

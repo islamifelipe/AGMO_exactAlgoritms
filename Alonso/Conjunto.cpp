@@ -2,9 +2,12 @@
 
 
 #include "Conjunto.h"
-
+#include <iostream>
 using namespace std;
 
+Conjunto::Conjunto(){
+
+}
 Conjunto::Conjunto(int n1){
 	n = n1;
 	pai = new int[n+1];
@@ -67,16 +70,16 @@ int Conjunto::getN(){
 	return n;
 }
 
-Conjunto& Conjunto::operator=( Conjunto& d){
-	
+Conjunto& Conjunto::operator=( const Conjunto& d){
+	//cout<<"COPIE"<<endl;
 	if (this == &d) return *this;
-	n = d.getN();
+	n = d.n;
 	pai = new int[n+1];
 	ordem = new int[n+1];
 	for (int i=0; i<=n; i++){
 
-		pai[i] = (d.getPai())[i];
-		ordem[i] = (d.getOrdem())[i];
+		pai[i] = (d.pai)[i];
+		ordem[i] = (d.ordem)[i];
 	} 
 
 	return *this;

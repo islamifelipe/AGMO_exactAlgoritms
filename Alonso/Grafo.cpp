@@ -5,6 +5,9 @@ using namespace std;
 Grafo::Grafo(int n1){
 	n = n1;
 	lista_vertices = new Vertice*[n];
+	for (int i=0; i<lista_allArestas.size(); i++){
+		particao[i] = 0; /*inicialmente opcional*/
+	}
 }
 
 void Grafo::addVertice(int id){
@@ -43,4 +46,18 @@ int Grafo::getQuantArestas(){
 
 int Grafo::getQuantVertices(){	
 	return n;	
+}
+Aresta ** Grafo::getAllArestasPtr(){
+	Aresta **arestasPtr = new Aresta*[lista_allArestas.size()];
+	for (int i=0; i<lista_allArestas.size(); i++){
+		arestasPtr[i] = lista_allArestas[i];
+	}
+	return arestasPtr;
+}
+
+int Grafo::getStatus(int i){
+	return particao[i];
+}
+void Grafo::setStatus(int i, int valor){
+	particao[i] = valor;
 }
