@@ -32,12 +32,6 @@ map <int, Aresta *> arestas;
 Aresta ** arestasPtr;
 int contAux = 0, contAux2=0;
 
-bool isEgal(int *t1, int *t2, int size){
-	for (int i=0; i<size; i++){
-		if (t1[i]!=t2[i]) return false;
-	}
-	return true;
-}
 
 bool isEgalObjetive(float t1_peso1, float t1_peso2, float t2_peso1, float t2_peso2){
 	return equalfloat(t1_peso1,t2_peso1) && equalfloat(t2_peso2,t1_peso2);
