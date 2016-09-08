@@ -142,7 +142,7 @@ void mergesort(float xl, float yl, float xll, float yll, Aresta **v, int size, i
 		b = 2*b;
 	}
 }
-bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float &custo, int direto){
+bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float &custo, float &x, float &y, int direto){
 	/*O parâmetro "direto" recebe:
 		1 - se as arestas devem ser na ordem lexicográfica direta
 		2 - se as arestas devem ser na ordem lexocográfica inversa  
@@ -152,6 +152,7 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 	 */
 	Conjunto conjunto(g->getQuantVertices());
 	int cont=0, i=0;
+	x = 0;y= 0;
 	//float peso;
 	Aresta **listaAresta = g->getAllArestasPtr();
 	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/
@@ -162,6 +163,8 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 		 	cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
 		 	conjunto.union1(listaAresta[k]->getOrigem(), listaAresta[k]->getDestino());
 			custo+=listaAresta[k]->getPeso1()*(yl-yll)+listaAresta[k]->getPeso2()*(xll-xl);
+			x +=listaAresta[k]->getPeso1();
+			y += listaAresta[k]->getPeso2();
 		}
 	}
 	mergesort(xl, yl, xll, yll, listaAresta, g->getQuantArestas(), direto);
@@ -174,7 +177,8 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 			A[listaAresta[i]->getId()] = 1;
 			conjunto.union1(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino());
 			custo+=listaAresta[i]->getPeso1()*(yl-yll)+listaAresta[i]->getPeso2()*(xll-xl);
-		
+			x +=listaAresta[i]->getPeso1();
+			y += listaAresta[i]->getPeso2();
 		}
 		i++;
 	}
