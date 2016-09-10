@@ -4,11 +4,11 @@
 #-----------------------------------------------------------------------
 # This code implements the Perny and Spanjaard's (2003) algorithm (prim_like)
 # to resolve the Biobjective Spanning Tree Problem (preference-based approach)
-
-# Apparently, the prim_like algorithm can return disferent results depending on the
-# initital vertice
+# It returns the superset of the maximal solutions
 #=======================================================================
 */
+
+
 
 #include <iostream>
 #include <map> 
@@ -43,27 +43,13 @@ vector <Aresta *> maximal(Grafo *g, int *arestas, vector<pair<int, int> > relaca
 			}
 			if (esta == false){
 				retorno.push_back(aresta);
+			//	return retorno;
 			}
 		}
 	}
-	// for (int i=0; i<g->getQuantArestas(); i++){
-	// 	if (grausChegada[i]==0){
-	// 		retorno.push_back((g->get_allArestas())[i]);
-	// 	}
-	// }
+	
 	return retorno;
 }
-
-// /* Usada para subtrair um vertice v do grafo relacao, bem como seus graus de chegada e saida
-// */
-// void subtrai(Grafo *relacao,int *grausChegada, int v){
-// 	grausChegada[v] = -1;
-// 	Vertice *vertice = relacao->getVertice(v);
-// 	for (int i=0; i<vertice->getGrau(); i++){
-// 		Aresta *a = vertice->getAresta(i);
-// 		grausChegada[a->getDestino()]--;
-// 	}
-// }
 
 int *omega(int* vertices, Grafo *my_grafo){
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
@@ -80,17 +66,7 @@ int *omega(int* vertices, Grafo *my_grafo){
 		}
 	}
 	return retorno;
-	// // depois verificamos a preferência entre as arestas
-
-	// for (int i = 0; i<arestas.size(); i++){ 
-	// 	int v = arestas[i]->getId();
-	// 	if (retorno[v] == 0){
-	// 		grausChegada[v] = -1;
-	// 		for (int j=0; j<relacao->getVertice(v)->getGrau(); j++){
-	// 			grausChegada[relacao->getVertice(v)->getAresta(j)->getId()]--;
-	// 		}
-	// 	}
-	// }
+	
 }
 
 vector<pair <int *, int*> > prim_like(Grafo *g, vector<pair<int, int> > relacao2){
@@ -106,7 +82,7 @@ vector<pair <int *, int*> > prim_like(Grafo *g, vector<pair<int, int> > relacao2
 
 	for (int t=1; t<=g->getQuantVertices()-1; t++){
 		vector<pair <int *, int*> > It = at[t-1];
-		for (int i=0; i<1/*It.size()*/; i++){
+		for (int i=0; i<It.size(); i++){
 			
 			int *arestas = omega(It[i].first, g);
 			vector <Aresta *> max = maximal(g, arestas, relacao2);
@@ -180,18 +156,22 @@ int main(){
 	cout<<user_time1<<endl;
 	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
    	
-	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
+	for (int k = 0; k <arvores.size(); k++){ // cada arvore formada
     	pair <int *, int*>  arestas= arvores[k]; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     	cout<<"Arvore "<<k+1<<endl;
+    	float cont1 = 0, cont2 = 0;
     	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
 			if ((arestas.second)[a] == 1){
+				cont1+= arestasPtr[a]->getPeso1();
+				cont2+= arestasPtr[a]->getPeso2();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << endl;
     		}
     	}
+    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
     	cout<<endl;
     }
 

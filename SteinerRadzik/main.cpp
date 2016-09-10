@@ -41,7 +41,7 @@ bool isEgalObjetive(float t1_peso1, float t1_peso2, float t2_peso1, float t2_pes
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs,list <Grafo > &vetorParticoes){
-	/*Pa = vetor de arestas = correspondente à partição P
+	/*Pa = vetor de arestas = correspondente à partição P (n-1 arestas)
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
 	contAux++;
@@ -49,40 +49,31 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	//cout<<List.getSize()<<endl;
 	bool res = false;
 	float custo;
-	Aresta *a; 
 	int *A2;
-	//map <int, Aresta *> allArestas = P.get_allArestas();
-	//for (int i=0; i<P.getQuantVertices()-1; i++){
 	int m = P.getQuantArestas();
-	for (int i=0; i<m && List.getSize()<MAX2; i++){
-		a = arestasPtr[i];
-		if (Pa[a->getId()]==1){
-			//a = P.getArestas(i);	
-			if (P.getStatus(a->getId())==0){ /*Se a aresta for opcional*/
-				//A2 = new Aresta*[P.getQuantVertices()-1];
-				A2 = new int[m];
-				//for(int mmm = 0; mmm<m; mmm++) A2[mmm] = 0;
-				P1.setStatus(a->getId(), 2); /*proibida*/
-				P2.setStatus(a->getId(), 1); /*obrigatória*/
-				float x, y;
-				res = kruskal(&P1, arestasPtr,A2, x, y);
-				custo =x*(yl-yll)+y*(xll-xl);
-			
-				//map<int, pair<int*, list<Grafo>::iterator > > 
-				if (res){
-					vetorParticoes.push_back(P1);
-					list<Grafo>::iterator itt = vetorParticoes.end();
-					itt--;
-					MSTs[idMST] = make_pair(make_pair(A2,make_pair( x, y)),itt);//A2;
-					List.insert(idMST++, custo); // o valor da variavel "custo" vem do kruskal
-					//vetorParticoes[idMST++] = P1;
-				//	cout<<"size = "<<idMST<<endl;
-				} else {
-					delete[] A2;
-				}
-				P1.setStatus(a->getId(), 1); 
-				//P1 = P2;
+	int n =P.getQuantVertices();
+	//for (int i=0; i<m && List.getSize()<MAX2; i++){
+	for (int i=0; i<n-1 && List.getSize()<MAX2; i++){
+		int iddnovo = Pa[i];
+		if (P.getStatus(iddnovo)==0){ /*Se a aresta for opcional*/
+			A2 = new int[n-1];
+			//A2 = new int[m];
+			P1.setStatus(iddnovo, 2); /*proibida*/
+			P2.setStatus(iddnovo, 1); /*obrigatória*/
+			float x, y;
+			res = kruskal(&P1, arestasPtr,A2, x, y);
+			custo =x*(yl-yll)+y*(xll-xl);
+			if (res){
+				vetorParticoes.push_back(P1);
+				list<Grafo>::iterator itt = vetorParticoes.end();
+				itt--;
+				MSTs[idMST] = make_pair(make_pair(A2,make_pair( x, y)),itt);//A2;
+				List.insert(idMST++, custo); // o valor da variavel "custo" vem do kruskal
+				
+			} else {
+				delete[] A2;
 			}
+			P1.setStatus(iddnovo, 1); 
 		}
 	}
 }
@@ -107,12 +98,6 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair
 				Partition(Ps,xl, yl, xll, yll, it.first, List,MSTs,vetorParticoes);
 			
 			}
-
-			
-				
-
-	
-	//List.desaloca();
 	return MSTs.size();
 }
 
@@ -160,8 +145,8 @@ void borderSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul, pair<
 		pilhaX.pop();
 		pilhaY.pop();
 
-		A2 = new int[g->getQuantArestas()];
-		//for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
+		//A2 = new int[g->getQuantArestas()];
+		A2 = new int[g->getQuantVertices()-1];
 		float cont; // nao utilisazado nesse caso
 		mergesort(xl, yl, xll, yll, arestasPtr, g->getQuantArestas(),3);
 		float x, y;
@@ -201,20 +186,20 @@ void borderSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul, pair<
 */
 list <pair<int*, pair<float, float> > > phase1GM(Grafo *g){
 	list< pair<int*, pair<float, float> > > result;
-	int *s1 = new int[g->getQuantArestas()];
+	int *s1 = new int[g->getQuantVertices()-1];
 	//for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
 	float xr, yr; // nao utilisazado nesse caso
 	mergesort(0, 0, 0, 0, arestasPtr, g->getQuantArestas(),1);
 	kruskal(g, arestasPtr,s1,xr, yr); // arvore para o primeiro objetivo
 	 pair<int*, pair<float, float> > ps1 = make_pair(s1, make_pair(xr,yr));
 	result.push_back(ps1);
-	int* s2 = new int[g->getQuantArestas()];
+	int* s2 = new int[g->getQuantVertices()-1];
 	//for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
 	mergesort(0, 0, 0, 0, arestasPtr, g->getQuantArestas(),2);
 	float xr2, yr2;
 	kruskal(g, arestasPtr, s2,xr2, yr2); // arvore para o segundo objetivo
 	pair<int*, pair<float, float> > ps2 = make_pair(s2, make_pair(xr2,yr2));
-//	list<int*>::iterator it = result.end();
+	
 	if (isEgalObjetive(xr, yr, xr2, yr2)==false){
 		borderSearch(g, result, ps1, ps2);
 		result.push_back(ps2);
@@ -303,7 +288,7 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 		map<int, pair<pair<int*, pair<float, float> >, list<Grafo>::iterator > > MSTs; // usada para lista de árvores
 		idMST = 0;
 		//cout<<"REDEFINIU"<<endl;
-		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
+		int *A = new int[g->getQuantVertices()-1]; // usada para a primeira árvore 
 		//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 		mergesort(xp,yp, xq,yq, arestasPtr, g->getQuantArestas(),3);
 		float x, y;
@@ -406,14 +391,14 @@ int main(){
     for (list<pair<int*, pair<float, float> > >::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		
 		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-		
-			if (((*it).first)[a] == 1){
-				cout<<my_grafo.getArestas(a)->getOrigem() << " ";
-    			cout<<my_grafo.getArestas(a)->getDestino() << " ";
-    			cout<<my_grafo.getArestas(a)->getPeso1() << " ";
-    			cout<<my_grafo.getArestas(a)->getPeso2() << endl;
-    		}
+    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
+			int iddd = ((*it).first)[a];
+			
+				cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
+    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
+    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
+    			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
+    		
     	}
     	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
     	i++;
@@ -424,14 +409,13 @@ int main(){
     for (list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
 		
 		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-		
-			if (((*it).first)[a] == 1){
-				cout<<my_grafo.getArestas(a)->getOrigem() << " ";
-    			cout<<my_grafo.getArestas(a)->getDestino() << " ";
-    			cout<<my_grafo.getArestas(a)->getPeso1() << " ";
-    			cout<<my_grafo.getArestas(a)->getPeso2() << endl;
-    		}
+    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
+			int iddd = ((*it).first)[a];
+				cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
+    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
+    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
+    			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
+    		
     	}
     	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
     	i++;

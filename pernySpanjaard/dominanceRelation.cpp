@@ -40,9 +40,11 @@ int main(){
 		id++;
 
 	}
-
-cout<<id<<endl;
 	//fim de leitura
+	cout<<n<<" "<<id<<endl;
+	for (int i=0; i<arestas.size(); i++){
+	cout<<arestas[i]->getOrigem()<<" "<<arestas[i]->getDestino()<<" "<<arestas[i]->getPeso1()<<" "<<arestas[i]->getPeso2()<<endl;
+	}
 
 	// a seguir construimos o vetor da relacao de dominância
 	id = 0;

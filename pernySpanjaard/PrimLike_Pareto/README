@@ -1,0 +1,2 @@
+Esta pasta comtém os resultados do caso de testes do PRIM-like onde a relacao de preferência é dominância de pareto.
+Sao tratados os caso em que o algoritmo gera apenas uma solucao otima e o caso em que gera um superconjunto
