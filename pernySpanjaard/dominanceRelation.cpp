@@ -20,6 +20,11 @@ bool a_domina_fracamente_b( Aresta *a, Aresta *b){
 		return true;
 	} else return false;
 }
+bool a_domina_b( Aresta *a, Aresta *b){
+	if (a->getPeso1() <= b->getPeso1() && a->getPeso2() <= b->getPeso2() && (a->getPeso1() < b->getPeso1() || a->getPeso2() < b->getPeso2())){
+		return true;
+	} else return false;
+}
 
 int main(){
 
@@ -51,7 +56,7 @@ int main(){
 	for (int i=0; i<arestas.size(); i++){
 		for (int j=0; j<arestas.size(); j++){
 			if (i!=j){
-				if (a_domina_fracamente_b(arestas[i], arestas[j])){
+				if (a_domina_b(arestas[i], arestas[j])){
 					cout<<i<<" "<<j<<endl;
 					//my_grafo.addAresta(id++, i, j, 0,0);
 				}

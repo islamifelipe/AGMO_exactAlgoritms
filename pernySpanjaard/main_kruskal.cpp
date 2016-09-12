@@ -31,12 +31,12 @@ vector <Aresta *> maximal(Grafo *g, int *arestas, Conjunto *conjIt, vector<pair<
 	vector <Aresta *> retorno;
 	for (int i=0; i<g->getQuantArestas(); i++){
 		Aresta *aresta = (g->get_allArestas())[i];
-		if (arestas[aresta->getId()]==0){
+		//if (arestas[aresta->getId()]!=1){
 			if (conjIt->compare(aresta->getOrigem(), aresta->getDestino())==false){
 				bool esta = false;
 				for (int j=0; j<relacao2.size(); j++){
 					Aresta *firstt = (g->get_allArestas())[relacao2[j].first];
-					if (relacao2[j].second == aresta->getId() && arestas[relacao2[j].first] == 0 && conjIt->compare(firstt->getOrigem(), firstt->getDestino())==false) {
+					if (relacao2[j].second == aresta->getId() && conjIt->compare(firstt->getOrigem(), firstt->getDestino())==false) {
 						esta = true;
 						break;
 					}
@@ -46,7 +46,7 @@ vector <Aresta *> maximal(Grafo *g, int *arestas, Conjunto *conjIt, vector<pair<
 				//	return retorno;
 				}
 			}
-		}
+		//}
 	}
 	
 	return retorno;
@@ -69,8 +69,10 @@ vector< int * > krukal_like(Grafo *g, vector< pair<int, int> > relacao2){
 		for (int i=0; i<It.size(); i++){
 			Conjunto *conjIt = veco[i];
 			vector <Aresta *> max = maximal(g, It[i], conjIt, relacao2);
+			
 			for (int a=0; a<max.size(); a++){
 				if (conjIt->compare(max[a]->getOrigem(), max[a]->getDestino())==false){
+					
 					int * arvore = new int[g->getQuantArestas()];
 					for (int p=0; p<g->getQuantArestas(); p++) arvore[p] = It[i][p];
 					arvore[max[a]->getId()] = 1;
@@ -83,15 +85,16 @@ vector< int * > krukal_like(Grafo *g, vector< pair<int, int> > relacao2){
 				//}
 			}   
 		}
-		// retira duplicatas
-		for (int i=0; i<at[t].size(); i++){
-			for (int j=i+1; j<at[t].size(); j++){
-				if (isEgal(at[t][i], at[t][j], g->getQuantArestas())){
-					at[t].erase(at[t].begin()+j);
-					conjuntos[t].erase(conjuntos[t].begin()+j);
+			// retira duplicatas
+			for (int i=0; i<at[t].size(); i++){
+				for (int j=i+1; j<at[t].size(); j++){
+					if (isEgal(at[t][i], at[t][j], g->getQuantArestas())){
+						at[t].erase(at[t].begin()+j);
+						conjuntos[t].erase(conjuntos[t].begin()+j);
+						j--;
+					}
 				}
 			}
-		}
 	}
 
 	return at[g->getQuantVertices()-1];
