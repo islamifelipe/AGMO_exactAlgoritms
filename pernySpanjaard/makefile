@@ -31,8 +31,8 @@ main_prim_pareto.o : main_prim_pareto.cpp
 main_kruskal_pareto.o : main_kruskal_pareto.cpp
 	g++ -g -c main_kruskal_pareto.cpp
 
-kruskal : main_kruskal.o  Grafo.o Vertice.o Aresta.o   
-	g++ -g  Aresta.o  Vertice.o Grafo.o main_kruskal.o -lm -o kruskal
+kruskal : main_kruskal.o  Grafo.o Vertice.o Aresta.o Conjunto.o  
+	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o main_kruskal.o -lm -o kruskal
 
 prim : main_prim.o  Grafo.o Vertice.o Aresta.o   
 	g++ -g  Aresta.o  Vertice.o Grafo.o main_prim.o -lm -o prim

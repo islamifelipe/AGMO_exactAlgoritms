@@ -2,9 +2,10 @@
 
 
 #include "Conjunto.h"
-
+#include <iostream>
 using namespace std;
 
+Conjunto::Conjunto(){}
 Conjunto::Conjunto(int n1){
 	n = n1;
 	pai = new int[n+1];
@@ -58,26 +59,33 @@ void Conjunto::desaloca(){
 }
 
 
-// int* Conjunto::getPai(){
-// 	return pai;
-// }
-// int* Conjunto::getOrdem(){
-// 	return ordem;
-// }
-// int Conjunto::getN(){
-// 	return n;
-// }
+int* Conjunto::getPai(){
+	return pai;
+}
+int* Conjunto::getOrdem(){
+	return ordem;
+}
+int Conjunto::getN(){
+	return n;
+}
 
-// Conjunto& Conjunto::operator=( Conjunto& d){
-	
-// 	if (this == &d) return *this;
-// 	n = d.getN();
+void Conjunto::copia(Conjunto* d){
+	for (int i=0; i<=n; i++){
+		pai[i] = (d->getPai())[i];
+ 		ordem[i] = (d->getOrdem())[i];
+ 	}
+}
+
+// Conjunto& Conjunto::operator=( Conjunto* d){
+// 	cout<<"ok"<<endl;
+// 	if (this == d) return *this;
+// 	n = d->getN();
 // 	pai = new int[n+1];
 // 	ordem = new int[n+1];
 // 	for (int i=0; i<=n; i++){
 
-// 		pai[i] = (d.getPai())[i];
-// 		ordem[i] = (d.getOrdem())[i];
+// 		pai[i] = (d->getPai())[i];
+// 		ordem[i] = (d->getOrdem())[i];
 // 	} 
 
 // 	return *this;

@@ -17,6 +17,7 @@ class Conjunto {
 		void link(int x, int y);/*A união sempre pegará a raiz de "menor altura" e a colocará como subárovre filha da de "maior altura" */
 		
 		Conjunto(int n);
+		Conjunto();
 		void union1(int x, int y);
 	
 		/*A raiz do conjunto o identifica; como a função find_set faz x ter como pai a raiz, e retorna este elemento, basta verificar se o valor
@@ -24,10 +25,12 @@ class Conjunto {
 		bool compare(int x, int y);
 		 void desaloca();
 
-		// int* getPai();
-		// int* getOrdem();
-		// int getN();
+		 int* getPai();
+		 int* getOrdem();
+		 int getN();
+		 void copia(Conjunto* d);
 
-		// Conjunto& operator=( Conjunto& d);
+
+		 //Conjunto& operator=( Conjunto* d);
 };
 #endif
