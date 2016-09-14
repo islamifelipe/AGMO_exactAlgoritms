@@ -14,6 +14,8 @@
 #include <utility>
 #include <stack>
 #include "Grafo.h"
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 
@@ -67,13 +69,13 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 		initT[i] =0; // tudo vazio
 		index[i] = 0; 
 	}	
-	initV[3] = 1; // vertice inicial v1;
+	initV[0] = 1; // vertice inicial v1;
 
 	pilha.push(make_pair(initV, initT));
 	pilha_level.push(0); // inicialmente, o level é zero
 	sizeT.push(0);
 	while (pilha.size()!=0){
-		cout<<"Size = "<<pilha.size()<<endl;
+		//cout<<"Size = "<<pilha.size()<<endl;
 		pair <int*, int*> s = pilha.top();
 		int * S = s.first; // vetor de vértices
 		int * T = s.second; // vetor de arestas (g->getQuantArestas)
@@ -87,7 +89,9 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 		int level0 = level;
 		//for (int oo=0; oo<g->getQuantArestas(); oo++) cout<<T[oo]<<" ";
 		//			cout<<endl;
-		for (int i=0; i<E0.size(); i++){ // por cada e in E0 ...
+		//cout<<"size E0 = "<<E0.size()<<endl;
+
+		for (int i=0; i<E0.size(); i++){ // para cada e in E0 ...
 			
 			Aresta *e = E0[i];
 			if ((index[e->getId()] > level) || (index[e->getId()] == 0)){
@@ -96,14 +100,20 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 			}
 		}
 
-		for (int i=0; i<E0.size(); i++){ // para cada e in E0 ...
-			Aresta *e = E0[i];
+		//cout<<"level0 = " <<level0<<endl;
+		//cout<<"level = "<<level<<endl;
 			int max = -1;
 			for (int aa = 0; aa<g->getQuantArestas(); aa++){
 				if (T[aa] == 1){
 					if (index[aa] > max) max = index[aa];
 				}
 			}
+
+//		cout<<"max = "<<max<<endl;
+		for (int i=0; i<E0.size(); i++){ // para cada e in E0 ...
+			Aresta *e = E0[i];
+			//cout<<"index[e->getId()] = "<<index[e->getId()]<<endl;
+			//cout<<e->getOrigem()<<" "<<e->getDestino()<<" "<<e->getPeso1()<<" "<<e->getPeso2()<<endl;
 			if (index[e->getId()] > max || size == 0){
 				int * newS = new int[g->getQuantVertices()];
 				for (int oo=0; oo<g->getQuantVertices(); oo++)newS[oo] =S[oo];
@@ -114,9 +124,12 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 				newS[e->getOrigem()] = 1;
 				newS[e->getDestino()] = 1;
 				size++;
+
 				if (size == g->getQuantVertices() -1){
+					//cout<<"ADD"<<endl;
 					OptCUT.push_back(make_pair(newS, newT));
 				} else{
+					//cout<<"recursive"<<endl;
 					pilha.push(make_pair(newS, newT));
 					pilha_level.push(level0); 
 					sizeT.push(size);
@@ -129,6 +142,10 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 }
 
 int main(){
+
+	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+	
+
 	int n, m;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -137,6 +154,7 @@ int main(){
 	cin>>m;
 	Grafo my_grafo(n);
 	Grafo relacao(m); // como a relacao se dá no conjunto de arestas, entao a quantidade de vértices do Grafo relacao será a mesma quantidade de arestas de my_grafo  
+	
 	// contruir o grafo
 	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
 		my_grafo.addVertice(i);
@@ -162,8 +180,16 @@ int main(){
 		// origem R destino
 	}
 
-
+	times(&tempsInit);
+	
 	vector<pair <int *, int*> > arvores = optimalcutset_P(&my_grafo, relacao2);
+	
+	times(&tempsFinal1);
+	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time1<<endl;
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	
+
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	float cont1 = 0, cont2 = 0;
     	pair <int *, int*>  arestas= arvores[k]; 
