@@ -70,6 +70,7 @@ int Conjunto::getN(){
 	return n;
 }
 
+// verificar a necessidade disso.
 Conjunto& Conjunto::operator=( const Conjunto& d){
 	//cout<<"COPIE"<<endl;
 	if (this == &d) return *this;

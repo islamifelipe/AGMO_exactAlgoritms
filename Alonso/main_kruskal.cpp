@@ -119,7 +119,7 @@ vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair
 	vector <Aresta *> ret;
 	for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
 		Aresta *e = arestas[i];
-		if (T[e->getId()]==0 && !conjunto.compare(e->getDestino(), e->getOrigem()))
+		if (!conjunto.compare(e->getDestino(), e->getOrigem()))
 			forComparaison[e->getId()] = 1;
 		else {
 			forComparaison[e->getId()] = 0;
@@ -172,9 +172,12 @@ vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
 		pair<int *, Conjunto> s = pilhaT.top();
 		pilhaT.pop();
 		int *T = s.first;
+		
 		Conjunto c = s.second;
+		
 		int k1 = 0;
 		vector <Aresta *> E0 = maximal(T, c, g, relacao2,k1);
+
 		
 		// Conjunto copie(g->getQuantVertices());
 		// copie = c;

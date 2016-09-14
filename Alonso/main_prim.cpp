@@ -65,7 +65,7 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 		initT[i] =0; // tudo vazio
 		index[i] = 0; 
 	}	
-	initV[0] = 1; // vertice inicial v1;
+	initV[3] = 1; // vertice inicial v1;
 
 	pilha.push(make_pair(initV, initT));
 	pilha_level.push(0); // inicialmente, o level é zero
@@ -93,9 +93,9 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 			}
 		}
 
-		for (int i=0; i<E0.size(); i++){ // por cada e in E0 ...
+		for (int i=0; i<E0.size(); i++){ // para cada e in E0 ...
 			Aresta *e = E0[i];
-			int max = 0;
+			int max = -1;
 			for (int aa = 0; aa<g->getQuantArestas(); aa++){
 				if (T[aa] == 1){
 					if (index[aa] > max) max = index[aa];
