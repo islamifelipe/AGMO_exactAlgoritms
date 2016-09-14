@@ -19,6 +19,8 @@
 #include "Grafo.h"
 #include "Conjunto.h"
 #include "Kruskal.h"
+#include <sys/times.h>
+#include <unistd.h>
 using namespace std;
 
 
@@ -92,6 +94,7 @@ int AllSpaningTree(Grafo *g,list< pair<int*, Conjunto > > &resul, int k0){
 		}
 
 		while (!fila.empty()){	
+
 			//cout<<"size = "<<fila.size()<<endl;
 			int id = fila.front();
 			fila.pop();
@@ -110,9 +113,9 @@ int AllSpaningTree(Grafo *g,list< pair<int*, Conjunto > > &resul, int k0){
 }
 
 
-vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair<int, int> > relacao2, int &k0){
-	int aux[my_grafo->getQuantVertices()];
-	for (int i=0; i<my_grafo->getQuantVertices(); i++) aux[i] =0; 
+vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair<int, int> > relacao2){
+	//int aux[my_grafo->getQuantVertices()];
+	//for (int i=0; i<my_grafo->getQuantVertices(); i++) aux[i] =0; 
 
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
 	int *forComparaison = new int[arestas.size()]; // vetor dos id das arestas
@@ -124,10 +127,10 @@ vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair
 		else {
 			forComparaison[e->getId()] = 0;
 			if (T[e->getId()]==1){
-				if (aux[e->getOrigem()]==0) k0++;
-				if (aux[e->getDestino()]==0) k0++;
-				aux[e->getOrigem()]=1;
-				aux[e->getDestino()] = 1;
+				// if (aux[e->getOrigem()]==0) k0++;
+				// if (aux[e->getDestino()]==0) k0++;
+				// aux[e->getOrigem()]=1;
+				// aux[e->getDestino()] = 1;
 			 	my_grafo->setStatus(e->getId(), 1);// se a restas estah em T, entao ela é obrigatoria
 			}
 			else my_grafo->setStatus(e->getId(), 2);
@@ -145,10 +148,10 @@ vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair
 			}
 			if (dominada==false){
 				ret.push_back(arestas[i]);
-				if (aux[arestas[i]->getOrigem()]==0) k0++;
-				if (aux[arestas[i]->getDestino()]==0) k0++;
-				aux[arestas[i]->getOrigem()]=1;
-				aux[arestas[i]->getDestino()] = 1;
+				// if (aux[arestas[i]->getOrigem()]==0) k0++;
+				// if (aux[arestas[i]->getDestino()]==0) k0++;
+				// aux[arestas[i]->getOrigem()]=1;
+				// aux[arestas[i]->getDestino()] = 1;
 				my_grafo->setStatus(arestas[i]->getId(), 0);// se está na lista de maximais, é opcional 
 			} else {
 				my_grafo->setStatus(arestas[i]->getId(), 2);
@@ -168,26 +171,47 @@ vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
 	Conjunto Tcinit(g->getQuantVertices());
 	pilhaT.push(make_pair(Tinit, Tcinit));
 
-	while (pilhaT.size()){
+	while (pilhaT.size()!=0){
+		///cout<<"Size = "<<pilhaT.size()<<endl;
 		pair<int *, Conjunto> s = pilhaT.top();
 		pilhaT.pop();
 		int *T = s.first;
+
+		////
+
+		////
 		
 		Conjunto c = s.second;
 		
-		int k1 = 0;
-		vector <Aresta *> E0 = maximal(T, c, g, relacao2,k1);
+		//int k1 = 0;
+		vector <Aresta *> E0 = maximal(T, c, g, relacao2);
 
+		for (int i=0; i<E0.size(); i++){
+			c.union1(E0[i]->getOrigem(), E0[i]->getDestino());
+		}
 		
+		int aux[g->getQuantVertices()];
+		int k0 = 0;
+		for (int i=0; i<g->getQuantVertices(); i++) aux[i] =0; 
+		for (int i=0; i<g->getQuantVertices(); i++){
+			if (aux[c.find_set(i)]!=1){
+				k0++;
+				aux[c.find_set(i)] = 1; // um conjunto diferente
+			}
+		}
+		//cout<<"k0 = "<<k0<<endl;
+		//cout<<"size E0 = "<<E0.size()<<"  ( "<< E0[0]->getPeso1()<<", "<<E0[0]->getPeso2()<<" )"<<endl;
+		//cout<<"k1 = "<<k1<<endl;
 		// Conjunto copie(g->getQuantVertices());
 		// copie = c;
 		list< pair<int*, Conjunto > > resul2;
 
-		AllSpaningTree(g,resul2,k1);
-	
+		AllSpaningTree(g,resul2,k0);
+		//cout<<"size = "<<resul2.size()<<endl;
 		//cout<<"K1 = "<<k1<<endl;
 		for (list<pair<int*, Conjunto > >::iterator itnt = resul2.begin(); itnt!=resul2.end(); itnt++){
-			if (k1==g->getQuantVertices()){
+			//if (k1==g->getQuantVertices()){
+			if (k0==1){
 				resul.push_back(itnt->first);
 			}else{
 				
@@ -222,6 +246,9 @@ vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
 }
 
 int main(){
+	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+	
+
 	int n, m;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -229,7 +256,7 @@ int main(){
 	cin>>n; // quantidade de vértices do grafo;
 	cin>>m;
 	Grafo my_grafo(n);
-	Grafo relacao(m); // como a relacao se dá no conjunto de arestas, entao a quantidade de vértices do Grafo relacao será a mesma quantidade de arestas de my_grafo  
+	//Grafo relacao(m); // como a relacao se dá no conjunto de arestas, entao a quantidade de vértices do Grafo relacao será a mesma quantidade de arestas de my_grafo  
 	// contruir o grafo
 	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
 		my_grafo.addVertice(i);
@@ -241,22 +268,29 @@ int main(){
 		cin>>peso2;
 		my_grafo.addAresta(id, origem, destino, peso1, peso2);
 	}
-	int nA = id; // quantidade de arestas do grafo	
+	//int nA = id; // quantidade de arestas do grafo	
 	//cout<<m<<endl;
 	id = 0;
-	for (int i=0; i<m; i++){ // PADRAO : vértices numerados de 0 à n-1
-		relacao.addVertice(i);
-	}
+	// for (int i=0; i<m; i++){ // PADRAO : vértices numerados de 0 à n-1
+	// 	relacao.addVertice(i);
+	// }
 	vector< pair<int, int> > relacao2; // primeira aresta domina a segunda
 	while (cin>>origem){
 		cin>>destino;
-		relacao.addArestaDirecionada(id++, origem, destino); // nao nos preocupamos com os pesos para o grafo relacao
+		//relacao.addArestaDirecionada(id++, origem, destino); // nao nos preocupamos com os pesos para o grafo relacao
 		relacao2.push_back(make_pair(origem, destino));
 		// origem R destino
 	}
 
 	arestasPtr = my_grafo.getAllArestasPtr();
+	times(&tempsInit);
 	vector<int* > arvores = optimalcutset_K(&my_grafo, relacao2);
+	times(&tempsFinal1);
+	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time1<<endl;
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	
+
 	map <int, Aresta *> arestas = my_grafo.get_allArestas();
     	
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada

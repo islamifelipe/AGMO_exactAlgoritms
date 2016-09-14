@@ -19,25 +19,27 @@ using namespace std;
 
 vector <Aresta *> maximal(int* S, Grafo *my_grafo,vector<pair<int, int> > relacao2){
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
-	int *retorno = new int[arestas.size()]; // vetor dos id das arestas
+	//int *retorno = new int[arestas.size()]; // vetor dos id das arestas
 	
-	for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
-		Aresta *a = arestas[i];
-		if (S[a->getOrigem()] != S[a->getDestino()]){
-			retorno[a->getId()] = 1; 
-		//	cout<<"("<<a->getOrigem()+1<<", "<<a->getDestino()+1<<")"<<endl;
-		} else {
-			retorno[a->getId()] = 0; 
-		}
-	}
+	// for (int i = 0; i<arestas.size(); i++){ //O(m) m arestas
+	// 	Aresta *a = arestas[i];
+	// 	if (S[a->getOrigem()] != S[a->getDestino()]){
+	// 		retorno[a->getId()] = 1; 
+	// 	//	cout<<"("<<a->getOrigem()+1<<", "<<a->getDestino()+1<<")"<<endl;
+	// 	} else {
+	// 		retorno[a->getId()] = 0; 
+	// 	}
+	// }
 	vector <Aresta *> ret;
 	for (int i = 0; i<arestas.size(); i++){ 
 		int v = arestas[i]->getId();
 		bool dominada = false;
-		if (retorno[v] == 1){ // verifia se v é dominada
+		//if (retorno[v] == 1){ // verifia se v é dominada
+		if (S[arestas[i]->getOrigem()] != S[arestas[i]->getDestino()]){
 			for (int j=0; j<relacao2.size(); j++){ 
 				if (v==relacao2[j].second){ // se existe alguém que domina v
-					if (retorno[relacao2[j].first]==1) dominada=true;
+					//if (retorno[relacao2[j].first]==1) dominada=true;
+					if (S[arestas[relacao2[j].first]->getOrigem()] != S[arestas[relacao2[j].first]->getDestino()]) dominada=true;
 				}
 			}
 			if (dominada==false){
@@ -71,6 +73,7 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 	pilha_level.push(0); // inicialmente, o level é zero
 	sizeT.push(0);
 	while (pilha.size()!=0){
+		cout<<"Size = "<<pilha.size()<<endl;
 		pair <int*, int*> s = pilha.top();
 		int * S = s.first; // vetor de vértices
 		int * T = s.second; // vetor de arestas (g->getQuantArestas)

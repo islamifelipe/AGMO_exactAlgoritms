@@ -49,6 +49,6 @@ bool kruskal (Grafo *g, Aresta **listaAresta,  int  *A, float &x, float &y,int k
 	//conjunto.desaloca();
 	
 	//if (cont==g->getQuantVertices()-1) return true; /*grafo conexo*/
-	if (cont==k0-1) return true; /*grafo conexo*/
+	if (cont==g->getQuantVertices()-k0) return true; /*grafo conexo*/
 	else return false; /*grafo desconexo*/
 }
