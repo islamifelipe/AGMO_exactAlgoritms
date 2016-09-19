@@ -1,0 +1,13 @@
+Loading graph Instancias/Completo/correlated/35.3/35.corr3.in...
+Graph loaded
+552 edges removed
+43 edges left
+24 mandatory edges
+LS time =  0.006846 s
+19 solutions after LS
+Search time  =  0.019619 s
+Total time   =  0.057104 s
+19 solutions
+63 calls to oracle
+LS finds the optimum
+(126,348)(128,346)(129,339)(131,337)(132,335)(134,333)(135,331)(137,329)(138,327)(140,325)(142,324)(143,323)(144,322)(145,321)(147,320)(149,318)(151,317)(153,316)(158,315)

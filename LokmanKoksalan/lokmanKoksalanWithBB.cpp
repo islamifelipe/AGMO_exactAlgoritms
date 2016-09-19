@@ -87,7 +87,7 @@ pair <bool, int *>branchAndBound(Grafo &g, vector< pair<int,float> >  criterio, 
 	bool ok = false;
 	int contttttt = 1;
 	while (pilha.size()!=0){
-		cout<<contttttt++<<endl;
+		//cout<<contttttt++<<endl;
 		pair<int, float > nivelUBp = nivelUB.top();
 		nivelUB.pop();
 		int nivel = nivelUBp.first;

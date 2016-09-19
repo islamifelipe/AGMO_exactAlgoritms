@@ -1,0 +1,17 @@
+Loading graph Instancias/Completo/concave/12.1/12.conc1.in...
+Graph loaded
+44 edges removed
+22 edges left
+3 mandatory edges
+LS time =  0.006307 s
+26 solutions after LS
+58 presorted orderings of arcs
+Presort time =  0.000947 s
+Shaving removed 0 edges
+Shaving time =  0.001964 s
+Search time  =  0.019311 s
+Total time   =  0.056904 s
+26 solutions
+91 calls to oracle
+LS finds the optimum
+(70,199)(71,193)(72,188)(73,187)(74,182)(75,181)(76,176)(77,175)(78,118)(79,111)(80,106)(81,103)(82,100)(83,97)(84,94)(85,91)(86,90)(90,88)(91,87)(95,85)(101,83)(170,82)(171,81)(175,79)(176,78)(180,76)

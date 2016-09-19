@@ -68,7 +68,14 @@ int* Conjunto::getOrdem(){
 int Conjunto::getN(){
 	return n;
 }
-Conjunto& Conjunto::operator=( Conjunto& d){
+void Conjunto::copia( Conjunto& d){
+	for (int i=0; i<=n; i++){
+
+		pai[i] = (d.getPai())[i];
+		ordem[i] = (d.getOrdem())[i];
+	} 	
+}
+/*Conjunto& Conjunto::operator=( Conjunto& d){
 	
 	if (this == &d) return *this;
 	n = d.getN();
@@ -81,6 +88,6 @@ Conjunto& Conjunto::operator=( Conjunto& d){
 	} 
 
 	return *this;
-}
+}*/
 
 

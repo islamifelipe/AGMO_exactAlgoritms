@@ -76,7 +76,7 @@ vector < pair<int,float> > getCoefCriterios(Grafo &g){
 }
 
 
-// O vetor de objetivos (negativos) ja deve está ordenado em ordem decrescente (como a ordenacao é única, faze-la-emos no main)
+// O vetor de objetivos (negativos) ja deve está ordenado em ordem decrescente (como a ordenacao é única, fazer-la-emos no main)
 bool krukalMax(Grafo &g, vector< pair<int,float> > objetivo, int *A, float &custo){
 	custo = 0;
 	Conjunto conjunto(g.getQuantVertices());

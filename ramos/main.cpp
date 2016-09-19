@@ -122,7 +122,7 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 			pilhaF.push(make_pair(xl, x));
 			pilhaG.push(make_pair(yl, y));
 			
-		}
+		} else delete[] A2; // NOVO
 	}
 }
 
@@ -190,10 +190,13 @@ void retiraDominadas(list<pair<int*, pair<float, float> > > &noSuportadas, pair<
 	
 	for (std::list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it != noSuportadas.end(); ++it){
 		if (t1_domina_t2(T.second.first, T.second.second, (*it).second.first, (*it).second.second)){
+			int *qux =  (*it).first;
 			it = noSuportadas.erase(it);
+			delete[] qux;  
 			it--;
 		} else if (t1_domina_t2((*it).second.first, (*it).second.second, T.second.first, T.second.second)){
 			noSuportadas.remove(T);
+			delete[] T.first;
 			return;
 		}
 	}
@@ -212,19 +215,28 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 	pilhaFG.push(make_pair(0,0));
 
 	float tf, tg;
-
+	pair<int *, int> p1;
+	pair<float, float> fg;
+	pair<float, float> p2;
+	list< pair<float, float> >::iterator it;
+	pair<float, float> ponto, ponto1,ponto2,fg_step1; 
+	pair<int*, pair<float, float> > novo;
+	float novo_tf,novo_tg,ponto_x,ponto_y;
+	int *T_aux ;
+	Aresta *e;
+	vector<Aresta*> Astep;
 	while (pilha.size()!=0){
-		pair<int *, int> p1 = pilha.top();
+		p1 = pilha.top();
 		T = p1.first;
 		step = p1.second;
 		pilha.pop();
 
-		pair<float, float> fg = pilhaFG.top();
+		fg = pilhaFG.top();
 		tf = fg.first;
 		tg = fg.second; 
 		pilhaFG.pop();
 
-		pair<float, float> p2 = pilhaLimites.top();
+		p2 = pilhaLimites.top();
 		fBound = p2.first;
 		gBound = p2.second;
 		pilhaLimites.pop();
@@ -232,53 +244,54 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 		conjunto = pilhaCojunto.top();
 		pilhaCojunto.pop();
 
-		vector<Aresta*> Astep = g->getVertice(step)->getAdjacentes();
+		 Astep = g->getVertice(step)->getAdjacentes();
 
 		//cout<<fBound<<", "<<gBound<<endl;
+		//cout<<"regiaoViavel = "<<regiaoViavel.size()<<endl;
+		//cout<<"pilha = "<<pilha.size()<<endl;
 		for (int a=0; a<Astep.size(); a++){
-			Aresta *e = Astep[a];
+			e = Astep[a];
 			//cout<<T[e->getId()]<<"   "<< conjunto.compare(e->getOrigem(), e->getDestino())<<endl;
-			if (T[e->getId()]!=1 && !conjunto.compare(e->getOrigem(), e->getDestino())){ // se nao formar ciclo
+			if (!conjunto.compare(e->getOrigem(), e->getDestino())){ // se nao formar ciclo
 
 				//getXandY(T, g->get_allArestas(), tf, tg);
-				list< pair<float, float> >::iterator it;
+				//list< pair<float, float> >::iterator it;
 				//cout<<isInViableRegion(g, regiaoViavel, tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound, it)<<endl;
 				if (isInViableRegion(g, regiaoViavel, tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound, it)){ // se estiver na regiao viavel
-					int *T_aux = new int[g->getQuantArestas()];
+					T_aux = new int[g->getQuantArestas()];
 					for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
 					Conjunto copie(g->getQuantVertices());
-					copie = conjunto;
+					copie.copia(conjunto);
 					T_aux[e->getId()] = 1;
-					float novo_tf = tf+e->getPeso1();
-					float novo_tg = tg+e->getPeso2();
+					novo_tf = tf+e->getPeso1();
+					novo_tg = tg+e->getPeso2();
 					copie.union1(e->getOrigem(), e->getDestino());
 					if (step+1 == g->getQuantVertices()-1){
-						pair<int*, pair<float, float> > novo = make_pair(T_aux,make_pair(novo_tf,novo_tg));
+						novo = make_pair(T_aux,make_pair(novo_tf,novo_tg));
 						noSuportadas.push_back(novo); // armazena T
 						retiraDominadas(noSuportadas, novo); //remove any solutions dominated by T
 						
 						// atualiza a regiao viavel
-						pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
-						float ponto_x = ponto.first, ponto_y = ponto.second;
-						pair<float, float> ponto1 = make_pair(tf+e->getPeso1(), ponto_y);
-						pair<float, float> ponto2 = make_pair(ponto_x, tg+e->getPeso2());
+						ponto = (*it); // um ponto extremo que delimita a regiao viável
+						 ponto_x = ponto.first, ponto_y = ponto.second;
+						ponto1 = make_pair(tf+e->getPeso1(), ponto_y);
+						ponto2 = make_pair(ponto_x, tg+e->getPeso2());
 						regiaoViavel.insert(it, ponto1);
 						regiaoViavel.insert(it, ponto2);
 						regiaoViavel.remove(ponto); // remove-se o ponto (corner), e adiciona-se os novos dois pontos formados
 							
 					} else {
-						pair<float, float> fg_step1 = min_f_g_vector[step+1];//min_f_g(g->getVertice(step+1)->getAdjacentes());
+						 fg_step1 = min_f_g_vector[step+1];//min_f_g(g->getVertice(step+1)->getAdjacentes());
 						pilhaCojunto.push(copie);
 						pilhaLimites.push(make_pair(fBound-fg_step1.first,gBound-fg_step1.second));
 						pilha.push(make_pair(T_aux, step+1));
 						pilhaFG.push(make_pair(novo_tf, novo_tg));
-						//EBST_BrB(T_aux, fBound-fg_step1.first, gBound-fg_step1.second, step+1, g, noSuportadas, copie, regiaoViavel);
-		
-
 					}
 				}
 			}
 		}
+		delete[] T;
+		conjunto.desaloca();
 	}
 }
 
