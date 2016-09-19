@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o Heap.o  ranking
+all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o Heap.o MargeSort.o ranking
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -12,6 +12,9 @@ Grafo.o : Grafo.cpp Grafo.h
 	
 ranking.o : ranking.cpp
 	g++ -g -c  ranking.cpp
+
+MargeSort.o : MargeSort.cpp
+	g++ -g -c MargeSort.cpp
 
 lambda.o : lambda.cpp
 	g++ -g -c  lambda.cpp
@@ -26,6 +29,6 @@ Heap.o : Heap.cpp Heap.h
 	g++ -g -c Heap.cpp
 
 		
-ranking : ranking.o  Grafo.o Vertice.o Aresta.o   lambda.o ranking.o Conjunto.o kruskal.o Heap.o 
-	g++ -g  Aresta.o  Vertice.o Grafo.o ranking.o lambda.o Conjunto.o kruskal.o Heap.o  -lm -o ranking
+ranking : ranking.o  Grafo.o Vertice.o Aresta.o   lambda.o ranking.o Conjunto.o kruskal.o Heap.o MargeSort.o
+	g++ -g  Aresta.o  Vertice.o Grafo.o ranking.o lambda.o Conjunto.o kruskal.o Heap.o MargeSort.o  -lm -o ranking
 	
