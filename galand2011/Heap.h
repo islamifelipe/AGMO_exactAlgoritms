@@ -7,7 +7,7 @@ class Heap {
 		int size; /*tamanho atual (parcial) da heap*/
 		float *heap; //Guarda as chaves a serem ordenadas. Vetor de floats
 		int *auxHeap; // Guarda os id das arestas
-		int *auxID; 
+		//int *auxID; 
 		int maximo;
 	
 	public: Heap(int maximo1);

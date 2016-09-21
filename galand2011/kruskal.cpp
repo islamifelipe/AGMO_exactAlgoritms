@@ -18,6 +18,7 @@ bool kruskal (Grafo *g, int  *A, Aresta **listaAresta, float lambda1, float lamb
 	
 	Conjunto conjunto(g->getQuantVertices());
 	int cont=0, i=0;
+	x = 0; y= 0;
 	//float peso;
 	custo =0;
 	//Aresta **listaAresta = g->getAllArestasPtr();
@@ -32,8 +33,9 @@ bool kruskal (Grafo *g, int  *A, Aresta **listaAresta, float lambda1, float lamb
 			custo+=listaAresta[k]->getPeso1()*(lambda1)+listaAresta[k]->getPeso2()*(lambda2);
 			x+=listaAresta[k]->getPeso1();
 			y+=listaAresta[k]->getPeso2();
-		}
+		} else A[listaAresta[k]->getId()] = 0;
 	}
+	//cout<<cont<<endl;
 	//mergesort( lambda1,  lambda2, listaAresta, g->getQuantArestas(), direto);
 	i=0;
 	while (cont<g->getQuantVertices()-1 && i<g->getQuantArestas()){ 
@@ -49,6 +51,7 @@ bool kruskal (Grafo *g, int  *A, Aresta **listaAresta, float lambda1, float lamb
 		}
 		i++;
 	}
+	
 	conjunto.desaloca();
 	
 	if (cont==g->getQuantVertices()-1) return true; /*grafo conexo*/

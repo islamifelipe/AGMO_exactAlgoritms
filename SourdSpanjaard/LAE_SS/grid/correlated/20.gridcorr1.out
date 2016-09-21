@@ -1,0 +1,13 @@
+Loading graph Instancias/Grid/correlate/20.gridcorr1.in...
+Graph loaded
+6 edges removed
+22 edges left
+15 mandatory edges
+LS time =  0.005335 s
+8 solutions after LS
+Search time  =  0.01864 s
+Total time   =  0.052391 s
+8 solutions
+23 calls to oracle
+LS finds the optimum
+(820,940)(825,933)(829,931)(836,929)(840,922)(845,915)(852,913)(881,911)

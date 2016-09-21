@@ -5,7 +5,7 @@ using namespace std;
 Grafo::Grafo(int n1){
 	n = n1;
 	lista_vertices = new Vertice*[n];
-	for (int i=0; i<lista_allArestas.size(); i++){
+	for (int i=0; i<MAX1; i++){
 		particao[i] = 0; /*inicialmente opcional*/
 	}
 }

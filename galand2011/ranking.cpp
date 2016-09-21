@@ -21,7 +21,6 @@
 #include <list>
 #include <climits>
 #include "lambda.h"
-#include <tuple>
 #include <stack> 
 #include <sys/times.h>
 #include <unistd.h>  
@@ -102,74 +101,18 @@ int AllSpaningTree(Grafo *g,float lambda1, float lambda2, list< pair<int*, pair<
 	
 	int id = List.getId();
 	pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > par = MSTs[id];
-				
 	pair<int*, pair<float, float> > it = par.first;//MSTs[id];
+	
 	Grafo Ps = *par.second;
-			
 	List.extract();
 	resul.push_back(it);
-	//MSTs.erase(id);
-	//vetorParticoes.erase(id);
 			
 	Partition(Ps,lambda1, lambda2, it.first, List,MSTs,vetorParticoes);
-			
+	
+	//MSTs.erase(id);
+	//vetorParticoes.erase(par.second);		
 			
 	return MSTs.size();
-
-
-	// int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
-	// list<int*> MSTs; // usada para lista de árvores
-	// float custoMinimo =0, x=0, y=0;
-	// Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE MAX1 ERROR???????
-	// list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
-	// //A estrutura "List" do algortimo original é um heap chamada List
-	// bool res = kruskal(g, A, listaAresta, lambda1, lambda2, custoMinimo, 3);
-	// cont =1;
-	// if (res){
-	// 	int contMSTs = MSTs.size();
-	// 	MSTs.push_back(A);
-	// 	List.insert(contMSTs, custoMinimo);
-	// 	vetorParticoes.push_back(*g);
-	// }
-	// do{ //List.getChave()<=custoMinimo
-	// 	if (List.getSize()>0){
-	// 		int id = List.getId();
-	// 		//ElementGrafo *init = vetorParticoes->getInit();
-	// 		//ElementArvore *initArvore = MSTs->getInit();
-	// 		list<int*>::iterator it;
-	// 		list<Grafo>::iterator itg = vetorParticoes.begin();
-	// 		int k=0;
-	// 		for (it=MSTs.begin(); k<id; ++it){
-	// 			k++;
-	// 			itg++;
-	// 		}
-	// 		Grafo Ps = *itg;
-	// 		//cout<<"Size : "<<List.getSize()<<endl;
-			
-	// 		List.extract();
-	// 		//cout<<"Size : "<<List.getSize()<<endl;
-			
-	// 		if (k_best>0){
-	// 			Partition(Ps, lambda1,  lambda2, *it, List,MSTs, cont,vetorParticoes);
-	// 			resul.push_back(*it);
-	// 		}
-	// 		k_best--;
-			
-	// 	}
-	// }while (List.getSize()>0);
-	// //cout<<"Quantidade de vezes que o Kruskal foi invocado: "<<cont<<endl;
-	// //cout<<"Quantidade de árvores criadas e armazenadas de fato: "<<contMSTs<<endl;
-	// //cout<<contMSTs<<endl;
-	// /*for (int i=0; i<vetorParticoes.size(); i++){ TODO
-		
-	// 		vetorParticoes->remove(vetorParticoes->getInit());
-	// 		ElementArvore *initArvore = MSTs->getInit();
-	// 		MSTs->remove(MSTs->getInit());
-	// 		delete initArvore;
-	// }*/
-	
-	// List.desaloca();
-	// return MSTs.size();
 }
 
 
@@ -182,11 +125,6 @@ Retorna o vetor de m 0's ou 1's e os valores objetivo associados
 */
 pair<int*, pair<float, float> > algorithm2(Grafo *g, float v[4], float eplison){
 
-	
-	// list<int *> result;
-	// int cont;
-	// int k_best = 500;
-	
 
 		Heap List(MAX1); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE UM VALOR
 		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
@@ -196,6 +134,7 @@ pair<int*, pair<float, float> > algorithm2(Grafo *g, float v[4], float eplison){
 		int *A = new int[g->getQuantArestas()]; // usada para a primeira árvore 
 		//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 		//mergesort(xp,yp, xq,yq, arestasPtr, g->getQuantArestas(),3);
+		
 		float x, y, custoMinimo;
 		bool res = kruskal(g, A, listaAresta, lambda.first, lambda.first, custoMinimo, x, y, 3);
 		//float custoMinimo = x*(yp-yq)+y*(xq-xp);
@@ -206,36 +145,32 @@ pair<int*, pair<float, float> > algorithm2(Grafo *g, float v[4], float eplison){
 			itt--;
 			MSTs[idMST] = make_pair(make_pair(A, make_pair(x, y)),itt);//A2;
 			List.insert(idMST++, custoMinimo); // o valor da variavel "custo" vem do kruskal
+		} else {
+			delete[] A;
+			exit(1);
 		}
+		list< pair<int*, pair<float, float> > > resul1;
+		AllSpaningTree(g,lambda.first, lambda.second, resul1, List,MSTs, vetorParticoes);
+		pair<int*, pair<float, float> > resulTemp = *(resul1.begin());
+		int *X1 = resulTemp.first, *Xi, *Xbest = X1;
+		int i = 1;
+		int omegai = 1;
+		//pair<float, float> x1 = arvorePesos(X1, g->get_allArestas()), xi;
+		pair<float, float> x1 = resulTemp.second, xbest = x1;
+		pair<float, float> xi;
+		float best = psi(x1.first, x1.second,v);
 
-	//AllSpaningTree(g, lambda.first, lambda.second, result, cont, k_best); // esse valor de 500 pode variar conforme o tamanho da arvore
-	//std::list<int *>::iterator it = result.begin();
-	//int *X1 = *it, *Xi, *Xbest = X1;
-	//it++;
-	list< pair<int*, pair<float, float> > > resul1;
-	AllSpaningTree(g,lambda.first, lambda.second, resul1, List,MSTs, vetorParticoes);
-	pair<int*, pair<float, float> > resulTemp = *(resul1.begin());
-	int *X1 = resulTemp.first, *Xi, *Xbest = X1;
-	int i = 1;
-	int omegai = 1;
-	//pair<float, float> x1 = arvorePesos(X1, g->get_allArestas()), xi;
-	pair<float, float> x1 = resulTemp.second, xbest = x1;
-	pair<float, float> xi;
-	float best = psi(x1.first, x1.second,v);
 	//cout<<best<<endl;
 	do{
 
 		i = i+1;
-
-		//list< pair<int*, pair<float, float> > > resul1;
+		
 		AllSpaningTree(g,lambda.first, lambda.second, resul1, List,MSTs, vetorParticoes);
+		
 		resulTemp = *(resul1.begin());
 		Xi = resulTemp.first;
 
 	
-		//Xi = *it;
-		//it++;
-		//xi = arvorePesos(Xi, g->get_allArestas());
 		xi = resulTemp.second;
 		float psiwx = psi(xi.first, xi.second,v);
 		if (psiwx<best){
@@ -245,8 +180,9 @@ pair<int*, pair<float, float> > algorithm2(Grafo *g, float v[4], float eplison){
 			xbest = xi;
 
 		} 
-	} while (i<500 && !maiorIgualQuefloat((1.0+eplison)*w(lambda.first*xi.first+lambda.second*xi.second),best));
-	cout<<omegai<<"-ésima arvore encontrada"<<endl;
+	} while (i<MAX1 && !maiorIgualQuefloat((1.0+eplison)*w(lambda.first*xi.first+lambda.second*xi.second),best));
+	//cout<<omegai<<"-ésima arvore encontrada"<<endl;
+	List.desaloca();
 	return make_pair(Xbest, xbest);
 }
 
@@ -392,7 +328,7 @@ int main(){
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
 	cin>>m; // quantidade de arestas do grafo	
-	Grafo my_grafo(n);
+	Grafo my_grafo(n); 
 	// contruir o grafo
 	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
 		my_grafo.addVertice(i);
@@ -425,7 +361,7 @@ int main(){
 
 	lambda = algorithm1(v);
 
-	cout<<lambda.first<<"   "<<lambda.second<<endl;
+	//cout<<lambda.first<<"   "<<lambda.second<<endl;
 
 	mergesort( lambda.first,  lambda.second, listaAresta, my_grafo.getQuantArestas(), 3);
 	mergesort( lambda.first,  lambda.second, listaAresta1, my_grafo.getQuantArestas(), 1);
@@ -433,25 +369,30 @@ int main(){
 		
 
 	times(&tempsInit);
-	int * arestas = BB(my_grafo, v, 0.4);//// algorithm2(&my_grafo, v,0.3);
-		
+	int * arestas =  BB(my_grafo, v, 0.5);//algorithm2(&my_grafo, v,0.2);
+	
 	times(&tempsFinal1);   /* current time */ // clock final
 	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
 	cout<<user_time1<<endl;
 	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
   
 
-
+		float cont1=0, cont2=0;
 		for (int j=0; j<my_grafo.getQuantArestas(); j++){
 			
 			if (arestas[j] == 1){
+
+				cont1 += my_grafo.get_allArestas()[j]->getPeso1();
+				cont2 += my_grafo.get_allArestas()[j]->getPeso2();
+
 				cout<<my_grafo.get_allArestas()[j]->getOrigem()<<" ";
 				cout<<my_grafo.get_allArestas()[j]->getDestino()<<" ";
 				cout<<my_grafo.get_allArestas()[j]->getPeso1()<<" ";
 				cout<<my_grafo.get_allArestas()[j]->getPeso2()<<endl;
 			}
 		}
-		cout<<endl;
+		cout<<"("<<cont1 <<", "<<cont2<<")"<<endl;
+	
 	// }
 
 	return 0;

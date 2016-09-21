@@ -1,0 +1,13 @@
+Loading graph Instancias/Grid/anticorrelate/6.gridanticorr1.in...
+Graph loaded
+0 edges removed
+7 edges left
+1 mandatory edges
+LS time =  0.005529 s
+6 solutions after LS
+Search time  =  0.019374 s
+Total time   =  0.053806 s
+6 solutions
+13 calls to oracle
+LS finds the optimum
+(280,247)(290,235)(302,227)(309,219)(321,211)(371,209)

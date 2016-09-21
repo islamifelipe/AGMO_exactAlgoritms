@@ -1,0 +1,17 @@
+Loading graph Instancias/Grid/correlate/70.gridcorr1.in...
+Graph loaded
+43 edges removed
+80 edges left
+59 mandatory edges
+LS time =  0.015118 s
+41 solutions after LS
+297 presorted orderings of arcs
+Presort time =  0.001811 s
+Shaving removed 0 edges
+Shaving time =  0.002126 s
+Search time  =  0.021963 s
+Total time   =  0.07253 s
+41 solutions
+209 calls to oracle
+LS finds the optimum
+(2135,2629)(2141,2624)(2142,2620)(2145,2619)(2148,2611)(2150,2603)(2155,2602)(2156,2598)(2157,2594)(2160,2593)(2163,2585)(2169,2580)(2170,2576)(2173,2575)(2176,2571)(2179,2567)(2185,2562)(2186,2558)(2189,2557)(2192,2553)(2195,2552)(2196,2550)(2199,2549)(2202,2545)(2203,2541)(2206,2540)(2209,2536)(2212,2535)(2217,2533)(2220,2532)(2230,2531)(2231,2530)(2233,2527)(2236,2526)(2241,2524)(2244,2523)(2255,2521)(2258,2520)(2272,2519)(2283,2517)(2286,2516)

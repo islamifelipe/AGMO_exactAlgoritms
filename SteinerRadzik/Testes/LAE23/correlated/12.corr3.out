@@ -1,0 +1,41 @@
+Fim da primeira fase ... 
+0
+0
+Fim da segunda fase ... 
+0
+0
+Total ...
+0
+Resultado 
+ SUPORTADAS
+Arvore 1
+0 6 1 8
+2 11 3 9
+2 3 4 5
+0 11 6 6
+2 7 6 12
+3 9 8 12
+0 4 9 13
+1 11 10 21
+2 5 10 22
+6 8 16 14
+8 10 32 31
+(105, 153)
+
+Arvore 2
+2 3 4 5
+0 11 6 6
+0 6 1 8
+2 11 3 9
+2 7 6 12
+3 9 8 12
+0 4 9 13
+6 8 16 14
+5 7 15 15
+1 11 10 21
+8 10 32 31
+(110, 146)
+
+Resultado 
+ NAO SUPORTADAS
+Partition = 2

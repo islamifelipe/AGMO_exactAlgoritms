@@ -4,7 +4,7 @@
 #include "Vertice.h"
 #include <map>
 
-#define MAX1 20000
+#define MAX1 3000
 
 class Grafo{
 	private:

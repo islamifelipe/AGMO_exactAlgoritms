@@ -1,0 +1,55 @@
+#!/bin/bash
+
+for i in 5 7 10 12 15 17 20 22 25 27 30 33 35 38 40 42 45 48 50
+do
+
+
+	./padronizador < ../../../Instâncias/instPatMestrado/correlated/$i.1/$i.corr1.in > completo/correlated/$i.corr1.in
+	echo "Done  $i.1 correlated";
+
+	./padronizador < ../../../Instâncias/instPatMestrado/correlated/$i.2/$i.corr2.in > completo/correlated/$i.corr2.in
+	echo "Done  $i.2 correlated";
+
+	./padronizador < ../../../Instâncias/instPatMestrado/correlated/$i.3/$i.corr3.in > completo/correlated/$i.corr3.in
+	echo "Done  $i.3 correlated";
+
+
+	./padronizador < ../../../Instâncias/instPatMestrado/anticorrelated/$i.1/$i.anticorr1.in > completo/anticorrelated/$i.anticorr1.in
+	echo "Done  $i.1 anticorrelated";
+
+	./padronizador < ../../../Instâncias/instPatMestrado/anticorrelated/$i.2/$i.anticorr2.in > completo/anticorrelated/$i.anticorr2.in
+	echo "Done  $i.2 anticorrelated";
+
+	./padronizador < ../../../Instâncias/instPatMestrado/anticorrelated/$i.3/$i.anticorr3.in > completo/anticorrelated/$i.anticorr3.in
+	echo "Done  $i.3 anticorrelated";
+
+
+	./padronizador < ../../../Instâncias/instPatMestrado/concave/$i.1/$i.conc1.in > completo/concave/$i.conc1.in
+	echo "Done  $i.1 concave";
+
+	./padronizador < ../../../Instâncias/instPatMestrado/concave/$i.2/$i.conc2.in > completo/concave/$i.conc2.in
+	echo "Done  $i.2 concave";
+
+	./padronizador < ../../../Instâncias/instPatMestrado/concave/$i.3/$i.conc3.in > completo/concave/$i.conc3.in
+	echo "Done  $i.3 concave";
+done 
+echo "DONE completo"
+
+
+
+
+
+for i in 6 12 18 20 24 27 30 33 36 38 40 42 44 48 50 52 55 58 60 63 66 68 70 75 77 80 82 86 90 93 96 100
+do
+
+
+	./padronizador < ../../GridInstâncias/correlate/$i.gridcorr1.in > grid/correlated/$i.gridcorr1.in
+	echo "Done  $i.1 correlated";
+
+
+	./padronizador < ../../GridInstâncias/anticorrelate/$i.gridanticorr1.in > grid/anticorrelated/$i.gridanticorr1.in
+	echo "Done  $i.1 anticorrelated";
+
+
+done 
+echo "DONE grid"

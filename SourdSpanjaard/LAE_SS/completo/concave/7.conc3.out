@@ -1,0 +1,13 @@
+Loading graph Instancias/Completo/concave/7.3/7.conc3.in...
+Graph loaded
+10 edges removed
+11 edges left
+1 mandatory edges
+LS time =  0.005564 s
+12 solutions after LS
+Search time  =  0.019114 s
+Total time   =  0.053408 s
+12 solutions
+19 calls to oracle
+LS finds the optimum
+(108,190)(109,188)(112,186)(113,185)(131,133)(132,131)(135,129)(136,128)(188,110)(189,108)(192,106)(193,105)
