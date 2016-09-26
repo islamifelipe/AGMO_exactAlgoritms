@@ -1,0 +1,15 @@
+Sigas
+PLL: Prim-Like com relação Lexicográfica
+KLL: Kruskal-Like com relação Lexicográfica
+OPTPL: optimalcutsetP com relação Lexicográfica
+OPTKL: optimalcutsetK com relação Lexicográfica
+CR: Choquet ranking 
+CBB: Choquet Branch-and-Bound
+CLY: Corley
+PGL: Pugliese
+LMKS: Lokman and Koksalan
+RA: Ramos
+SR: Steiner and Radzik
+SS: Sourd and Spanjaard
+PLS: Prim-Like que gera um superconjunto de Pareto
+KLS; Kruskal-like que gera um  superconjunto de Pareto
