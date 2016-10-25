@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o ramos
+all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o ramos AllMST
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -21,4 +21,9 @@ main.o : main.cpp
 		
 ramos : main.o  Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o   
 	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o main.o -lm -o ramos
-	
+
+AllMST.o : AllMST.cpp
+	g++ -g -c AllMST.cpp
+
+AllMST : AllMST.o Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o   
+	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o AllMST.o -lm -o AllMST

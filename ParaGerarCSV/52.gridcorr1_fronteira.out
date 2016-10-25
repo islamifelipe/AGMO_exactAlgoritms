@@ -1,0 +1,17 @@
+Loading graph Instancias/Grid/correlate/52.gridcorr1.in...
+Graph loaded
+18 edges removed
+58 edges left
+43 mandatory edges
+LS time =  0.008066 s
+18 solutions after LS
+192 presorted orderings of arcs
+Presort time =  0.001199 s
+Shaving removed 0 edges
+Shaving time =  0.002023 s
+Search time  =  0.019622 s
+Total time   =  0.059869 s
+18 solutions
+67 calls to oracle
+LS finds the optimum
+(1892,2203)(1893,2191)(1895,2188)(1896,2176)(1900,2169)(1902,2166)(1903,2154)(1909,2149)(1911,2146)(1912,2134)(1921,2132)(1930,2122)(1939,2120)(1953,2119)(1959,2116)(1968,2114)(1982,2113)(1991,2111)
