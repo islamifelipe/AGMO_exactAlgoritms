@@ -5,9 +5,9 @@ using namespace std;
 Grafo::Grafo(int n1){
 	n = n1;
 	lista_vertices = new Vertice*[n];
-	for (int i=0; i<lista_allArestas.size(); i++){
-		particao[i] = 0; /*inicialmente opcional*/
-	}
+	//for (int i=0; i<lista_allArestas.size(); i++){
+	//	particao[i] = 0; /*inicialmente opcional*/
+	//}
 }
 
 void Grafo::addVertice(int id){
@@ -25,6 +25,7 @@ Aresta *Grafo::addAresta(int id, int origem, int destino, float peso1, float pes
 	lista_allArestas[id] = nova;
 	lista_vertices[origem]->adicionaAresta(nova);
 	lista_vertices[destino]->adicionaAresta(nova);
+	particao[id] = 0;
 	return nova;
 }
 
