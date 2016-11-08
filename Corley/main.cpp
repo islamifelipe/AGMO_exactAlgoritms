@@ -14,7 +14,33 @@
 #include "Grafo.h"
 #include <sys/times.h>
 #include <unistd.h>
+#include <pthread.h> 
 using namespace std;
+
+struct tms tempsInit, tempsFinal; // para medir o tempo
+
+int n, nA;
+
+//map<int, int* > *X = new map<int, int* >[n+1];
+map<int, int* > *X;
+	/* X é um vetor de map's. 
+	 * cada índice do vetor (0...n), representa o valor das iteracoes r do algoritmo do Corley
+	 * cada item o map é um valor de k = 1 ... mr
+	 * O tamanho de X nao aumenta. Somente aumenta o tamanho do map
+     * dado um id do map com m elementos, busca é feita em O(mlogm)
+     * O valor do map é um vator de **** n **** inteiros que representam os vértices 
+     incluidos na arvore. Se um indice i for 1, entao o vertice 1 está na arvore  
+	 */
+
+//map<int, int* > *A = new map<int, int* >[n+1];
+map<int, int* > *A;
+	 /* Semelhante ao vetor X, mas aqui o int* é um vetor de nA inteiros 
+	  * se um indice i do int* for 1, entao a i-esima aresta (0 à nA-1) está presente na arvore   	
+	  */
+
+//int m[n+1]; // de 1 à n : nao utilisar o 0
+int *m;
+map <int, Aresta *> arestasPtr;
 
 bool a_domina_b( Aresta *a, Aresta *b){
 	if (a->getPeso1() <= b->getPeso1() && a->getPeso2() <= b->getPeso2() && (a->getPeso1() < b->getPeso1() || a->getPeso2() < b->getPeso2())){
@@ -85,11 +111,63 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 		return true;
 	} else return false;
 }
-int main(){
-	struct tms tempsInit, tempsFinal; // para medir o tempo
-	times(&tempsInit);  // pega o tempo do clock inical
+
+
+
+void printResultado(){
+	cout<<m[n]<<endl;
+   	cout<<endl;
+    for (int k = 1; k <= m[n]; k++){ // cada arvore formada
+    	int *arestas  = A[n][k]; 
+    	float cont1 = 0, cont2 = 0;
+    	cout<<"Arvore "<<k<<endl;
+    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
+			if (arestas[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
+    			cout<<arestasPtr[a]->getOrigem() << " ";
+    			cout<<arestasPtr[a]->getDestino() << " ";
+    			cout<<arestasPtr[a]->getPeso1() << " ";
+    			cout<<arestasPtr[a]->getPeso2() << endl;
+    		}
+    	}
+    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
+    	cout<<endl;
+    }
+}
+
+
+void *tempo(void *nnnn){
+	while (true){
+		times(&tempsFinal);   /* current time */ // clock final
+		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-	int n;
+		if (sec>250){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			cout<<sec<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+			printResultado();
+			//cout<<"saindo... valor de ppp="<<ppp<<endl;
+			exit(-1);
+		}
+	}
+}
+
+int main(){
+	
+	times(&tempsInit);  // pega o tempo do clock inical
+
+	// para medir o tempo em caso limite
+	pthread_t thread_time; 
+	pthread_attr_t attr;
+	int nnnnnnnn=0;
+	if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
+        printf("Error to create the thread");
+        exit(-1);
+    }
+    //
+		
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
@@ -106,25 +184,14 @@ int main(){
 		my_grafo.addAresta(id, origem, destino, peso1, peso2);
 		id++;
 	}
-	int nA = id; // quantidade de arestas do grafo	
+	nA = id; // quantidade de arestas do grafo
+	m = new int[n+1];	
+	for (int mmm=0; mmm<=n; mmm++)m[mmm] = 0; // by felipe
+	 m[1] = 1;
 
-	map<int, int* > *X = new map<int, int* >[n+1];
-	/* X é um vetor de map's. 
-	 * cada índice do vetor (0...n), representa o valor das iteracoes r do algoritmo do Corley
-	 * cada item o map é um valor de k = 1 ... mr
-	 * O tamanho de X nao aumenta. Somente aumenta o tamanho do map
-     * dado um id do map com m elementos, busca é feita em O(mlogm)
-     * O valor do map é um vator de **** n **** inteiros que representam os vértices 
-     incluidos na arvore. Se um indice i for 1, entao o vertice 1 está na arvore  
-	 */
-
-	 map<int, int* > *A = new map<int, int* >[n+1];
-	 /* Semelhante ao vetor X, mas aqui o int* é um vetor de nA inteiros 
-	  * se um indice i do int* for 1, entao a i-esima aresta (0 à nA-1) está presente na arvore   	
-	  */
-     int m[n+1]; // de 1 à n : nao utilisar o 0
-     m[1] = 1;
-
+	 A = new map<int, int* >[n+1];
+	 X = new map<int, int* >[n+1];
+	 arestasPtr = my_grafo.get_allArestas();
 
      X[1][1] = new int[n];
      for (int mmm=0; mmm<n; mmm++)X[1][1][mmm] = 0; // by felipe
@@ -217,25 +284,8 @@ int main(){
 	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 	cout<<user_time<<endl;
 	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-   	cout<<m[n]<<endl;
-   	cout<<endl;
-    for (int k = 1; k <= m[n]; k++){ // cada arvore formada
-    	int *arestas  = A[n][k]; 
-    	float cont1 = 0, cont2 = 0;
-    	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    	cout<<"Arvore "<<k<<endl;
-    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-			if (arestas[a] == 1){
-				cont1+=arestasPtr[a]->getPeso1();
-				cont2+=arestasPtr[a]->getPeso2();
-    			cout<<arestasPtr[a]->getOrigem() << " ";
-    			cout<<arestasPtr[a]->getDestino() << " ";
-    			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
-    		}
-    	}
-    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
-    	cout<<endl;
-    }
+   	
+	printResultado();
+
 	return 0;
 }
