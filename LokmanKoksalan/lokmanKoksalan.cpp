@@ -24,17 +24,71 @@ m = 1
 #include <unistd.h>
 using namespace std;
 
+int n;
+struct tms tempsInit, tempsFinal1,tempsFinal2, tempsFinal; // para medir o tempo
+//double coeficienteObjetv[n][n],matrix_peso1[n][n],matrix_peso2[n][n];;
+double **coeficienteObjetv,**matrix_peso1,**matrix_peso2;
+short **arestas;
+std::vector<short**> S;
+
+void printResultado(){
+	for (int pp=0; pp<S.size(); pp++){
+		double cont11=0, cont22 = 0;
+		short **result = S[pp];
+		cout<<"Arvore "<<pp+1<<endl;
+		for (int i=0; i<n; i++){
+			for (int j=i+1; j<n; j++){
+				if (arestas[i][j] == 1){
+					if (result[i][j] == 1){
+						cout <<i<<" "<<j<<" "<<matrix_peso1[i][j]*(-1)<<" "<<matrix_peso2[i][j]*(-1)<<endl;
+						cont11+=matrix_peso1[i][j]*(-1);
+						cont22+=matrix_peso2[i][j]*(-1);
+					}
+				}
+			}
+		}
+		cout<<"("<<cont11<<", "<<cont22<<")"<<endl;
+		cout<<endl;
+	}	
+}
+
+void *tempo(void *nnnn){
+	while (true){
+		times(&tempsFinal);   /* current time */ // clock final
+		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
+		
+		if (sec>20){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			cout<<sec<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO...   " <<endl;
+
+			printResultado();
+			//cout<<"saindo... valor de ppp="<<ppp<<endl;
+			exit(-1);
+		}
+	}
+}
 
 int main(){
-	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+
 	
-	int n;
+	
+	
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
-	double coeficienteObjetv[n][n],matrix_peso1[n][n],matrix_peso2[n][n];;
-	short arestas[n][n];
+	arestas = new short*[n];
+	coeficienteObjetv = new double*[n];
+	matrix_peso1 = new double*[n];
+	matrix_peso2 = new double*[n];
+	for (int i=0; i<n; i++){
+		arestas[i] = new short[n];
+		coeficienteObjetv[i] = new double[n];
+		matrix_peso1[i] = new double[n];
+		matrix_peso2[i] = new double[n];
+	}
+
 
 	GRBEnv env = GRBEnv();;
 	env.set("OutputFlag","0");
@@ -157,8 +211,21 @@ int main(){
 	*/
 	try {
 		times(&tempsInit);
+
+
+		// para medir o tempo em caso limite
+		pthread_t thread_time; 
+		pthread_attr_t attr;
+		int nnnnnnnn=0;
+		if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
+	        printf("Error to create the thread");
+	        exit(-1);
+	    }
+	    //
+
+
 		int optimstatus;
-		std::vector<short**> S;
+		//std::vector<short**> S;
 		 do{
 			//cout<<"Inicio"<<endl;
 			short **result = new short*[n];
@@ -204,24 +271,7 @@ int main(){
 
 
 
-		   	for (int pp=0; pp<S.size(); pp++){
-		   		double cont11=0, cont22 = 0;
-		   		short **result = S[pp];
-		   		cout<<"Arvore "<<pp+1<<endl;
-				for (int i=0; i<n; i++){
-					for (int j=i+1; j<n; j++){
-						if (arestas[i][j] == 1){
-						    if (result[i][j] == 1){
-						        cout <<i<<" "<<j<<" "<<matrix_peso1[i][j]*(-1)<<" "<<matrix_peso2[i][j]*(-1)<<endl;
-						        cont11+=matrix_peso1[i][j]*(-1);
-						         cont22+=matrix_peso2[i][j]*(-1);
-						    }
-						}
-				    }
-				}
-				cout<<"("<<cont11<<", "<<cont22<<")"<<endl;
-				cout<<endl;
-		   	}
+		   	printResultado();
 
   	 	} catch(GRBException e) {
 	    cout << "Error code = " << e.getErrorCode() << endl;
