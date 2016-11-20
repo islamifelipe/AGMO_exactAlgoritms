@@ -25,11 +25,7 @@ bool maiorIgualQuefloat(float a, float b){ //returna true se a>=b
 /*Implementação do MargeSort para utilizar no algortimo de Kruskal*/
 void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Aresta **v, int size, int direto){
 	
-	 /*O parâmetro "direto" recebe:
-		1 - se as arestas devem ser na ordem lexicográfica direta
-		2 - se as arestas devem ser na ordem lexocográfica inversa  
-		3 - se as arestas devem ser na ordem crescente da pondenraçao dos pesos das arestas (formula do método geometrico da busca dicotômica)
-	  */
+	 
 	int i, j, k;
 	Aresta **w = new Aresta *[size];
 	float peso_i, peso_j; 
