@@ -31,7 +31,7 @@ int idMST = 0;
 map <int, Aresta *> arestas;
 Aresta ** arestasPtr;
 int contAux = 0, contAux2=0;
-
+int nesimaArvore=0;
 
 bool isEgalObjetive(float t1_peso1, float t1_peso2, float t2_peso1, float t2_peso2){
 	return equalfloat(t1_peso1,t2_peso1) && equalfloat(t2_peso2,t1_peso2);
@@ -391,6 +391,29 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 	return noSoportadas;
 
 }
+//nesimaArvore
+void printArvore (list <pair<int*, pair<float, float> > > &list1, Grafo *my_grafo){
+	for (list<pair<int*, pair<float, float> > >::iterator it=list1.begin(); it!=list1.end(); it++){
+		
+		cout<<"Arvore "<<nesimaArvore<<endl;
+		float p1=0, p2=0, p3=0;
+    	for (int a = 0; a<my_grafo->getQuantVertices()-1; a++){ // cada aresta da arvore
+			int iddd = ((*it).first)[a];
+			
+				cout<<my_grafo->getArestas(iddd)->getOrigem() << " ";
+    			cout<<my_grafo->getArestas(iddd)->getDestino() << " ";
+    			cout<<my_grafo->getArestas(iddd)->getPeso1() << " ";
+    			cout<<my_grafo->getArestas(iddd)->getPeso2() << " ";
+    			cout<<my_grafo->getArestas(iddd)->getPeso3() << endl;
+    			p1 += my_grafo->getArestas(iddd)->getPeso1();
+    			p2 += my_grafo->getArestas(iddd)->getPeso2();
+    			p3 += my_grafo->getArestas(iddd)->getPeso3();
+    		
+    	}
+    	cout<<"("<<p1<<","<<p2<<","<<p3<<")\n"<<endl;
+    	nesimaArvore++;
+	}
+}
 
 int main(){
 	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
@@ -419,6 +442,8 @@ int main(){
 	
 	arestas = my_grafo.get_allArestas();
 	arestasPtr = my_grafo.getAllArestasPtr();
+
+	cout<<"COMINACAO 1 E 2 OBJETIVOS"<<endl;
  	times(&tempsInit);
 
 	 list <pair<int*, pair<float, float> > > arvores = phase1GM(&my_grafo, 12);
@@ -440,70 +465,117 @@ int main(){
 	clock_t user_time2 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
 	cout<<user_time2<<endl;
 	cout<<(float) user_time2 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-	cout<<"Total ..."<<endl;
-	cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
+	//cout<<"Total ..."<<endl;
+	//cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
 
 	
+
+	cout<<"COMINACAO 1 E 3 OBJETIVOS"<<endl;
+ 	times(&tempsInit);
+
+	 list <pair<int*, pair<float, float> > > arvores13 = phase1GM(&my_grafo, 13);
+	cout<<"Fim da primeira fase ... "<<endl;
+
+	times(&tempsFinal1);   /* current time */ // clock final
+	clock_t user_time3 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time3<<endl;
+	cout<<(float) user_time3 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	times(&tempsInit);
+
+
+	list <pair<int*, pair<float, float> > > noSuportadas13 = phase2KB(&my_grafo, arvores13, 13);
+	
+
+	cout<<"Fim da segunda fase ... "<<endl;
+
+	times(&tempsFinal2);   /* current time */ // clock final
+	clock_t user_time4 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
+	cout<<user_time4<<endl;
+	cout<<(float) user_time4 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+	// cout<<"Total ..."<<endl;
+	// cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
+
+
+
+	cout<<"COMINACAO 2 E 3 OBJETIVOS"<<endl;
+ 	times(&tempsInit);
+
+	 list <pair<int*, pair<float, float> > > arvores23 = phase1GM(&my_grafo, 23);
+	cout<<"Fim da primeira fase ... "<<endl;
+
+	times(&tempsFinal1);   /* current time */ // clock final
+	clock_t user_time5 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<user_time5<<endl;
+	cout<<(float) user_time5 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+    times(&tempsInit);
+
+
+	list <pair<int*, pair<float, float> > > noSuportadas23 = phase2KB(&my_grafo, arvores23, 23);
+	
+
+	cout<<"Fim da segunda fase ... "<<endl;
+
+	times(&tempsFinal2);   /* current time */ // clock final
+	clock_t user_time6 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
+	cout<<user_time6<<endl;
+	cout<<(float) user_time6 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+	cout<<"Total ..."<<endl;
+	cout<<(float) (user_time1+user_time2 +user_time3+user_time4+user_time5+user_time6) / (float) sysconf(_SC_CLK_TCK)<<endl;
+
     int i = 1, cont=0;
     //cout<<"saiu2"<<endl;
     //cout<<resul.size()<<endl;
    // list<int*>::iterator it=resul.begin();
    cout<<"Resultado \n SUPORTADAS"<<endl;
-    for (list<pair<int*, pair<float, float> > >::iterator it=arvores.begin(); it!=arvores.end(); it++){
+   printArvore(arvores, &my_grafo);
+   printArvore(arvores13, &my_grafo);
+   printArvore(arvores23, &my_grafo);
+ //    for (list<pair<int*, pair<float, float> > >::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		
-		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
-			int iddd = ((*it).first)[a];
+	// 	cout<<"Arvore "<<i<<endl;
+	// 	float p1=0, p2=0, p3=0;
+ //    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
+	// 		int iddd = ((*it).first)[a];
 			
-				cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
+	// 			cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getPeso2() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getPeso3() << endl;
+ //    			p1 += my_grafo.getArestas(iddd)->getPeso1();
+ //    			p2 += my_grafo.getArestas(iddd)->getPeso2();
+ //    			p3 += my_grafo.getArestas(iddd)->getPeso3();
     		
-    	}
-    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
-    	i++;
-	}
+ //    	}
+ //    	cout<<"("<<p1<<","<<p2<<","<<p3<<")\n"<<endl;
+ //    	i++;
+	// }
 
 
 	cout<<"Resultado \n NAO SUPORTADAS"<<endl;
-    for (list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
+	printArvore(noSuportadas, &my_grafo);
+   printArvore(noSuportadas13, &my_grafo);
+   printArvore(noSuportadas23, &my_grafo);
+ //    for (list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
 		
-		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
-			int iddd = ((*it).first)[a];
-				cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
-    		
-    	}
-    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
-    	i++;
-	}
-
-	// cout<<"Nao Suportada"<<endl;
-
-	// for (list<int*>::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
 	// 	cout<<"Arvore "<<i<<endl;
-	// 	float cont1 = 0, cont2 = 0;
- //    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-		
-	// 		if ((*it)[a] == 1){
-	// 			cont1+=arestas[a]->getPeso1();
-	// 			cont2+=arestas[a]->getPeso2();
-				
- //    			cout<<arestas[a]->getOrigem() << " ";
- //    			cout<<arestas[a]->getDestino() << " ";
- //    			cout<<arestas[a]->getPeso1() << " ";
- //    			cout<<arestas[a]->getPeso2() << endl;
- //    		}
+	// 	float p1=0, p2=0, p3=0;
+ //    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
+	// 		int iddd = ((*it).first)[a];
+	// 			cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getPeso2() << " ";
+ //    			cout<<my_grafo.getArestas(iddd)->getPeso3() << endl;
+ //    			p1 += my_grafo.getArestas(iddd)->getPeso1();
+ //    			p2 += my_grafo.getArestas(iddd)->getPeso2();
+ //    			p3 += my_grafo.getArestas(iddd)->getPeso3();
+    		
  //    	}
- //    	cout<<"("<<cont1<<", "<<cont2<<")\n"<<endl;
+ //    	cout<<"("<<p1<<","<<p2<<","<<p3<<")\n"<<endl;
  //    	i++;
 	// }
-	//cout<<"pega valor = "<<contAux2<<endl;
-	//cout<<"Dominancia ou igualdade = "<<contAux<<endl;
+
 	cout<<"Partition = "<<contAux<<endl;
 	return 0;
 }
