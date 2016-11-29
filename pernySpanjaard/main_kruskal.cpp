@@ -69,7 +69,7 @@ vector< int * > krukal_like(Grafo *g, vector< pair<int, int> > relacao2){
 		for (int i=0; i<It.size(); i++){
 			Conjunto *conjIt = veco[i];
 			vector <Aresta *> max = maximal(g, It[i], conjIt, relacao2);
-			
+			//cout<<"size = "<<max.size()<<" obj = "<<max[0]->getPeso1()<<" , "<<max[0]->getPeso2()<<endl;
 			for (int a=0; a<max.size(); a++){
 				if (conjIt->compare(max[a]->getOrigem(), max[a]->getDestino())==false){
 					
