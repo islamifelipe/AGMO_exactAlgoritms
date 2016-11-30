@@ -36,7 +36,6 @@ int main (int argc, char *argv[]){
 	//int cont = 0;
 	for (int i=0; i<n; i++){
 		for (int j=i+1; j<n; j++){
-
 			cout<<i<<" "<<j<<" ";
 			float obj1 = ((float)(random())/(float)(RAND_MAX));
 

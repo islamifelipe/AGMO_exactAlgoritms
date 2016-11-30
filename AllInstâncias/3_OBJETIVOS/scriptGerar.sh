@@ -1,67 +1,28 @@
 #!/bin/bash
 
-./generatorGrid 2 3 0.6 > correlate/6.gridcorr1.in 
-./generatorGrid 2 6 0.6 > correlate/12.gridcorr1.in 
-./generatorGrid 2 9 0.6 > correlate/18.gridcorr1.in 
-./generatorGrid 2 10 0.6 > correlate/20.gridcorr1.in 
-./generatorGrid 4 6 0.6 > correlate/24.gridcorr1.in 
-./generatorGrid 3 9 0.6 > correlate/27.gridcorr1.in 
-./generatorGrid 3 10 0.6 > correlate/30.gridcorr1.in 
-./generatorGrid 3 11 0.6 > correlate/33.gridcorr1.in 
-./generatorGrid 3 12 0.6 > correlate/36.gridcorr1.in 
-./generatorGrid 2 19 0.6 > correlate/38.gridcorr1.in 
-./generatorGrid 4 10 0.6 > correlate/40.gridcorr1.in 
-./generatorGrid 3 14 0.6 > correlate/42.gridcorr1.in 
-./generatorGrid 4 11 0.6 > correlate/44.gridcorr1.in 
-./generatorGrid 4 12 0.6 > correlate/48.gridcorr1.in 
-./generatorGrid 5 10 0.6 > correlate/50.gridcorr1.in 
-./generatorGrid 2 26 0.6 > correlate/52.gridcorr1.in 
-./generatorGrid 5 11 0.6 > correlate/55.gridcorr1.in 
-./generatorGrid 2 29 0.6 > correlate/58.gridcorr1.in 
-./generatorGrid 6 10 0.6 > correlate/60.gridcorr1.in 
-./generatorGrid 3 21 0.6 > correlate/63.gridcorr1.in 
-./generatorGrid 6 11 0.6 > correlate/66.gridcorr1.in 
-./generatorGrid 2 34 0.6 > correlate/68.gridcorr1.in 
-./generatorGrid 7 10 0.6 > correlate/70.gridcorr1.in 
-./generatorGrid 5 15 0.6 > correlate/75.gridcorr1.in 
-./generatorGrid 7 11 0.6 > correlate/77.gridcorr1.in 
-./generatorGrid 8 10 0.6 > correlate/80.gridcorr1.in 
-./generatorGrid 2 41 0.6 > correlate/82.gridcorr1.in 
-./generatorGrid 2 43 0.6 > correlate/86.gridcorr1.in 
-./generatorGrid 9 10 0.6 > correlate/90.gridcorr1.in 
-./generatorGrid 3 31 0.6 > correlate/93.gridcorr1.in 
-./generatorGrid 2 48 0.6 > correlate/96.gridcorr1.in 
-./generatorGrid 10 10 0.6 > correlate/100.gridcorr1.in 
+for i in 5 7 10 12 15 17 20 22 25 27 30 33 35 38 40 42 45 48 50
+do
+	./generator $i 0.2 > correlate/$i.corr1.in
 
-./generatorGrid 2 3 -0.6 > anticorrelate/6.gridanticorr1.in 
-./generatorGrid 2 6 -0.6 > anticorrelate/12.gridanticorr1.in 
-./generatorGrid 2 9 -0.6 > anticorrelate/18.gridanticorr1.in 
-./generatorGrid 2 10 -0.6 > anticorrelate/20.gridanticorr1.in 
-./generatorGrid 4 6 -0.6 > anticorrelate/24.gridanticorr1.in 
-./generatorGrid 3 9 -0.6 > anticorrelate/27.gridanticorr1.in 
-./generatorGrid 3 10 -0.6 > anticorrelate/30.gridanticorr1.in 
-./generatorGrid 3 11 -0.6 > anticorrelate/33.gridanticorr1.in 
-./generatorGrid 3 12 -0.6 > anticorrelate/36.gridanticorr1.in 
-./generatorGrid 2 19 -0.6 > anticorrelate/38.gridanticorr1.in 
-./generatorGrid 4 10 -0.6 > anticorrelate/40.gridanticorr1.in 
-./generatorGrid 3 14 -0.6 > anticorrelate/42.gridanticorr1.in 
-./generatorGrid 4 11 -0.6 > anticorrelate/44.gridanticorr1.in 
-./generatorGrid 4 12 -0.6 > anticorrelate/48.gridanticorr1.in 
-./generatorGrid 5 10 -0.6 > anticorrelate/50.gridanticorr1.in 
-./generatorGrid 2 26 -0.6 > anticorrelate/52.gridanticorr1.in 
-./generatorGrid 5 11 -0.6 > anticorrelate/55.gridanticorr1.in 
-./generatorGrid 2 29 -0.6 > anticorrelate/58.gridanticorr1.in 
-./generatorGrid 6 10 -0.6 > anticorrelate/60.gridanticorr1.in 
-./generatorGrid 3 21 -0.6 > anticorrelate/63.gridanticorr1.in 
-./generatorGrid 6 11 -0.6 > anticorrelate/66.gridanticorr1.in 
-./generatorGrid 2 34 -0.6 > anticorrelate/68.gridanticorr1.in 
-./generatorGrid 7 10 -0.6 > anticorrelate/70.gridanticorr1.in 
-./generatorGrid 5 15 -0.6 > anticorrelate/75.gridanticorr1.in 
-./generatorGrid 7 11 -0.6 > anticorrelate/77.gridanticorr1.in 
-./generatorGrid 8 10 -0.6 > anticorrelate/80.gridanticorr1.in 
-./generatorGrid 2 41 -0.6 > anticorrelate/82.gridanticorr1.in 
-./generatorGrid 2 43 -0.6 > anticorrelate/86.gridanticorr1.in 
-./generatorGrid 9 10 -0.6 > anticorrelate/90.gridanticorr1.in 
-./generatorGrid 3 31 -0.6 > anticorrelate/93.gridanticorr1.in 
-./generatorGrid 2 48 -0.6 > anticorrelate/96.gridanticorr1.in 
-./generatorGrid 10 10 -0.6 > anticorrelate/100.gridanticorr1.in 
+	sleep 1 #como a semete do gerador aleatrorio usa o tempo, é preciso colocar o shell pra dormir pelo menos um segundo, de modo a nao gerar o mesmo time para a semente
+
+	./generator $i -0.2 > anticorrelate/$i.anticorr1.in
+
+	sleep 1
+
+	./generator $i 0.5 > correlate/$i.corr2.in
+
+	sleep 1
+
+	./generator $i -0.5 > anticorrelate/$i.anticorr2.in
+
+	sleep 1
+
+	./generator $i 0.85 > correlate/$i.corr3.in
+
+	sleep 1
+	./generator $i -0.85 > anticorrelate/$i.anticorr3.in
+
+	sleep 1
+
+done
