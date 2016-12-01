@@ -143,7 +143,7 @@ void *tempo(void *nnnn){
 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-		if (sec>250){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+		if (sec>1000000){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
 			cout<<sec<<endl;
 			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
 
