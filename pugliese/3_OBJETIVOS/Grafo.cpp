@@ -16,8 +16,8 @@ Vertice *Grafo::getVertice(int id){
 	return lista_vertices[id]; 		
 }
 
-Aresta *Grafo::addAresta(int id, int origem, int destino, float peso1, float peso2){
-	Aresta *nova = new Aresta(id, origem, destino, peso1, peso2);
+Aresta *Grafo::addAresta(int id, int origem, int destino, float peso1, float peso2,float peso3){
+	Aresta *nova = new Aresta(id, origem, destino, peso1, peso2, peso3);
 	//lista_allArestas.push_back(nova); /*deve ser passado o ponteiro, isto é, a referência*/
 	lista_allArestas[id] = nova;
 	lista_vertices[origem]->adicionaAresta(nova);

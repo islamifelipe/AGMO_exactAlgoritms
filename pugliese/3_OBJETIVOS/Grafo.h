@@ -16,7 +16,7 @@ class Grafo{
 		Grafo(int n1);
 		void addVertice(int id); // lista_vertices[id] = vertice de identificador id (entre 0 e n-1)
 		Vertice *getVertice(int id);
-		Aresta *addAresta(int id, int origem, int destino, float peso1, float peso2);
+		Aresta *addAresta(int id, int origem, int destino, float peso1, float peso2, float peso3);
 		map <int, Aresta *> get_allArestas();
 		int getQuantArestas();
 		int getQuantVertices();

@@ -1,11 +1,12 @@
 #include "Aresta.h"
 using namespace std;
 
-Aresta::Aresta(int id2, int origem1, int destino1, float peso1_1, float peso2_1){
+Aresta::Aresta(int id2, int origem1, int destino1, float peso1_1, float peso2_1, float peso3_1){
 	origem = origem1;
 	destino = destino1;
 	peso1 = peso1_1;
 	peso2 = peso2_1;
+	peso3 = peso3_1;
 	id= id2;
 	//pesoUnique = 0;
 } 
@@ -26,6 +27,9 @@ float Aresta::getPeso1(){
 }
 float Aresta::getPeso2(){
 	return peso2;
+}
+float Aresta::getPeso3(){
+	return peso3;
 }
 void Aresta::setId(int novo){
 	id = novo;

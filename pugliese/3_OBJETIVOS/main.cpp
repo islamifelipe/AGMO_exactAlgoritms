@@ -36,18 +36,20 @@ bool isEquivalente(int *t1, int *t2, int n){ //
 	return true;
 }
 bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
-	float t1_peso1=0, t1_peso2=0, t2_peso1=0, t2_peso2=0;
+	float t1_peso1=0, t1_peso2=0, t1_peso3=0, t2_peso1=0, t2_peso2=0, t2_peso3=0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t1[i]==1){
 			t1_peso1+=arestas[i]->getPeso1();
 			t1_peso2+=arestas[i]->getPeso2();
+			t1_peso3+=arestas[i]->getPeso3();
 		} 
 		if (t2[i]==1){
 			t2_peso1+=arestas[i]->getPeso1();
 			t2_peso2+=arestas[i]->getPeso2();
+			t2_peso3+=arestas[i]->getPeso3();
 		}
 	}
-	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
+	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && t1_peso3 <= t2_peso3 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2 || t1_peso3 < t2_peso3)){
 		return true;
 	} else return false;
 }
@@ -139,7 +141,7 @@ int main(){
 	times(&tempsInit);  // pega o tempo do clock inical
 	
 	int n;
-	float peso1, peso2;
+	float peso1, peso2, peso3;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
@@ -152,7 +154,8 @@ int main(){
 		cin>>destino;
 		cin>>peso1;
 		cin>>peso2;
-		my_grafo.addAresta(id, origem, destino, peso1, peso2);
+		cin>>peso3;
+		my_grafo.addAresta(id, origem, destino, peso1, peso2,peso3);
 		id++;
 	}
 	int nA = id; // quantidade de arestas do grafo	
@@ -169,18 +172,20 @@ int main(){
     	int *arestas  = arvores[k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     	cout<<"Arvore "<<k+1<<endl;
-    	float cont1 = 0, cont2=0;
+    	float cont1 = 0, cont2=0, cont3=0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 			if (arestas[a] == 1){
 				cont1+=arestasPtr[a]->getPeso1();
 				cont2+=arestasPtr[a]->getPeso2();
+				cont3+=arestasPtr[a]->getPeso3();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
+    			cout<<arestasPtr[a]->getPeso2() << " ";
+    			cout<<arestasPtr[a]->getPeso3() <<endl;
     		}
     	}
-    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
+    	cout<<"("<<cont1<<", "<<cont2<<", "<<cont3<<")"<<endl;
     	cout<<endl;
     }
 	return 0;
