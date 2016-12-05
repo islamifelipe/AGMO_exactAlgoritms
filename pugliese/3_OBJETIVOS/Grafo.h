@@ -13,6 +13,7 @@ class Grafo{
 		Vertice **lista_vertices; /*Lista (fixa) de vértice. É um vetor de ponteiros. Cada vértice possui uma lista de arestas adjacentes.*/
 		map <int, Aresta *> lista_allArestas; /*lista de todas as arestas do Grafo. É um vetor de ponteiros*/
 	public:
+		Grafo();
 		Grafo(int n1);
 		void addVertice(int id); // lista_vertices[id] = vertice de identificador id (entre 0 e n-1)
 		Vertice *getVertice(int id);
@@ -20,6 +21,7 @@ class Grafo{
 		map <int, Aresta *> get_allArestas();
 		int getQuantArestas();
 		int getQuantVertices();
+		void setN(int n1);
 };
 
 #endif

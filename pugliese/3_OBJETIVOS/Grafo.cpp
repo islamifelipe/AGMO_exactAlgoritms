@@ -2,7 +2,15 @@
 
 using namespace std;
 
+Grafo::Grafo(){
+
+}
 Grafo::Grafo(int n1){
+	n = n1;
+	lista_vertices = new Vertice*[n];
+}
+
+void Grafo::setN(int n1){
 	n = n1;
 	lista_vertices = new Vertice*[n];
 }

@@ -2,7 +2,7 @@
 #=======================================================================
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
-# This code implements the Pugliese et al's (2014) algorithm 
+# This code implements the Pugliese et al's (2015) algorithm 
 # to resolve the 3-objective Spanning Tree Problem
 # The user time is returned (in seconds)
 #=======================================================================
@@ -16,8 +16,14 @@
 #include "Grafo.h"
 #include <sys/times.h>
 #include <unistd.h>
+#include <pthread.h> 
+#include <stdlib.h>
 using namespace std;
 
+struct tms tempsInit, tempsFinal; // para medir o tempo
+vector< pair<int*, int*> > arvores;
+Grafo my_grafo;
+int nA;
 
 bool isEgal(int *t1, int *t2, int size){
 	for (int i=0; i<size; i++){
@@ -58,11 +64,11 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
  Tqh1 é um vetor de 0's e 1's com o comprimento igual ao numero de ARESTAS
  Lq1 DEVE SER UMA REFERÊNCIA
 */
-bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g){
+bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1){
 	// verificacao se Tqh1 é dominada por alguém
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
-		if (isEquivalente(Tqh1.first,Lq1[t].first, g->getQuantVertices()) && t1_domina_t2(arvore_parcial, Tqh1.second, g->get_allArestas())){
+		if (isEquivalente(Tqh1.first,Lq1[t].first, my_grafo.getQuantVertices()) && t1_domina_t2(arvore_parcial, Tqh1.second, my_grafo.get_allArestas())){
 			return true; // é dominada
 		}
 	} 
@@ -70,7 +76,7 @@ bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g
 	// se Tqh1 nao é dominada por ninguém equivalente, entao verificamos se Tqh1 domina algum t em Lq1. Se sim, removemos t de Lq1.
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
-		if ((isEquivalente(Tqh1.first,Lq1[t].first,  g->getQuantVertices()) && t1_domina_t2(Tqh1.second, arvore_parcial, g->get_allArestas())) || isEgal(Tqh1.second, arvore_parcial, g->getQuantArestas())){
+		if ((isEquivalente(Tqh1.first,Lq1[t].first,  my_grafo.getQuantVertices()) && t1_domina_t2(Tqh1.second, arvore_parcial, my_grafo.get_allArestas())) || isEgal(Tqh1.second, arvore_parcial, my_grafo.getQuantArestas())){
 			
 			Lq1.erase(Lq1.begin()+t); 
 			t--;
@@ -79,95 +85,8 @@ bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g
 	return false; // nao é dominada
 	
 }
-/* Um estado S é um par de vetores (um de vertices, outro de arestas)
- Lq é um vector de pares, ou seja, estados de S do tipo Sq (nivel q)
- L é um map (cuja chave é q) de Lq's
 
- A funçao retorna Ln
-
- OBS.: os autores numeram os vértices de 1 à n; nós porém enumeramos de 0 à n-1
-*/
-vector< pair<int*, int*> > algoritmoPD(Grafo *g){
-	int n = g->getQuantVertices();
-	map <int, vector< pair<int*, int*> > > L ;//= new map <int, vector< pair<int*, int*> > >[n-1]; // n níveis (1 até n) // nao confundir com a enumeracao dos vertices
-	int *X = new int[n];
-	for (int i=0; i<n; i++) X[i] = 0;
-	X[0] = 1; // pros autores é o indice 1. Nós enumeramos de 0  
-	int *E = new int[g->getQuantArestas()]; // inicialmente, vazio
-	for (int i=0; i<g->getQuantArestas(); i++) E[i] = 0;
-	pair<int*, int*> S11 = make_pair(X, E); // o primeiro par (o primeiro par do nivel 1) 
-	vector< pair<int*, int*> > L1;
-	L1.push_back(S11);
-	L[1] = L1;
-
-	for (int q = 1; q<=n-1; q++) { // para cada nivel. Deve ser no maximo n-1, porque q+1 deve ser no máximo n 
-		vector< pair<int*, int*> > Lq = L[q];
-		for (int h = 0; h<Lq.size(); h++){ // como Lq é um vector, começaremos do 0
-			pair<int*, int*> Sq_h = Lq[h];
-			for (int i=0; i<n; i++){
-				if ((Sq_h.first)[i] == 1){
-					Vertice *v = g->getVertice(i); //pega o vertice de id=i
-					for (int j = 0; j<v->getGrau(); j++){ // aqui, j nao é o id da aresta ij
-						Aresta *ij = v->getAresta(j); // a priori, nao há como saber quem é a origem ou o destino (i ou j )
-						if ((Sq_h.first)[ij->getOrigem()] != (Sq_h.first)[ij->getDestino()]){ // nao gerar ciclo
-							int *Xq1 = new int[n];
-							for (int o=0; o<n; o++) Xq1[o] = (Sq_h.first)[o];
-							//ij->getOrigem()==i ? Xq1[ij->getDestino()] = 1 : Xq1[ij->getOrigem()] = 1;
-							Xq1[ij->getDestino()] = 1;
-							Xq1[ij->getOrigem()] = 1;
-							int *Eqhij = new int[g->getQuantArestas()]; 
-							for (int o=0; o<g->getQuantArestas(); o++) Eqhij[o] = (Sq_h.second)[o];
-							Eqhij[ij->getId()] = 1;
-							pair<int*, int*> Sq1 = make_pair(Xq1, Eqhij);
-
-							// Teste de dominância 
-							if (isDominada(Sq1, L[q+1], g) == false){
-								L[q+1].push_back(Sq1);
-							}
-								
-						} 
-					}
-				}
-			}
-		}
-	}
-
-	return L[n];
-}
-
-
-int main(){
-	struct tms tempsInit, tempsFinal; // para medir o tempo
-	times(&tempsInit);  // pega o tempo do clock inical
-	
-	int n;
-	float peso1, peso2, peso3;
-	int origem, destino; // vértices para cada aresta;
-	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
-	cin>>n; // quantidade de vértices do grafo;
-	Grafo my_grafo(n);
-	// contruir o grafo
-	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
-		my_grafo.addVertice(i);
-	}
-	while (cin>>origem){
-		cin>>destino;
-		cin>>peso1;
-		cin>>peso2;
-		cin>>peso3;
-		my_grafo.addAresta(id, origem, destino, peso1, peso2,peso3);
-		id++;
-	}
-	int nA = id; // quantidade de arestas do grafo	
-
-	vector< pair<int*, int*> > arvores = algoritmoPD(&my_grafo);
-	 
-
-	times(&tempsFinal);   /* current time */ // clock final
-	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
-	cout<<user_time<<endl;
-	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-   	 
+void printResultado(){
 	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
     	int *arestas  = arvores[k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
@@ -188,5 +107,135 @@ int main(){
     	cout<<"("<<cont1<<", "<<cont2<<", "<<cont3<<")"<<endl;
     	cout<<endl;
     }
+}
+
+/* Um estado S é um par de vetores (um de vertices, outro de arestas)
+ Lq é um vector de pares, ou seja, estados de S do tipo Sq (nivel q)
+ L é um map (cuja chave é q) de Lq's
+
+ A funçao retorna Ln
+
+ OBS.: os autores numeram os vértices de 1 à n; nós porém enumeramos de 0 à n-1
+*/
+void algoritmoPD(){
+	int n = my_grafo.getQuantVertices();
+	map <int, vector< pair<int*, int*> > > L ;//= new map <int, vector< pair<int*, int*> > >[n-1]; // n níveis (1 até n) // nao confundir com a enumeracao dos vertices
+	int *X = new int[n];
+	for (int i=0; i<n; i++) X[i] = 0;
+	X[0] = 1; // pros autores é o indice 1. Nós enumeramos de 0  
+	int *E = new int[my_grafo.getQuantArestas()]; // inicialmente, vazio
+	for (int i=0; i<my_grafo.getQuantArestas(); i++) E[i] = 0;
+	pair<int*, int*> S11 = make_pair(X, E); // o primeiro par (o primeiro par do nivel 1) 
+	vector< pair<int*, int*> > L1;
+	L1.push_back(S11);
+	L[1] = L1;
+
+	for (int q = 1; q<=n-1; q++) { // para cada nivel. Deve ser no maximo n-1, porque q+1 deve ser no máximo n 
+		vector< pair<int*, int*> > Lq = L[q];
+		for (int h = 0; h<Lq.size(); h++){ // como Lq é um vector, começaremos do 0
+			pair<int*, int*> Sq_h = Lq[h];
+			for (int i=0; i<n; i++){
+				if ((Sq_h.first)[i] == 1){
+					Vertice *v = my_grafo.getVertice(i); //pega o vertice de id=i
+					for (int j = 0; j<v->getGrau(); j++){ // aqui, j nao é o id da aresta ij
+						Aresta *ij = v->getAresta(j); // a priori, nao há como saber quem é a origem ou o destino (i ou j )
+						if ((Sq_h.first)[ij->getOrigem()] != (Sq_h.first)[ij->getDestino()]){ // nao gerar ciclo
+							int *Xq1 = new int[n];
+							for (int o=0; o<n; o++) Xq1[o] = (Sq_h.first)[o];
+							//ij->getOrigem()==i ? Xq1[ij->getDestino()] = 1 : Xq1[ij->getOrigem()] = 1;
+							Xq1[ij->getDestino()] = 1;
+							Xq1[ij->getOrigem()] = 1;
+							int *Eqhij = new int[my_grafo.getQuantArestas()]; 
+							for (int o=0; o<my_grafo.getQuantArestas(); o++) Eqhij[o] = (Sq_h.second)[o];
+							Eqhij[ij->getId()] = 1;
+							pair<int*, int*> Sq1 = make_pair(Xq1, Eqhij);
+
+							// Teste de dominância 
+							if (isDominada(Sq1, L[q+1]) == false){
+								L[q+1].push_back(Sq1);
+							}
+								
+						} 
+					}
+				}
+			}
+		}
+	}
+
+	arvores = L[n];
+}
+
+void *tempo(void *nnnn){
+	while (true){
+		times(&tempsFinal);   /* current time */ // clock final
+		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
+		
+		if (sec==60){  //3600
+			cout<<"RESULTADO AO FIM DE 1H"<<endl;
+			printResultado();
+			sleep(50); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==120){ //7200
+			cout<<"RESULTADO AO FIM DE 2H"<<endl;
+			printResultado();
+			sleep(50); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==180){// 10800 se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			
+			cout<<"RESULTADO AO FIM DE 3H"<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+			printResultado();
+			//cout<<"saindo... valor de ppp="<<ppp<<endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
+
+int main(){
+	times(&tempsInit);  // pega o tempo do clock inical
+	
+
+
+	// para medir o tempo em caso limite
+	pthread_t thread_time; 
+	pthread_attr_t attr;
+	int nnnnnnnn=0;
+	if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
+         cout<<"Error to create the thread"<<endl;
+        exit(EXIT_FAILURE);
+    }
+    //
+
+
+	int n;
+	float peso1, peso2, peso3;
+	int origem, destino; // vértices para cada aresta;
+	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
+	cin>>n; // quantidade de vértices do grafo;
+	my_grafo.setN(n);
+	// contruir o grafo
+	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
+		my_grafo.addVertice(i);
+	}
+	while (cin>>origem){
+		cin>>destino;
+		cin>>peso1;
+		cin>>peso2;
+		cin>>peso3;
+		my_grafo.addAresta(id, origem, destino, peso1, peso2,peso3);
+		id++;
+	}
+	nA = id; // quantidade de arestas do grafo	
+
+	//vector< pair<int*, int*> > arvores = algoritmoPD(&my_grafo);
+	algoritmoPD();
+
+	times(&tempsFinal);   /* current time */ // clock final
+	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+	cout<<user_time<<endl;
+	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	 
+	printResultado();
 	return 0;
 }
