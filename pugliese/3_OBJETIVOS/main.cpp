@@ -21,9 +21,10 @@
 using namespace std;
 
 struct tms tempsInit, tempsFinal; // para medir o tempo
-vector< pair<int*, int*> > arvores;
 Grafo my_grafo;
+map <int, vector< pair<int*, int*> > > L ;//= new map <int, vector< pair<int*, int*> > >[n-1]; // n níveis (1 até n) // nao confundir com a enumeracao dos vertices
 int nA;
+int n;
 
 bool isEgal(int *t1, int *t2, int size){
 	for (int i=0; i<size; i++){
@@ -87,8 +88,9 @@ bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1){
 }
 
 void printResultado(){
-	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
-    	int *arestas  = arvores[k].second; 
+	
+	for (int k = 0; L.find(n)!=L.end() && k < L[n].size(); k++){ // cada arvore formada
+    	int *arestas  = L[n][k].second; 
     	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
     	cout<<"Arvore "<<k+1<<endl;
     	float cont1 = 0, cont2=0, cont3=0;
@@ -119,7 +121,6 @@ void printResultado(){
 */
 void algoritmoPD(){
 	int n = my_grafo.getQuantVertices();
-	map <int, vector< pair<int*, int*> > > L ;//= new map <int, vector< pair<int*, int*> > >[n-1]; // n níveis (1 até n) // nao confundir com a enumeracao dos vertices
 	int *X = new int[n];
 	for (int i=0; i<n; i++) X[i] = 0;
 	X[0] = 1; // pros autores é o indice 1. Nós enumeramos de 0  
@@ -161,8 +162,6 @@ void algoritmoPD(){
 			}
 		}
 	}
-
-	arvores = L[n];
 }
 
 void *tempo(void *nnnn){
@@ -187,6 +186,7 @@ void *tempo(void *nnnn){
 			printResultado();
 			//cout<<"saindo... valor de ppp="<<ppp<<endl;
 			exit(EXIT_FAILURE);
+			//exit(-1);
 		}
 	}
 }
@@ -208,7 +208,6 @@ int main(){
     //
 
 
-	int n;
 	float peso1, peso2, peso3;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
