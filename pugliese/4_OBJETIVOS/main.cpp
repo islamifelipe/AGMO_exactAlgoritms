@@ -3,7 +3,7 @@
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
 # This code implements the Pugliese et al's (2015) algorithm 
-# to resolve the 3-objective Spanning Tree Problem
+# to resolve the 4-objective Spanning Tree Problem
 # The user time is returned (in seconds)
 #=======================================================================
 */
@@ -48,20 +48,22 @@ bool isEquivalente(int *t1, int *t2, int n){ //
 	return true;
 }
 bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
-	float t1_peso1=0, t1_peso2=0, t1_peso3=0, t2_peso1=0, t2_peso2=0, t2_peso3=0;
+	float t1_peso1=0, t1_peso2=0, t1_peso3=0, t1_peso4=0, t2_peso1=0, t2_peso2=0, t2_peso3=0,t2_peso4=0;
 	for (int i=0; i<arestas.size(); i++){
 		if (t1[i]==1){
 			t1_peso1+=arestas[i]->getPeso1();
 			t1_peso2+=arestas[i]->getPeso2();
 			t1_peso3+=arestas[i]->getPeso3();
+			t1_peso4+=arestas[i]->getPeso4();
 		} 
 		if (t2[i]==1){
 			t2_peso1+=arestas[i]->getPeso1();
 			t2_peso2+=arestas[i]->getPeso2();
 			t2_peso3+=arestas[i]->getPeso3();
+			t2_peso4+=arestas[i]->getPeso4();
 		}
 	}
-	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && t1_peso3 <= t2_peso3 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2 || t1_peso3 < t2_peso3)){
+	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && t1_peso3 <= t2_peso3 && t1_peso4 <= t2_peso4 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2 || t1_peso3 < t2_peso3 || t1_peso4 < t2_peso4)){
 		return true;
 	} else return false;
 }
@@ -101,20 +103,22 @@ void printResultado(){
     	//cout<<"Depois"<<endl;
     	int *arestas  = L[n][k].second; 
     	cout<<"Arvore "<<k+1<<endl;
-    	float cont1 = 0, cont2=0, cont3=0;
+    	float cont1 = 0, cont2=0, cont3=0, cont4=0;
     	for (int a = 0; a<nA; a++){ // cada aresta da arvore
 			if (arestas[a] == 1){
 				cont1+=arestasPtr[a]->getPeso1();
 				cont2+=arestasPtr[a]->getPeso2();
 				cont3+=arestasPtr[a]->getPeso3();
+				cont4+=arestasPtr[a]->getPeso4();
     			cout<<arestasPtr[a]->getOrigem() << " ";
     			cout<<arestasPtr[a]->getDestino() << " ";
     			cout<<arestasPtr[a]->getPeso1() << " ";
     			cout<<arestasPtr[a]->getPeso2() << " ";
-    			cout<<arestasPtr[a]->getPeso3() <<endl;
+    			cout<<arestasPtr[a]->getPeso3() <<" ";
+    			cout<<arestasPtr[a]->getPeso4() <<endl;
     		}
     	}
-    	cout<<"("<<cont1<<", "<<cont2<<", "<<cont3<<")"<<endl;
+    	cout<<"("<<cont1<<", "<<cont2<<", "<<cont3<<", "<<cont4<<")"<<endl;
     	cout<<endl;
     }
 }
@@ -225,7 +229,7 @@ void *executar(void *nnnn){
 
 int main(){
 	
-	float peso1, peso2, peso3;
+	float peso1, peso2, peso3, peso4;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
@@ -239,7 +243,8 @@ int main(){
 		cin>>peso1;
 		cin>>peso2;
 		cin>>peso3;
-		my_grafo.addAresta(id, origem, destino, peso1, peso2,peso3);
+		cin>>peso4;
+		my_grafo.addAresta(id, origem, destino, peso1, peso2,peso3, peso4);
 		id++;
 	}
 	nA = id; // quantidade de arestas do grafo	
