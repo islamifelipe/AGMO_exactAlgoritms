@@ -24,7 +24,7 @@ bool maiorIgualQuefloat(float a, float b){ //returna true se a>=b
 
 /*Implementação do MargeSort para utilizar no algortimo de Kruskal*/
 /*A implementacao nao está tao legal, mas a complexidade nao é alterada, e por enquanto, vai assim mesmo*/
-void intercala(float xl, float yl, float zl, float xll, float yll, float zll, float xlll, float ylll, float zlll, int p, int q, int r, Aresta **v, int size, int direto){
+void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Aresta **v, int size, int direto, int pares){
 	
 	
 	 /*O parâmetro "direto" recebe:
@@ -42,14 +42,11 @@ void intercala(float xl, float yl, float zl, float xll, float yll, float zll, fl
 	int i, j, k;
 	Aresta **w = new Aresta *[size];
 	float peso_i, peso_j; 
-	float A = yl*(zll-zlll) + yll*(zlll-zl)+ ylll*(zl-zll);
-	float B = zl*(xll-xlll) + zll*(xlll-xl)+ zlll*(xl-xll);
-	float C = xl*(yll-ylll) + xll*(ylll-yl)+ xlll*(yl-yll);
 	i = p;
 	j = q;
 	k = 0;
 	while (i < q && j < r) {
-		if (direto==1){
+		if (direto==1 && pares == 12){
 			if (!maiorIgualQuefloat(v[i]->getPeso1(), v[j]->getPeso1())) {
 				w[k] = v[i];
 				i++;
@@ -67,13 +64,13 @@ void intercala(float xl, float yl, float zl, float xll, float yll, float zll, fl
 					j++;
 				}
 			}
-		} else if(direto==2) {
-			if (!maiorIgualQuefloat(v[i]->getPeso2(), v[j]->getPeso2())) {
+		} else if (direto==1 && pares == 13){
+			if (!maiorIgualQuefloat(v[i]->getPeso1(), v[j]->getPeso1())) {
 				w[k] = v[i];
 				i++;
 			} else {
-				if (equalfloat(v[i]->getPeso2(), v[j]->getPeso2())){
-					if (!maiorQuefloat(v[i]->getPeso3(), v[j]->getPeso3())){ 
+				if (equalfloat(v[i]->getPeso1(), v[j]->getPeso1())){
+					if (!maiorQuefloat(v[i]->getPeso3(), v[j]->getPeso3())){
 						w[k] = v[i];
 						i++;
 					} else {
@@ -85,7 +82,43 @@ void intercala(float xl, float yl, float zl, float xll, float yll, float zll, fl
 					j++;
 				}
 			}
-		}else if(direto==3) {
+		} else if(direto==2 && pares == 12) {
+			if (!maiorIgualQuefloat(v[i]->getPeso2(), v[j]->getPeso2())) {
+				w[k] = v[i];
+				i++;
+			} else {
+				if (equalfloat(v[i]->getPeso2(), v[j]->getPeso2())){
+					if (!maiorQuefloat(v[i]->getPeso1(), v[j]->getPeso1())){
+						w[k] = v[i];
+						i++;
+					} else {
+						w[k] = v[j];
+						j++;	
+					}
+				} else {
+					w[k] = v[j];
+					j++;
+				}
+			}
+		} else if(direto==2 && pares == 23) {
+			if (!maiorIgualQuefloat(v[i]->getPeso2(), v[j]->getPeso2())) {
+				w[k] = v[i];
+				i++;
+			} else {
+				if (equalfloat(v[i]->getPeso2(), v[j]->getPeso2())){
+					if (!maiorQuefloat(v[i]->getPeso3(), v[j]->getPeso3())){
+						w[k] = v[i];
+						i++;
+					} else {
+						w[k] = v[j];
+						j++;	
+					}
+				} else {
+					w[k] = v[j];
+					j++;
+				}
+			}
+		}else if(direto==3 && pares == 23) {
 			if (!maiorIgualQuefloat(v[i]->getPeso3(), v[j]->getPeso3())) {
 				w[k] = v[i];
 				i++;
@@ -103,11 +136,36 @@ void intercala(float xl, float yl, float zl, float xll, float yll, float zll, fl
 					j++;
 				}
 			}
-		}else if(direto==4){
+		}else if(direto==3 && pares == 13) {
+			if (!maiorIgualQuefloat(v[i]->getPeso3(), v[j]->getPeso3())) {
+				w[k] = v[i];
+				i++;
+			} else {
+				if (equalfloat(v[i]->getPeso3(), v[j]->getPeso3())){
+					if (!maiorQuefloat(v[i]->getPeso1(), v[j]->getPeso1())){
+						w[k] = v[i];
+						i++;
+					} else {
+						w[k] = v[j];
+						j++;	
+					}
+				} else {
+					w[k] = v[j];
+					j++;
+				}
+			}
+		} else if(direto==4){
 
-				peso_i=v[i]->getPeso1()*(A)+v[i]->getPeso2()*(B)+v[i]->getPeso3()*(C);
-				peso_j=v[j]->getPeso1()*(A)+v[j]->getPeso2()*(B)+v[j]->getPeso3()*(C);
-			
+			if (pares == 12){
+				peso_i=v[i]->getPeso1()*(yl-yll)+v[i]->getPeso2()*(xll-xl);
+				peso_j=v[j]->getPeso1()*(yl-yll)+v[j]->getPeso2()*(xll-xl);
+			} else if (pares == 13){
+				peso_i=v[i]->getPeso1()*(yl-yll)+v[i]->getPeso3()*(xll-xl);
+				peso_j=v[j]->getPeso1()*(yl-yll)+v[j]->getPeso3()*(xll-xl);
+			} else { // 23
+				peso_i=v[i]->getPeso2()*(yl-yll)+v[i]->getPeso3()*(xll-xl);
+				peso_j=v[j]->getPeso2()*(yl-yll)+v[j]->getPeso3()*(xll-xl);
+			}
 
 			if (!maiorIgualQuefloat(peso_i,peso_j)) {
 				w[k] = v[i];
@@ -128,8 +186,7 @@ void intercala(float xl, float yl, float zl, float xll, float yll, float zll, fl
 			}
 
 		} 
-	
-			k++;
+		k++;
 	}
 	while (i < q) {
 		w[k] = v[i];
@@ -145,7 +202,7 @@ void intercala(float xl, float yl, float zl, float xll, float yll, float zll, fl
 	delete[] w;
 }
 
-void mergesort(float xl, float yl, float zl, float xll, float yll, float zll, float xlll, float ylll, float zlll, Aresta **v, int size, int direto){
+void mergesort(float xl, float yl, float xll, float yll, Aresta **v, int size, int direto, int pares){
 //v é um vetor de ponteiros do tipo Aresta (as arestas são ponteitos)
 //implementação interativa
 
@@ -155,7 +212,7 @@ void mergesort(float xl, float yl, float zl, float xll, float yll, float zll, fl
 		while (p+b < size){
 			r = p + 2*b;
 			if (r>size) r = size;
-			intercala( xl,  yl,  zl,  xll,  yll,  zll,  xlll,  ylll,  zlll, p, p+b, r, v, size, direto);
+			intercala(xl, yl, xll, yll, p, p+b, r, v, size, direto, pares);
 			p = p+2*b;
 		}
 		b = 2*b;

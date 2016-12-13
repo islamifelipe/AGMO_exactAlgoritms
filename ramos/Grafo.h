@@ -20,6 +20,7 @@ class Grafo{
 			particao[i] = 2  ---> indica que a aresta de id=i é proibida
 		*/
 	public:
+		Grafo();
 		Grafo(int n1);
 		void addVertice(int id); // lista_vertices[id] = vertice de identificador id (entre 0 e n-1)
 		Vertice *getVertice(int id);
@@ -31,6 +32,7 @@ class Grafo{
 		int getQuantVertices();
 		int getStatus(int i);
 		void setStatus(int i, int valor);
+		void setN(int n1);
 
 };
 

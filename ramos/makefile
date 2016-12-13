@@ -23,7 +23,7 @@ ramos : main.o  Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o
 	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o main.o -lm -o ramos
 
 AllMST.o : AllMST.cpp
-	g++ -g -c AllMST.cpp
+	g++ -pthread -g -c AllMST.cpp
 
 AllMST : AllMST.o Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o   
-	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o AllMST.o -lm -o AllMST
+	g++ -pthread -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o AllMST.o -lm -o AllMST

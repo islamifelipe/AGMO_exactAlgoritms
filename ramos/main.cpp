@@ -23,6 +23,12 @@
 using namespace std;
 
 #define MAX1 20000 // TODO : Aumentar
+struct tms tempsInit, tempsFinal; // para medir o tempo
+list<pair<int*, pair<float, float> > > noSuportadas;
+list<pair<int*, pair<float, float> > > arvoresSuportadas;
+map <int, Aresta *> arestasPtr;
+Grafo my_grafo;
+
 
 vector< pair<float, float> > min_f_g_vector;
 
@@ -39,17 +45,6 @@ bool t1_domina_t2(float xl, float yl,float xll, float yll){
 		return true;
 	} else return false;
 }
-
-// void getXandY(int *t, map <int, Aresta *> arestas, float &X, float &Y ){
-// 	X = 0; Y = 0;
-// 	for (int i=0; i<arestas.size(); i++){
-// 		if (t[i]==1){
-// 			X+=arestas[i]->getPeso1();
-// 			Y+=arestas[i]->getPeso2();
-// 		} 
-// 	}
-// 	contAA++;
-// }
 
 
 void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul, int * sl, pair<float, float> psl, int *sll, pair<float, float> psll){ 
@@ -134,24 +129,24 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 # Se o i-ésimo elemento do vetor é 1, entao a aresta de id=i está presente na arvore. Sera 0 caso contrario 
 # Portanto, retorna uma lista de inteiros
 */
-list<pair<int*, pair<float, float> > > efficientBiobjectiveSTinEB(Grafo *g){
-	list<pair<int*, pair<float, float> >  > result;
+void efficientBiobjectiveSTinEB(Grafo *g){
+	//list<pair<int*, pair<float, float> >  > arvoresSuportadas;
 	int *s1 = new int[g->getQuantArestas()];
 	for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
 	float cont; // nao utilisazado nesse caso
 	float xl, yl;
 	kruskal(g, s1, 0, 0, 0, 0,cont, xl, yl,  1); // arvore para o primeiro objetivo
-	result.push_back(make_pair(s1, make_pair(xl, yl)));
+	arvoresSuportadas.push_back(make_pair(s1, make_pair(xl, yl)));
 	int* s2 = new int[g->getQuantArestas()];
 	for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
 	float xll, yll;
 	kruskal(g, s2, 0, 0, 0, 0,cont, xll, yll, 2); // arvore para o segundo objetivo
-	list<pair<int*, pair<float, float> > >::iterator it = result.end();
+	list<pair<int*, pair<float, float> > >::iterator it = arvoresSuportadas.end();
 	if (isEgalObjetive(xl,yl,xll, yll)==false){
-		UniobjectiveSearch(g, result, s1, make_pair(xl, yl), s2, make_pair(xll, yll));
-		result.push_back(make_pair(s2, make_pair(xll, yll)));
+		UniobjectiveSearch(g, arvoresSuportadas, s1, make_pair(xl, yl), s2, make_pair(xll, yll));
+		arvoresSuportadas.push_back(make_pair(s2, make_pair(xll, yll)));
 	}
-	return result;
+//	return arvoresSuportadas;
 }
 /* 
 # retorna verdadeiro se o ponto (x,y) está dentro da regiao viável
@@ -295,54 +290,7 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 	}
 }
 
-// /* O parâmetro conjunto serve para detectar a formaçao de possíveis ciclo em T
-// cada vertice de T, deve também pertencer ao conjunto.
-// OBS.: na volta das chamadas recursivas, o conjunto deve readequirir seu estado anterior
-// ou seja, fora da chamada da funcao, o conjunto deve permanecer inalterado 
-// */
-// void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list<int*> &noSuportadas, Conjunto conjunto, list< pair<float, float> > &regiaoViavel){
-// 	vector<Aresta*> Astep = g->getVertice(step)->getAdjacentes();
-// 	//cout<<fBound<<", "<<gBound<<endl;
-// 	for (int a=0; a<Astep.size(); a++){
-// 		Aresta *e = Astep[a];
-// 		//cout<<T[e->getId()]<<"   "<< conjunto.compare(e->getOrigem(), e->getDestino())<<endl;
-// 		if (T[e->getId()]!=1 && !conjunto.compare(e->getOrigem(), e->getDestino())){ // se nao formar ciclo
-// 			float tf, tg;
-// 			getXandY(T, g->get_allArestas(), tf, tg);
-// 			list< pair<float, float> >::iterator it;
-// 			//cout<<isInViableRegion(g, regiaoViavel, tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound, it)<<endl;
-// 			if (isInViableRegion(g, regiaoViavel, tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound, it)){ // se estiver na regiao viavel
-// 				int *T_aux = new int[g->getQuantArestas()];
-// 				for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
-// 				Conjunto copie(g->getQuantVertices());
-// 				copie = conjunto;
-// 				T_aux[e->getId()] = 1;
-// 				copie.union1(e->getOrigem(), e->getDestino());
-// 				if (step+1 == g->getQuantVertices()-1){
-// 					noSuportadas.push_back(T_aux); // armazena T
-// 					retiraDominadas(noSuportadas, T_aux, g); //remove any solutions dominated by T
-					
-// 					// atualiza a regiao viavel
-// 					pair<float, float> ponto = (*it); // um ponto extremo que delimita a regiao viável
-// 					float ponto_x = ponto.first, ponto_y = ponto.second;
-// 					pair<float, float> ponto1 = make_pair(tf+e->getPeso1(), ponto_y);
-// 					pair<float, float> ponto2 = make_pair(ponto_x, tg+e->getPeso2());
-// 					regiaoViavel.insert(it, ponto1);
-// 					regiaoViavel.insert(it, ponto2);
-// 					regiaoViavel.remove(ponto); // remove-se o ponto (corner), e adiciona-se os novos dois pontos formados
-						
-// 				} else {
-// 					pair<float, float> fg_step1 = min_f_g(g->getVertice(step+1)->getAdjacentes());
-// 					EBST_BrB(T_aux, fBound-fg_step1.first, gBound-fg_step1.second, step+1, g, noSuportadas, copie, regiaoViavel);
-// 				}
-				
-// 			}
-// 		}
-// 	}
-// }  
-
-
-list<pair<int*, pair<float, float> > > efficientBiobjectiveSTinENB(Grafo *g, list<pair<int*, pair<float, float> > > extremas){
+void efficientBiobjectiveSTinENB(Grafo *g, list<pair<int*, pair<float, float> > > extremas){
 	float fBound =0, gBound=0;
 	for (int i=1; i<g->getQuantVertices()-1; i++){ 
 	// o algoritmo diz que o somatorio deve ser de 2 até n-1. Como nossa numeracao começa do 0 até n-1, nos vamos do 1 até n-2
@@ -352,7 +300,7 @@ list<pair<int*, pair<float, float> > > efficientBiobjectiveSTinENB(Grafo *g, lis
 	}
 	int *T = new int[g->getQuantArestas()];
 	for (int i=0; i<g->getQuantArestas(); i++) T[i] = 0;
-	list<pair<int*, pair<float, float> > > noSuportadas;
+	//list<pair<int*, pair<float, float> > > noSuportadas;
 	Conjunto conjunto(g->getQuantVertices());
 	// Calcular a regiao viavel inicial (delimitada somente pelos pontos suportados)
 	list< pair<float, float> > regiaoViavel;
@@ -376,20 +324,84 @@ list<pair<int*, pair<float, float> > > efficientBiobjectiveSTinENB(Grafo *g, lis
 
 	EBST_BrB(T, fBound,gBound,0,g, noSuportadas,conjunto, regiaoViavel);
 	
-	return noSuportadas;
+	//return noSuportadas;
 
 }
 
 
+
+void printResultado(){
+	int i = 1;
+   cout<<"SUPORTADAS"<<endl;
+    for (list<pair<int*, pair<float, float> > >::iterator it=arvoresSuportadas.begin(); it!=arvoresSuportadas.end(); it++){
+		cout<<"Arvore "<<i<<endl;
+    	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
+		
+			if ((*it).first[a] == 1){
+				cout<<arestasPtr[a]->getOrigem() << " ";
+    			cout<<arestasPtr[a]->getDestino() << " ";
+    			cout<<arestasPtr[a]->getPeso1() << " ";
+    			cout<<arestasPtr[a]->getPeso2() << endl;
+    		}
+    	}
+    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
+    	i++;
+	}
+
+	cout<<"Nao Suportada"<<endl;
+
+	for (list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
+		cout<<"Arvore "<<i<<endl;
+    	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
+		
+			if ((*it).first[a] == 1){
+    			cout<<arestasPtr[a]->getOrigem() << " ";
+    			cout<<arestasPtr[a]->getDestino() << " ";
+    			cout<<arestasPtr[a]->getPeso1() << " ";
+    			cout<<arestasPtr[a]->getPeso2() << endl;
+    		}
+    	}
+    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
+    	i++;
+	}
+}
+
+
+void *tempo(void *nnnn){
+	while (true){
+		times(&tempsFinal);   /* current time */ // clock final
+		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
+		
+		if (sec==3600){ //3600
+			cout<<"RESULTADO AO FIM DE 1H"<<endl;
+			printResultado();
+			sleep(3400); // 3400 é importante pra nao ficar verificando todo o tempo
+		} else if (sec==7200){//7200
+			cout<<"RESULTADO AO FIM DE 2H"<<endl;
+			printResultado();
+			sleep(3400); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==10800){// 10800 se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			
+			cout<<"RESULTADO AO FIM DE 3H"<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+			printResultado();
+			//cout<<"saindo... valor de ppp="<<ppp<<endl;
+			//exit(-1);
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
 int main(){
-	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
-	
+
 	int n;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
-	Grafo my_grafo(n);
+	my_grafo.setN(n);
 	// contruir o grafo
 	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
 		my_grafo.addVertice(i);
@@ -408,63 +420,30 @@ int main(){
 	for (int i=0; i<my_grafo.getQuantVertices(); i++){
 		min_f_g_vector.push_back(min_f_g_construcao(my_grafo.getVertice(i)->getAdjacentes()));
 	}
-
+	arestasPtr = my_grafo.get_allArestas();
 	times(&tempsInit);  // pega o tempo do clock inical
 	
-	list<pair<int*, pair<float, float> > > arvores = efficientBiobjectiveSTinEB(&my_grafo);
-	cout<<"Fim da primeira fase ... "<<endl;
-	times(&tempsFinal1);   /* current time */ // clock final
-	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
-	cout<<user_time1<<endl;
-	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-   	times(&tempsInit);
+	// para medir o tempo em caso limite
+	pthread_t thread_time; 
+	pthread_attr_t attr;
+	int nnnnnnnn=0;
+	if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
+        cout<<"Error to create the thread"<<endl;
+        //exit(-1);
+        exit(EXIT_FAILURE);
+    }
+    //
 
-	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    list<pair<int*, pair<float, float> > > noSuportadas = efficientBiobjectiveSTinENB(&my_grafo, arvores);
-    cout<<"Fim da segunda fase ... "<<endl;
-    times(&tempsFinal2);   /* current time */ // clock final
-	clock_t user_time2 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
-	cout<<user_time2<<endl;
-	cout<<(float) user_time2 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-	cout<<"Total ..."<<endl;
-	cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
+	efficientBiobjectiveSTinEB(&my_grafo);
+	
+	efficientBiobjectiveSTinENB(&my_grafo, arvoresSuportadas);
+    
+    times(&tempsFinal);   /* current time */ // clock final
+	clock_t user_time2 = (tempsFinal.tms_utime - tempsInit.tms_utime);
+	cout<<"Tempo em segundos: ";
+	cout<<(float) (user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
 
-
-    int i = 1, cont=0;
-    //cout<<"saiu2"<<endl;
-    //cout<<resul.size()<<endl;
-   // list<int*>::iterator it=resul.begin();
-   cout<<"Resultado \n SUPORTADAS"<<endl;
-    for (list<pair<int*, pair<float, float> > >::iterator it=arvores.begin(); it!=arvores.end(); it++){
-		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-		
-			if ((*it).first[a] == 1){
-				cout<<arestasPtr[a]->getOrigem() << " ";
-    			cout<<arestasPtr[a]->getDestino() << " ";
-    			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
-    		}
-    	}
-    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
-    	i++;
-	}
-
-	cout<<"Nao Suportada"<<endl;
-
-	for (list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
-		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<nA; a++){ // cada aresta da arvore
-		
-			if ((*it).first[a] == 1){
-    			cout<<arestasPtr[a]->getOrigem() << " ";
-    			cout<<arestasPtr[a]->getDestino() << " ";
-    			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
-    		}
-    	}
-    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
-    	i++;
-	}
+	cout<<"RESULTADO FINAL"<<endl;
+    printResultado();
 	return 0;
 }

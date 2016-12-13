@@ -4,8 +4,8 @@
 #include "Aresta.h"
 #define PRECISAO 0.00001
 
-void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Aresta **v, int size, int direto, int pares);
-void mergesort(float xl, float yl, float xll, float yll, Aresta **v, int size, int direto, int pares);
+void intercala(float xl, float yl, float zl, float xll, float yll, float zll, float xlll, float ylll, float zlll, int p, int q, int r, Aresta **v, int size, int direto);
+void mergesort(float xl, float yl, float zl, float xll, float yll, float zll, float xlll, float ylll, float zlll, Aresta **v, int size, int direto);
 
 
 

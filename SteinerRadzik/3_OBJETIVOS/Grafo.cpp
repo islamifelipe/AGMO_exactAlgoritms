@@ -11,6 +11,13 @@ Grafo::Grafo(int n1){
 	}
 }
 
+void Grafo::setN(int n1){
+	n = n1;
+	lista_vertices = new Vertice*[n];
+	for (int i=0; i<lista_allArestas.size(); i++){
+		particao[i] = 0; /*inicialmente opcional*/
+	}
+}
 void Grafo::addVertice(int id){
 	Vertice *novo = new Vertice(id);
 	lista_vertices[id] = novo; /*PADRÃO: A faixa de id's dos vértices é de 0 até n-1*/
