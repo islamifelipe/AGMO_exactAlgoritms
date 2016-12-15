@@ -22,7 +22,7 @@
 #include "kruskal.h"
 using namespace std;
 
-#define MAX1 20000 // TODO : Aumentar
+
 struct tms tempsInit, tempsFinal; // para medir o tempo
 list<pair<int*, pair<float, float> > > noSuportadas;
 list<pair<int*, pair<float, float> > > arvoresSuportadas;
