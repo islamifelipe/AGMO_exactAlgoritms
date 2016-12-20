@@ -20,9 +20,59 @@
 using namespace std;
 
 
-/* recebe um vetor de inteiros, onde o valor do indice i refere-se o grau de chegada do vértice i da relacao
-retorna um vetor de aresta do grafo normal (nao o da relacao)
-*/
+
+// // calcula os fronts
+// void front11(Grafo *g,vector <Aresta *> &front){
+// 	map <int, Aresta *> arestas = g->get_allArestas();
+// 	for (int i=0; i<g->getQuantArestas(); i++){
+// 		if (arestas[i]->isUsed()==false){
+// 			bool isDominated = false;
+// 			for (int j=i+1; j<g->getQuantArestas(); j++){
+// 				if (arestas[j]->isUsed()==false){
+// 					if (arestas[j]->getPeso1()<=arestas[i]->getPeso1() && arestas[j]->getPeso2()<=arestas[i]->getPeso2() && (arestas[j]->getPeso1()<arestas[i]->getPeso1() || arestas[j]->getPeso2()<arestas[i]->getPeso2())){
+// 						isDominated=true;
+// 						break;
+// 					}
+// 				}
+// 			}
+// 			if (isDominated==false){
+// 				front.push_back(arestas[i]);
+// 			}
+// 		}
+// 	}
+
+
+// }
+
+// pair <int *, int*> krukal_like(Grafo *g){
+// 	vector <Aresta *> front;
+// 	front11(g, front);
+// 	pair <int *, int*> retorno = make_pair(new int[g->getQuantVertices()], new int[g->getQuantArestas()]);
+// 	for (int i=0; i<g->getQuantVertices(); i++) (retorno.first)[i] = 0;
+//  	for (int i=0; i<g->getQuantArestas(); i++) (retorno.second)[i] = 0;
+// 	int contArestas = 0; // deve atingir g->getQuantVertices()-1;
+// 	Conjunto conjunto(g->getQuantVertices());
+// 	int comeco = 0;
+// 	while (contArestas<g->getQuantVertices()-1){
+// 		for (int i=comeco; i<front.size() && contArestas<g->getQuantVertices()-1; i++){ // os novos elemntos do front sao colocados na cabeça do vetor, de modo que quando o i atinge uma aresta usada, ele para
+// 			if (front[i]->isUsed()==false){
+// 				if (conjunto.compare(front[i]->getOrigem(), front[i]->getDestino()==false)){
+// 					(retorno.first)[front[i]->getOrigem()] = 1;
+//  					(retorno.first)[front[i]->getDestino()] = 1;
+//  					(retorno.second)[front[i]->getId()] = 1;
+//  					conjunto.union1(front[i]->getOrigem(),front[i]->getDestino());
+// 					contArestas++;
+// 				}
+// 				front[i]->toUse(true);
+// 			} 
+// 		}
+// 		comeco = front.size();
+// 		front11(g, front);
+// 	}
+// 	return retorno;
+
+// }
+
 Aresta * maximal(Grafo *g,Conjunto conjunto ){ // g é o grafo normal (nao o da relacao)
 	map <int, Aresta *> arestas = g->get_allArestas();
 	Aresta * retorno;
@@ -41,7 +91,7 @@ Aresta * maximal(Grafo *g,Conjunto conjunto ){ // g é o grafo normal (nao o da 
 }
 
 
-pair <int *, int*> krukal_like(Grafo *g, Grafo *relacao){
+pair <int *, int*> krukal_like(Grafo *g){
 	map<int, vector<pair <int *, int*> > > at;
 	/*cada vector<pair <int *, int*> > funciona, na verdade, como uma lista de arvores de tamanho t, onde t é seu indice em map. Portanto, uma lista de arvores da forma T^(t) 
 	I^(t), do algorito original, nada mais é senao os indices do t-ésimo vector do map*/
@@ -125,7 +175,7 @@ int main(){
 
 	times(&tempsInit);
 
-	pair <int *, int*>  arestas = krukal_like(&my_grafo, &relacao);
+	pair <int *, int*>  arestas = krukal_like(&my_grafo);
 	
 	times(&tempsFinal1);   /* current time */ // clock final
 	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);

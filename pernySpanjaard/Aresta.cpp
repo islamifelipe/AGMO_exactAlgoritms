@@ -7,11 +7,18 @@ Aresta::Aresta(int id2, int origem1, int destino1, float peso1_1, float peso2_1)
 	peso1 = peso1_1;
 	peso2 = peso2_1;
 	id= id2;
+	used = false;
 	//pesoUnique = 0;
 } 
 
-Aresta::Aresta(){}
+Aresta::Aresta(){used = false;}
 
+bool Aresta::isUsed(){
+	return used;
+}
+void Aresta::toUse(bool u){
+	used= u;
+}
 int Aresta::getId(){
 	return id;
 }
