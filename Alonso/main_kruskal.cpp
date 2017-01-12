@@ -21,11 +21,16 @@
 #include "Kruskal.h"
 #include <sys/times.h>
 #include <unistd.h>
+#include <stdlib.h>
 using namespace std;
 
-
+struct tms tempsInit, tempsFinal ; // para medir o tempo
+	
 int idMST = 0;
 Aresta ** arestasPtr;
+Grafo my_grafo;
+vector<int* > arvores;
+
 
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
@@ -164,7 +169,6 @@ vector <Aresta *> maximal(int* T, Conjunto conjunto, Grafo *my_grafo,vector<pair
 }
 
 vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
-	vector< int* > resul;
 	stack<pair<int *, Conjunto> > pilhaT;
 	int *Tinit = new int [g->getQuantArestas()];
 	for (int i=0; i<g->getQuantArestas(); i++) Tinit[i] =0; // tudo vazio
@@ -204,15 +208,15 @@ vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
 		//cout<<"k1 = "<<k1<<endl;
 		// Conjunto copie(g->getQuantVertices());
 		// copie = c;
-		list< pair<int*, Conjunto > > resul2;
+		list< pair<int*, Conjunto > > arvores2;
 
-		AllSpaningTree(g,resul2,k0);
+		AllSpaningTree(g,arvores2,k0);
 		//cout<<"size = "<<resul2.size()<<endl;
 		//cout<<"K1 = "<<k1<<endl;
-		for (list<pair<int*, Conjunto > >::iterator itnt = resul2.begin(); itnt!=resul2.end(); itnt++){
+		for (list<pair<int*, Conjunto > >::iterator itnt = arvores2.begin(); itnt!=arvores2.end(); itnt++){
 			//if (k1==g->getQuantVertices()){
 			if (k0==1){
-				resul.push_back(itnt->first);
+				arvores.push_back(itnt->first);
 			}else{
 				
 				pilhaT.push(make_pair(itnt->first, itnt->second));
@@ -242,54 +246,11 @@ vector< int* > optimalcutset_K(Grafo *g,vector<pair<int, int> > relacao2){
 		
 
 	}
-	return resul;
+	//return resul;
 }
 
-int main(){
-	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
-	
 
-	int n, m;
-	float peso1, peso2;
-	int origem, destino; // vértices para cada aresta;
-	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
-	cin>>n; // quantidade de vértices do grafo;
-	cin>>m;
-	Grafo my_grafo(n);
-	//Grafo relacao(m); // como a relacao se dá no conjunto de arestas, entao a quantidade de vértices do Grafo relacao será a mesma quantidade de arestas de my_grafo  
-	// contruir o grafo
-	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
-		my_grafo.addVertice(i);
-	}
-	for (id = 0; id<m; id++){
-		cin>>origem;
-		cin>>destino;
-		cin>>peso1;
-		cin>>peso2;
-		my_grafo.addAresta(id, origem, destino, peso1, peso2);
-	}
-	//int nA = id; // quantidade de arestas do grafo	
-	//cout<<m<<endl;
-	id = 0;
-	// for (int i=0; i<m; i++){ // PADRAO : vértices numerados de 0 à n-1
-	// 	relacao.addVertice(i);
-	// }
-	vector< pair<int, int> > relacao2; // primeira aresta domina a segunda
-	while (cin>>origem){
-		cin>>destino;
-		//relacao.addArestaDirecionada(id++, origem, destino); // nao nos preocupamos com os pesos para o grafo relacao
-		relacao2.push_back(make_pair(origem, destino));
-		// origem R destino
-	}
-
-	arestasPtr = my_grafo.getAllArestasPtr();
-	times(&tempsInit);
-	vector<int* > arvores = optimalcutset_K(&my_grafo, relacao2);
-	times(&tempsFinal1);
-	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
-	cout<<user_time1<<endl;
-	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-   	
+void printResultado(){
 
 	map <int, Aresta *> arestas = my_grafo.get_allArestas();
     	
@@ -312,6 +273,83 @@ int main(){
     	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
     	cout<<endl;
     }
+}
+
+
+void *tempo(void *nnnn){
+	while (true){
+		times(&tempsFinal);   /* current time */ // clock final
+		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
+		
+		if (sec==3600){ //3600
+			cout<<"RESULTADO AO FIM DE 1H"<<endl;
+			printResultado();
+			sleep(3400); // 3400 é importante pra nao ficar verificando todo o tempo
+		} else if (sec==7200){//7200
+			cout<<"RESULTADO AO FIM DE 2H"<<endl;
+			printResultado();
+			sleep(3400); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==10800){// 10800 se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			
+			cout<<"RESULTADO AO FIM DE 3H"<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+			printResultado();
+			//cout<<"saindo... valor de ppp="<<ppp<<endl;
+			//exit(-1);
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
+int main(){
+	
+	int n, m;
+	float peso1, peso2;
+	int origem, destino; // vértices para cada aresta;
+	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
+	cin>>n; // quantidade de vértices do grafo;
+	cin>>m;
+	my_grafo.setN(n);
+	//Grafo relacao(m); // como a relacao se dá no conjunto de arestas, entao a quantidade de vértices do Grafo relacao será a mesma quantidade de arestas de my_grafo  
+	// contruir o grafo
+	for (int i=0; i<n; i++){ // PADRAO : vértices numerados de 0 à n-1
+		my_grafo.addVertice(i);
+	}
+	for (id = 0; id<m; id++){
+		cin>>origem;
+		cin>>destino;
+		cin>>peso1;
+		cin>>peso2 ;
+		my_grafo.addAresta(id, origem, destino, peso1, peso2);
+	}
+	//int nA = id; // quantidade de arestas do grafo	
+	//cout<<m<<endl;
+	id = 0;
+	// for (int i=0; i<m; i++){ // PADRAO : vértices numerados de 0 à n-1
+	// 	relacao.addVertice(i);
+	// }
+	vector< pair<int, int> > relacao2; // primeira aresta domina a segunda
+	while (cin>>origem){
+		cin>>destino;
+		//relacao.addArestaDirecionada(id++, origem, destino); // nao nos preocupamos com os pesos para o grafo relacao
+		relacao2.push_back(make_pair(origem, destino));
+		// origem R destino
+	}
+
+	arestasPtr = my_grafo.getAllArestasPtr();
+	times(&tempsInit);
+	
+	optimalcutset_K(&my_grafo, relacao2);
+
+	times(&tempsFinal);
+	clock_t user_time1 = (tempsFinal.tms_utime - tempsInit.tms_utime);
+	cout<<user_time1<<endl;
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	
+   	cout<<"RESULTADO FINAL"<<endl;
+   	printResultado();
 
 	return 0;
 }

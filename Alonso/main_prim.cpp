@@ -18,6 +18,9 @@
 #include <unistd.h>
 using namespace std;
 
+struct tms tempsInit, tempsFinal; // para medir o tempo
+Grafo my_grafo;
+vector<pair <int *, int*> > arvores;
 
 vector <Aresta *> maximal(int* S, Grafo *my_grafo,vector<pair<int, int> > relacao2){
 	map <int, Aresta *> arestas = my_grafo->get_allArestas();
@@ -53,8 +56,8 @@ vector <Aresta *> maximal(int* S, Grafo *my_grafo,vector<pair<int, int> > relaca
 }
 
 
-vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > relacao2){
-	vector<pair <int *, int*> > OptCUT;
+void optimalcutset_P(Grafo *g,vector< pair<int, int> > relacao2){
+	//vector<pair <int *, int*> > arvores;
 	int *index = new int[g->getQuantArestas()]; //index é um vetor, onde cada indice representa o id da aresta, e o valor representa o level
 	
 	stack <pair <int*, int*> > pilha; // para simular a recursao. Primeiro elemento é o vetor de vertices (id's) e o segundo de arestas
@@ -127,7 +130,7 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 
 				if (size == g->getQuantVertices() -1){
 					//cout<<"ADD"<<endl;
-					OptCUT.push_back(make_pair(newS, newT));
+					arvores.push_back(make_pair(newS, newT));
 				} else{
 					//cout<<"recursive"<<endl;
 					pilha.push(make_pair(newS, newT));
@@ -138,13 +141,62 @@ vector<pair <int *, int*> > optimalcutset_P(Grafo *g,vector< pair<int, int> > re
 			}
 		}
 	}
-	return OptCUT;
+	//return arvores;
+}
+
+void printResultado(){
+
+	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
+    	float cont1 = 0, cont2 = 0;
+    	pair <int *, int*>  arestas= arvores[k]; 
+    	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
+    	cout<<"Arvore "<<k+1<<endl;
+    	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
+			if ((arestas.second)[a] == 1){
+				cont1+=arestasPtr[a]->getPeso1();
+				cont2+=arestasPtr[a]->getPeso2();
+
+    			cout<<arestasPtr[a]->getOrigem() << " ";
+    			cout<<arestasPtr[a]->getDestino() << " ";
+    			cout<<arestasPtr[a]->getPeso1() << " ";
+    			cout<<arestasPtr[a]->getPeso2() << endl;
+    		}
+    	}
+
+    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
+    	cout<<endl;
+    }
+
+}
+
+void *tempo(void *nnnn){
+	while (true){
+		times(&tempsFinal);   /* current time */ // clock final
+		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
+		
+		if (sec==3600){ //3600
+			cout<<"RESULTADO AO FIM DE 1H"<<endl;
+			printResultado();
+			sleep(3400); // 3400 é importante pra nao ficar verificando todo o tempo
+		} else if (sec==7200){//7200
+			cout<<"RESULTADO AO FIM DE 2H"<<endl;
+			printResultado();
+			sleep(3400); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==10800){// 10800 se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			
+			cout<<"RESULTADO AO FIM DE 3H"<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+			printResultado();
+			//cout<<"saindo... valor de ppp="<<ppp<<endl;
+			//exit(-1);
+			exit(EXIT_FAILURE);
+		}
+	}
 }
 
 int main(){
-
-	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
-	
 
 	int n, m;
 	float peso1, peso2;
@@ -152,7 +204,7 @@ int main(){
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
 	cin>>m;
-	Grafo my_grafo(n);
+	my_grafo.setN(n);
 	Grafo relacao(m); // como a relacao se dá no conjunto de arestas, entao a quantidade de vértices do Grafo relacao será a mesma quantidade de arestas de my_grafo  
 	
 	// contruir o grafo
@@ -180,36 +232,49 @@ int main(){
 		// origem R destino
 	}
 
+
 	times(&tempsInit);
 	
-	vector<pair <int *, int*> > arvores = optimalcutset_P(&my_grafo, relacao2);
+	// para medir o tempo em caso limite
+	pthread_t thread_time; 
+	pthread_attr_t attr;
+	int nnnnnnnn=0;
+	if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
+        cout<<"Error to create the thread"<<endl;
+        //exit(-1);
+        exit(EXIT_FAILURE);
+    }
+    //
+
+	optimalcutset_P(&my_grafo, relacao2);
 	
-	times(&tempsFinal1);
-	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	times(&tempsFinal);
+	clock_t user_time1 = (tempsFinal.tms_utime - tempsInit.tms_utime);
 	cout<<user_time1<<endl;
 	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
    	
+   	cout<<"RESULTADO FINAL"<<endl;
+   	printResultado();
+	// for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
+ //    	float cont1 = 0, cont2 = 0;
+ //    	pair <int *, int*>  arestas= arvores[k]; 
+ //    	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
+ //    	cout<<"Arvore "<<k+1<<endl;
+ //    	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
+	// 		if ((arestas.second)[a] == 1){
+	// 			cont1+=arestasPtr[a]->getPeso1();
+	// 			cont2+=arestasPtr[a]->getPeso2();
 
-	for (int k = 0; k < arvores.size(); k++){ // cada arvore formada
-    	float cont1 = 0, cont2 = 0;
-    	pair <int *, int*>  arestas= arvores[k]; 
-    	map <int, Aresta *> arestasPtr = my_grafo.get_allArestas();
-    	cout<<"Arvore "<<k+1<<endl;
-    	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
-			if ((arestas.second)[a] == 1){
-				cont1+=arestasPtr[a]->getPeso1();
-				cont2+=arestasPtr[a]->getPeso2();
+ //    			cout<<arestasPtr[a]->getOrigem() << " ";
+ //    			cout<<arestasPtr[a]->getDestino() << " ";
+ //    			cout<<arestasPtr[a]->getPeso1() << " ";
+ //    			cout<<arestasPtr[a]->getPeso2() << endl;
+ //    		}
+ //    	}
 
-    			cout<<arestasPtr[a]->getOrigem() << " ";
-    			cout<<arestasPtr[a]->getDestino() << " ";
-    			cout<<arestasPtr[a]->getPeso1() << " ";
-    			cout<<arestasPtr[a]->getPeso2() << endl;
-    		}
-    	}
-
-    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
-    	cout<<endl;
-    }
+ //    	cout<<"("<<cont1<<", "<<cont2<<")"<<endl;
+ //    	cout<<endl;
+ //    }
 
 	return 0;
 }
