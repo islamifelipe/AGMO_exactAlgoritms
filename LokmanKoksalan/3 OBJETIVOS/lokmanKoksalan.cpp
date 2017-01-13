@@ -56,7 +56,7 @@ void printResultado(){
 				}
 			}
 		}
-		cout<<"("<<Z[pp].peso1<<", "<<Z[pp].peso2<<", "<<Z[pp].peso3<<")"<<endl;
+		cout<<"("<<Z[pp].peso1*(-1)<<", "<<Z[pp].peso2*(-1)<<", "<<Z[pp].peso3*(-1)<<")"<<endl;
 		cout<<endl;
 	}	
 }
@@ -67,14 +67,32 @@ void *tempo(void *nnnn){
 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-		if (sec>20){ 
-			cout<<sec<<endl;
-			cout<<"TEMPO LIMITE ATINGIDO...   " <<endl;
+		if (sec==3600){ 
+			cout<<"RESULTADO AO FIM DE 1H"<<endl;
+			printResultado();
+			sleep(3510); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==7200){
+			cout<<"RESULTADO AO FIM DE 2H"<<endl;
+			printResultado();
+			sleep(3510); // é importante pra nao ficar verificando todo o tempo
+		} else if (sec==10800){// se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+			
+			cout<<"RESULTADO AO FIM DE 3H"<<endl;
+			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
 
 			printResultado();
 			//cout<<"saindo... valor de ppp="<<ppp<<endl;
 			exit(-1);
 		}
+
+		// if (sec>20){ 
+		// 	cout<<sec<<endl;
+		// 	cout<<"TEMPO LIMITE ATINGIDO...   " <<endl;
+
+		// 	printResultado();
+		// 	//cout<<"saindo... valor de ppp="<<ppp<<endl;
+		// 	exit(-1);
+		// }
 	}
 }
 
@@ -107,7 +125,7 @@ int main(){
 
 	GRBVar **y, **x;
 
-	float epslon = 0.001;
+	float epslon = 0.0001;
 	//cin>>epslon;
 
 
@@ -136,8 +154,8 @@ int main(){
 		cin>>peso2;
 		cin>>peso3;
 		coeficienteObjetv[origem][destino] = (peso1*epslon + peso2*epslon + peso3)*(-1); // o problema é de maximizacao
-		x[origem][destino] = model.addVar(0.0, 1000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(origem)+std::to_string(destino));
-        x[destino][origem] = model.addVar(0.0, 1000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(destino)+std::to_string(origem));
+		x[origem][destino] = model.addVar(0.0, 100000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(origem)+std::to_string(destino));
+        x[destino][origem] = model.addVar(0.0, 100000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(destino)+std::to_string(origem));
       	y[origem][destino] = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, "y"+std::to_string(origem)+std::to_string(destino));
       	arestas[origem][destino] = 1;
       	arestas[destino][origem] = 1;
@@ -269,22 +287,22 @@ int main(){
 			nn++;
 		}
 
-		do{ // esse loop para quando z3_k_estrela=-MM
+		do{ // esse loop para quando z3_k_estrela==-MM
 			kk_estrela = 0;
 			z3_k_estrela =(-1)*MM; // guarda o maximo
 			short **z_n_plus_1 = new short*[n];
 			for (int ii=0; ii<n; ii++){
 				z_n_plus_1[ii] = new short[n];
 			}
-			int z1_estrela, z2_estrela, z3_estrela;
-			for (int k=0; k<=nn; k++){ //k=0,...,n
+			int z1_estrela, z2_estrela;
+			for (int k=-1; k<nn; k++){ // no algoritmo original, k deve variar de 0 à n (existindo solucoes de 1 à n). 
+				//aqui, portanto, fazemos k de -1 à n-1, porque as solucoes vao de 0 à n-1
 				
 				//Primeiramente, prepara o b1 e b2
 				int b1,b2;
-				if (k==0) b1=(-1)*MM; // -M
+				if (k==-1) b1=(-1)*MM; // -M
 				else b1 = Z[k].peso1 + 1;
 
-				//vector<short**>Snk;
 				b2 = (-1)*MM; // Snk = vazio
 
 				for (int ii=0; ii<S.size(); ii++){
@@ -294,8 +312,8 @@ int main(){
 						}
 					}
 				}
-				b2=b2+1; // max + 1
-				//cout <<b1<<" , "<<b2<<endl;;
+				if (b2!=(-1)*MM) b2=b2+1; // max + 1
+				//cout <<"b1= "<<b1<<"  b2= "<<" "<<b2<<"  k="<<k<<endl;
 				if (auxbol == true){ // remove as restricoes de z2>b2 e adiciona novas
 					
 					GRBConstr cb1 = model.getConstrByName("cb1");
@@ -367,7 +385,7 @@ int main(){
    	
 
 
-
+			cout<<"RESULTADO FINAL..."<<endl;
 		   	printResultado();
 
   	 	} catch(GRBException e) {
