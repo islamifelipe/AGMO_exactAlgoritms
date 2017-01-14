@@ -3,7 +3,7 @@
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
 # This code implements the Lokman and Koksalan's (2013) algorithm 
-# based on the Multiobjective Integer Program for p = 3
+# based on the Multiobjective Integer Program for p = 4
 # This code uses Gurobi for resolve the Pmn model
 #=======================================================================
 
@@ -23,20 +23,38 @@ m = 1
 #include <sys/times.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sstream>
 using namespace std;
+
+
+ template <typename T>
+    std::string to_string(T value)
+    {
+      //create an output string stream
+      std::ostringstream os ;
+
+      //throw the value into the string stream
+      os << value ;
+
+      //convert the string stream into a string and return
+      return os.str() ;
+    }
+
+
 
 
 typedef struct Pesos{
 	int peso1;
 	int peso2;
 	int peso3;
+	int peso4;
 }Pesos;
 
 int n;
 struct tms tempsInit, tempsFinal1,tempsFinal2, tempsFinal; // para medir o tempo
 //double coeficienteObjetv[n][n],matrix_peso1[n][n],matrix_peso2[n][n];;
 double **coeficienteObjetv;//para guardar os coeficientes da funcao objetivo
-double **matrix_peso1,**matrix_peso2,**matrix_peso3; // para guardar os pesos das arestas
+double **matrix_peso1,**matrix_peso2,**matrix_peso3, **matrix_peso4; // para guardar os pesos das arestas
 short **arestas;
 std::vector<short**> S; // guarda as solucoes nao dominadas
 std::vector<Pesos> Z; // guarda os pontos associados às solucoes nao dominadas
@@ -51,13 +69,13 @@ void printResultado(){
 			for (int j=i+1; j<n; j++){
 				if (arestas[i][j] == 1){
 					if (result[i][j] == 1){
-						cout <<i<<" "<<j<<" "<<matrix_peso1[i][j]*(-1)<<" "<<matrix_peso2[i][j]*(-1)<<" "<<matrix_peso3[i][j]*(-1)<<endl;
+						cout <<i<<" "<<j<<" "<<matrix_peso1[i][j]*(-1)<<" "<<matrix_peso2[i][j]*(-1)<<" "<<matrix_peso3[i][j]*(-1)<<" "<<matrix_peso4[i][j]*(-1)<<endl;
 					
 					}
 				}
 			}
 		}
-		cout<<"("<<Z[pp].peso1*(-1)<<", "<<Z[pp].peso2*(-1)<<", "<<Z[pp].peso3*(-1)<<")"<<endl;
+		cout<<"("<<Z[pp].peso1*(-1)<<", "<<Z[pp].peso2*(-1)<<", "<<Z[pp].peso3*(-1)<<", "<<Z[pp].peso4*(-1)<<")"<<endl;
 		cout<<endl;
 	}	
 }
@@ -85,15 +103,6 @@ void *tempo(void *nnnn){
 			//cout<<"saindo... valor de ppp="<<ppp<<endl;
 			exit(-1);
 		}
-
-		// if (sec>20){ 
-		// 	cout<<sec<<endl;
-		// 	cout<<"TEMPO LIMITE ATINGIDO...   " <<endl;
-
-		// 	printResultado();
-		// 	//cout<<"saindo... valor de ppp="<<ppp<<endl;
-		// 	exit(-1);
-		// }
 	}
 }
 
@@ -102,7 +111,7 @@ int main(){
 	
 	
 	
-	float peso1, peso2, peso3;
+	float peso1, peso2, peso3,peso4;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
@@ -111,12 +120,14 @@ int main(){
 	matrix_peso1 = new double*[n];
 	matrix_peso2 = new double*[n];
 	matrix_peso3 = new double*[n];
+	matrix_peso4 = new double*[n];
 	for (int i=0; i<n; i++){
 		arestas[i] = new short[n];
 		coeficienteObjetv[i] = new double[n];
 		matrix_peso1[i] = new double[n];
 		matrix_peso2[i] = new double[n];
 		matrix_peso3[i] = new double[n];
+		matrix_peso4[i] = new double[n];
 	}
 
 
@@ -154,15 +165,17 @@ int main(){
 		cin>>peso1;
 		cin>>peso2;
 		cin>>peso3;
-		coeficienteObjetv[origem][destino] = (peso1*epslon + peso2*epslon + peso3)*(-1); // o problema é de maximizacao
-		x[origem][destino] = model.addVar(0.0, 100000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(origem)+std::to_string(destino));
-        x[destino][origem] = model.addVar(0.0, 100000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(destino)+std::to_string(origem));
-      	y[origem][destino] = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, "y"+std::to_string(origem)+std::to_string(destino));
+		cin>>peso4;
+		coeficienteObjetv[origem][destino] = (peso1*epslon + peso2*epslon + peso3*epslon + peso4)*(-1); // o problema é de maximizacao
+		x[origem][destino] = model.addVar(0.0, 100000, 0.0, GRB_CONTINUOUS, "x"+to_string(origem)+to_string(destino));
+        x[destino][origem] = model.addVar(0.0, 100000, 0.0, GRB_CONTINUOUS, "x"+to_string(destino)+to_string(origem));
+      	y[origem][destino] = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, "y"+to_string(origem)+to_string(destino));
       	arestas[origem][destino] = 1;
       	arestas[destino][origem] = 1;
       	matrix_peso1[origem][destino] = peso1*(-1);
       	matrix_peso2[origem][destino] = peso2*(-1);
       	matrix_peso3[origem][destino] = peso3*(-1);
+      	matrix_peso4[origem][destino] = peso4*(-1);
 		id++;
 	}
 	int nA = id; // quantidade de arestas do grafo	
@@ -191,7 +204,7 @@ int main(){
     	if (arestas[0][j] == 1)
         	constr5.addTerms(&coefff,&x[0][j],1);
     }
-    model.addConstr(constr5, GRB_EQUAL, n-1,std::to_string(constrCont++));
+    model.addConstr(constr5, GRB_EQUAL, n-1,to_string(constrCont++));
   
 
 
@@ -205,7 +218,7 @@ int main(){
           constr2.addTerms(&com,&x[j][i],1);
         }
       }
-      model.addConstr(constr2, GRB_EQUAL, 1,std::to_string(constrCont++));
+      model.addConstr(constr2, GRB_EQUAL, 1,to_string(constrCont++));
     }
 
     double coef = (double) n - 1;
@@ -217,7 +230,7 @@ int main(){
 	        constr8.addTerms(&coef,&y[i][j],1);
 	        constr9.addTerms(&coefff  ,&x[i][j],1);
 	        constr9.addTerms(&coefff  ,&x[j][i],1);
-	      	model.addConstr(constr8, GRB_GREATER_EQUAL, constr9,std::to_string(constrCont++));
+	      	model.addConstr(constr8, GRB_GREATER_EQUAL, constr9,to_string(constrCont++));
     	}
       }
     }
@@ -233,15 +246,15 @@ int main(){
 	        constr33.addTerms(&coefff  ,&x[i][j],1);
 	        constr33.addTerms(&coefff  ,&x[j][i],1);
 	       // cout<<constr22<<GRB_LESS_EQUAL<<constr33<<endl;     
-	        model.addConstr(constr22, GRB_LESS_EQUAL, constr33,std::to_string(constrCont++));
+	        model.addConstr(constr22, GRB_LESS_EQUAL, constr33,to_string(constrCont++));
     	}
       }
     }
 
     int nn = 0; // o 'n' do algoritmo de Lokman and Koksalan 	
-    int kk_estrela = 0; // o 'k*' do algoritmo 2 de Lokman and Koksalan
+    //int kk_estrela = 0; // o 'k*' do algoritmo 2 de Lokman and Koksalan
     int MM = 100000000; // o 'M' do algoritmo 2 de Lokman and Koksalan 	
-    int z3_k_estrela; // pra guardar o Z_p^(P^(b^(k*,n))) do algoritmo 2 de Lokman and Koksalan
+    int z4_k_estrela; // pra guardar o Z_p^(P^(b^(k*,n))) do algoritmo 2 de Lokman and Koksalan
     /* 
 	* Algoritmo 2 de Lokman and Koksalan 	
 	*/
@@ -268,9 +281,9 @@ int main(){
 			result[ii] = new short[n];
 		}
 		
-		model.optimize(); // P0,3 --> n=0 (modelo SIMPLES)
+		model.optimize(); // P0,4 --> n=0 (modelo SIMPLES)
 		optimstatus = model.get(GRB_IntAttr_Status);
-		int z1=0,z2=0,z3=0;
+		int z1=0,z2=0,z3=0,z4=0;
 		if (optimstatus != GRB_INFEASIBLE){
 			for (int i=0; i<n; i++){
 				for (int j=i+1; j<n; j++){
@@ -279,106 +292,131 @@ int main(){
 				    	z1+=result[i][j]*matrix_peso1[i][j]; // calcula os pesos
 				    	z2+=result[i][j]*matrix_peso2[i][j];
 				    	z3+=result[i][j]*matrix_peso3[i][j];
+				    	z4+=result[i][j]*matrix_peso4[i][j];
 				    }
 				}
 			}
 			S.push_back(result);
-			Pesos ppp = (Pesos){z1,z2,z3};
+			Pesos ppp = (Pesos){z1,z2,z3,z4};
 			Z.push_back(ppp);
 			nn++;
 		}
 
-		do{ // esse loop para quando z3_k_estrela==-MM
-			kk_estrela = 0;
-			z3_k_estrela =(-1)*MM; // guarda o maximo
+		do{ // esse loop para quando z4_k_estrela==-MM
+			z4_k_estrela =(-1)*MM; // guarda o maximo
 			short **z_n_plus_1 = new short*[n];
 			for (int ii=0; ii<n; ii++){
 				z_n_plus_1[ii] = new short[n];
 			}
-			int z1_estrela, z2_estrela;
-			for (int k=-1; k<nn; k++){ // no algoritmo original, k deve variar de 0 à n (existindo solucoes de 1 à n). 
+			int z1_estrela, z2_estrela, z3_estrela;
+
+
+			for (int ki=-1; ki<nn; ki++){ // no algoritmo original, ki deve variar de 0 à n (existindo solucoes de 1 à n). 
 				//aqui, portanto, fazemos k de -1 à n-1, porque as solucoes vao de 0 à n-1
-				
-				//Primeiramente, prepara o b1 e b2
-				int b1,b2;
-				if (k==-1) b1=(-1)*MM; // -M
-				else b1 = Z[k].peso1 + 1;
-
-				b2 = (-1)*MM; // Snk = vazio
-
-				for (int ii=0; ii<S.size(); ii++){
-					if (Z[ii].peso1>=b1) {
-						if (Z[ii].peso2 > b2){
-							b2 = Z[ii].peso2;
+				for (int kj=-1; kj<nn; kj++){ // como i de ver menor que j, a unica possibilidade é i=1 e j=2, pois p-2=2
+	 				//cout<<ki<<" "<<kj<<endl;
+	 				//cout<< Z[ki].peso1<<" "<<  Z[kj].peso2<<endl;
+	 				//if (kj!=-1 && ki!=-1 && (Z[ki].peso1 + 1 <= Z[kj].peso1)){
+	 					//Primeiramente, prepara o b1 e b2 e b3
+	 					int b1,b2,b3;
+	 					//b1
+	 					if (ki==-1) b1=(-1)*MM; // -M
+						else {
+							b1 = Z[ki].peso1 + 1;
 						}
-					}
-				}
-				if (b2!=(-1)*MM) b2=b2+1; // max + 1
-				//cout <<"b1= "<<b1<<"  b2= "<<" "<<b2<<"  k="<<k<<endl;
-				if (auxbol == true){ // remove as restricoes de z2>b2 e adiciona novas
-					
-					GRBConstr cb1 = model.getConstrByName("cb1");
-					GRBConstr cb2 = model.getConstrByName("cb2");
-					model.remove(cb1);
-					model.remove(cb2);
-				}
-				GRBLinExpr cb1;
-				GRBLinExpr cb2;
-				 for (int i=0; i<n; i++){
-				 	for (int j=i+1; j<n; j++){
-				 		if (arestas[i][j] == 1){
-				 			cb1.addTerms(&matrix_peso1[i][j], &y[i][j],1);
-				 			cb2.addTerms(&matrix_peso2[i][j], &y[i][j],1);
-				 		}
-				 	}
-				 }
-				model.addConstr(cb1, GRB_GREATER_EQUAL, b1,"cb1");
-			  	model.addConstr(cb2, GRB_GREATER_EQUAL, b2,"cb2");
 
-				//Agora resolvemos o modelo P^(b^(k,n))
-			  	auxbol=true;
-			  	model.optimize(); 
-				optimstatus = model.get(GRB_IntAttr_Status);
-		
-				//precisa-sa guardar o maximo de z3 entre todos o modelos P^(b^(k,n)) resulvidos para todo k 
-				if (optimstatus != GRB_INFEASIBLE){
-					short **result = new short*[n];
-					for (int ii=0; ii<n; ii++){
-						result[ii] = new short[n];
-					}
-					z1=0,z2=0,z3=0;
-					for (int i=0; i<n; i++){
-						for (int j=i+1; j<n; j++){
-				  			if (arestas[i][j] == 1){
-				        		result[i][j] = y[i][j].get(GRB_DoubleAttr_X); // GUARDA O RESULTADO
-						    	z1+=result[i][j]*matrix_peso1[i][j]; // calcula os pesos
-						    	z2+=result[i][j]*matrix_peso2[i][j];
-						    	z3+=result[i][j]*matrix_peso3[i][j];
-				    		}
+						//b2
+	 					if (kj==-1) b2=(-1)*MM; // -M
+						else {
+							if (Z[kj].peso1 >= b1){
+								b2 = Z[kj].peso2 + 1;
+							} else b2=(-1)*MM; // -M
 						}
-					}
-					if (z3>z3_k_estrela){
-						z1_estrela = z1;
-						z2_estrela = z2;
-						z3_k_estrela = z3;
-						kk_estrela = k;
-						for (int i=0; i<n; i++){
-							for (int j=i+1; j<n; j++){
-								z_n_plus_1[i][j] = result[i][j];
+
+						//b3
+						b3 = (-1)*MM; // Snk = vazio
+						for (int ii=0; ii<S.size(); ii++){
+							if (Z[ii].peso1>=b1 && Z[ii].peso2>=b2) {
+								if (Z[ii].peso3 > b3){
+									b3 = Z[ii].peso3;
+								}
 							}
 						}
-					}
-				}
+						if (b3!=(-1)*MM) b3=b3+1; // max + 1
+						//cout <<"b1= "<<b1<<" b2= "<<" "<<b2<<" b3= "<<b3<<endl;
+				
+						if (auxbol == true){ // remove as restricoes de z2>b2 e adiciona novas
+							GRBConstr cb1 = model.getConstrByName("cb1");
+							GRBConstr cb2 = model.getConstrByName("cb2");
+							GRBConstr cb3 = model.getConstrByName("cb3");
+							model.remove(cb1);
+							model.remove(cb2);
+							model.remove(cb3);
+						}
+
+						GRBLinExpr cb1;
+						GRBLinExpr cb2;
+						GRBLinExpr cb3;
+						 for (int i=0; i<n; i++){
+						 	for (int j=i+1; j<n; j++){
+						 		if (arestas[i][j] == 1){
+						 			cb1.addTerms(&matrix_peso1[i][j], &y[i][j],1);
+						 			cb2.addTerms(&matrix_peso2[i][j], &y[i][j],1);
+						 			cb3.addTerms(&matrix_peso3[i][j], &y[i][j],1);
+						 		}
+						 	}
+						 }
+						model.addConstr(cb1, GRB_GREATER_EQUAL, b1,"cb1");
+					  	model.addConstr(cb2, GRB_GREATER_EQUAL, b2,"cb2");
+					  	model.addConstr(cb3, GRB_GREATER_EQUAL, b3,"cb3");
+
+					  	// AGORA RESOLVE-SE O MODELO
+					  	auxbol=true;
+					  	model.optimize(); 
+						optimstatus = model.get(GRB_IntAttr_Status);
+		
+						if (optimstatus != GRB_INFEASIBLE){
+							short **result = new short*[n];
+							for (int ii=0; ii<n; ii++){
+								result[ii] = new short[n];
+							}
+							z1=0,z2=0,z3=0,z4=0;
+							for (int i=0; i<n; i++){
+								for (int j=i+1; j<n; j++){
+						  			if (arestas[i][j] == 1){
+						        		result[i][j] = y[i][j].get(GRB_DoubleAttr_X); // GUARDA O RESULTADO
+								    	z1+=result[i][j]*matrix_peso1[i][j]; // calcula os pesos
+								    	z2+=result[i][j]*matrix_peso2[i][j];
+								    	z3+=result[i][j]*matrix_peso3[i][j];
+								    	z4+=result[i][j]*matrix_peso4[i][j];
+						    		}
+								}
+							}
+							if (z4>z4_k_estrela){
+								z1_estrela = z1;
+								z2_estrela = z2;
+								z3_estrela = z3;
+								z4_k_estrela = z4;
+								for (int i=0; i<n; i++){
+									for (int j=i+1; j<n; j++){
+										z_n_plus_1[i][j] = result[i][j];
+									}
+								}
+							}
+						}
+	 				//}
+				}	
 			}
-			if (z3_k_estrela!=(-1)*MM){
+			if (z4_k_estrela!=(-1)*MM){
 				S.push_back(z_n_plus_1);
-				Pesos pppp = (Pesos){z1_estrela,z2_estrela,z3_k_estrela};
+				Pesos pppp = (Pesos){z1_estrela,z2_estrela,z3_estrela,z4_k_estrela};
 				Z.push_back(pppp);
 				nn++;
+				//cout<<"nn =  "<<nn<<endl;
 			}
-		} while (z3_k_estrela!=(-1)*MM);
-
-
+		} while (z4_k_estrela!=(-1)*MM);
+				
+				
 	  	 	times(&tempsFinal1);   /* current time */ // clock final
 			clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
 			cout<<user_time1<<endl;
