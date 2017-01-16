@@ -86,23 +86,23 @@ void *tempo(void *nnnn){
 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-		if (sec==3600){ 
-			cout<<"RESULTADO AO FIM DE 1H"<<endl;
-			printResultado();
-			sleep(3510); // é importante pra nao ficar verificando todo o tempo
-		} else if (sec==7200){
-			cout<<"RESULTADO AO FIM DE 2H"<<endl;
-			printResultado();
-			sleep(3510); // é importante pra nao ficar verificando todo o tempo
-		} else if (sec==10800){// se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
-			
-			cout<<"RESULTADO AO FIM DE 3H"<<endl;
-			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+		if (sec>=3600 && sec<=3660){
+                        cout<<"RESULTADO AO FIM DE 1H"<<endl;
+                        printResultado();
+                        sleep(70); // é importante pra nao ficar verificando todo o tempo
+                } else if (sec>=7200 && sec<=7260){
+                        cout<<"RESULTADO AO FIM DE 2H"<<endl;
+                        printResultado();
+                        sleep(70); // é importante pra nao ficar verificando todo o tempo
+                } else if (sec>=10800){// se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
 
-			printResultado();
+                        cout<<"RESULTADO AO FIM DE 3H"<<endl;
+                        cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+                        printResultado();
 			//cout<<"saindo... valor de ppp="<<ppp<<endl;
-			exit(-1);
-		}
+						exit(EXIT_FAILURE);
+			}
 	}
 }
 
@@ -267,8 +267,8 @@ int main(){
 		pthread_attr_t attr;
 		int nnnnnnnn=0;
 		if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
-	        printf("Error to create the thread");
-	        exit(-1);
+	       cout<<"Error to create the thread"<<endl;
+	        exit(EXIT_FAILURE);
 	    }
 	    //
 
