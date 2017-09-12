@@ -4,7 +4,7 @@
 #-----------------------------------------------------------------------
 # This code implements the Steiner and Radzik's (2003) algorithm 
 # to resolve the Biobjective Spanning Tree Problem
-# This code utilise the SONRENSEN JANSSENS's (2003) algorithm
+# This code utilises the SONRENSEN JANSSENS's (2003) algorithm
 # to calculate the k-best tree
 #=======================================================================
 */
@@ -304,21 +304,22 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 		}
 
 		for (int k = 1; k<MAX2 && List.getSize()!=0; k++){
+			//cout<<"k = "<<k<<endl;
 			list<pair<int*, pair<float, float> > > k_best_tree;
 		
 			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes,a, bM, k);  // k-best
 			pair<int*, pair<float, float> >  k_best = *(k_best_tree.begin());
 			float x = k_best.second.first;
 			float y= k_best.second.second;
-
+			//cout<<"("<<x<<","<<y<<")"<<endl;
 			if (isInViableRegion(g, regiaoViavel, x, y)){
 				noSoportadas.push_back(k_best);
 				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
 				bM = (float)maisDistante.second - (float)a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
-				//cout<<"k add = "<<k<<endl;
+			//	cout<<"k add = "<<k<<endl;
 			} else if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
-				//cout<<"K break = "<<k<<endl;
+			//	cout<<"K break = "<<k<<endl;
 				break;
 			}
 		}
@@ -390,17 +391,18 @@ int main(){
    cout<<"Resultado \n SUPORTADAS"<<endl;
     for (list<pair<int*, pair<float, float> > >::iterator it=arvores.begin(); it!=arvores.end(); it++){
 		
-		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
-			int iddd = ((*it).first)[a];
+		// cout<<"Arvore "<<i<<endl;
+  //   	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
+		// 	int iddd = ((*it).first)[a];
 			
-				cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
+		// 		cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
+  //   			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
+  //   			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
+  //   			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
     		
-    	}
-    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
+  //   	}
+    	//cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
+    	cout<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
     	i++;
 	}
 
@@ -408,16 +410,17 @@ int main(){
 	cout<<"Resultado \n NAO SUPORTADAS"<<endl;
     for (list<pair<int*, pair<float, float> > >::iterator it=noSuportadas.begin(); it!=noSuportadas.end(); it++){
 		
-		cout<<"Arvore "<<i<<endl;
-    	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
-			int iddd = ((*it).first)[a];
-				cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
-    			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
+		// cout<<"Arvore "<<i<<endl;
+  //   	for (int a = 0; a<n-1; a++){ // cada aresta da arvore
+		// 	int iddd = ((*it).first)[a];
+		// 		// cout<<my_grafo.getArestas(iddd)->getOrigem() << " ";
+  //   // 			cout<<my_grafo.getArestas(iddd)->getDestino() << " ";
+  //   // 			cout<<my_grafo.getArestas(iddd)->getPeso1() << " ";
+  //   // 			cout<<my_grafo.getArestas(iddd)->getPeso2() << endl;
     		
-    	}
-    	cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
+  //   	}
+    	//cout<<"("<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
+    	cout<<(*it).second.first<<", "<<(*it).second.second<<")\n"<<endl;
     	i++;
 	}
 
