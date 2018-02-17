@@ -23,6 +23,7 @@ class Conjunto {
 		 * retornando para a chamada com x e y são iguais.*/
 		bool compare(int x, int y);
 		 void desaloca();
+		 ~Conjunto();
 
 		// int* getPai();
 		// int* getOrdem();

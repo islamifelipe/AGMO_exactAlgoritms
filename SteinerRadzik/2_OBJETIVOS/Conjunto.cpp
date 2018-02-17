@@ -52,7 +52,7 @@ void Conjunto::union1(int x, int y){
 bool Conjunto::compare(int x, int y){
 	return find_set(x)==find_set(y);
 }
-void Conjunto::desaloca(){
+Conjunto::~Conjunto(){
 	delete[] pai;
 	delete[] ordem;
 }

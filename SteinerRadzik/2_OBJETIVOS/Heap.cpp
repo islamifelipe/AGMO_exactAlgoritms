@@ -91,7 +91,7 @@ int  Heap::getSize(){
 	return size;
 }
 
-void  Heap::desaloca(){
+void Heap::~Heap(){
 	delete[] auxHeap;
 	delete[] heap;
 	//delete[] auxID; 

@@ -25,6 +25,6 @@ class Heap {
 		float getChave();
 		int getId();
 		int getSize();
-		void desaloca();
+		~Heap();
 };
 #endif

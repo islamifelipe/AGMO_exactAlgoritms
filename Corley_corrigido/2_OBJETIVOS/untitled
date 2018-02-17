@@ -1,0 +1,19 @@
+
+#include <iostream>
+#include <map> 
+#include <string>
+#include <sys/times.h>
+#include <unistd.h>
+using namespace std;
+
+
+
+int main(){
+	string linha;
+
+	cin>>linha;
+
+	cout<<linha<<endl;
+
+
+}

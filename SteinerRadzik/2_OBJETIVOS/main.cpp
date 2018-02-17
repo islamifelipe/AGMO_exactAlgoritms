@@ -45,7 +45,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
 	*/
 	contAux++;
-	Grafo P1 = P, P2 = P;
+	Grafo P1 = P;//, P2 = P;
 	//cout<<List.getSize()<<endl;
 	bool res = false;
 	float custo;
@@ -59,7 +59,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 			A2 = new int[n-1];
 			//A2 = new int[m];
 			P1.setStatus(iddnovo, 2); /*proibida*/
-			P2.setStatus(iddnovo, 1); /*obrigatória*/
+			//P2.setStatus(iddnovo, 1); /*obrigatória*/
 			float x, y;
 			res = kruskal(&P1, arestasPtr,A2, x, y);
 			custo =x*(yl-yll)+y*(xll-xl);
@@ -78,7 +78,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	}
 }
 
-int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair<int*, pair<float, float> > > &resul, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs, list <Grafo > &vetorParticoes, float a, float bM, int k){ 
+list<Grafo>::iterator AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair<int*, pair<float, float> > > &resul, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs, list <Grafo > &vetorParticoes, float a, float bM, int k){ 
 	
 			int id = List.getId();
 			pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > par = MSTs[id];
@@ -98,7 +98,10 @@ int AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, list< pair
 				Partition(Ps,xl, yl, xll, yll, it.first, List,MSTs,vetorParticoes);
 			
 			}
-	return MSTs.size();
+			
+
+			
+	return par.second;
 }
 
 
@@ -307,7 +310,7 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 			//cout<<"k = "<<k<<endl;
 			list<pair<int*, pair<float, float> > > k_best_tree;
 		
-			AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes,a, bM, k);  // k-best
+			list<Grafo>::iterator pategk = AllSpaningTree(g,xp,yp, xq,yq, k_best_tree, List,MSTs, vetorParticoes,a, bM, k);  // k-best
 			pair<int*, pair<float, float> >  k_best = *(k_best_tree.begin());
 			float x = k_best.second.first;
 			float y= k_best.second.second;
@@ -320,12 +323,14 @@ list <pair<int*, pair<float, float> > >  phase2KB(Grafo *g, list< pair<int*, pai
 			//	cout<<"k add = "<<k<<endl;
 			} else if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
 			//	cout<<"K break = "<<k<<endl;
+				vetorParticoes.erase(pategk);
 				break;
 			}
 		}
+
 		//cout<<"List size final = "<<List.getSize()<<endl;	
 		//cout<<"RV = "<<regiaoViavel.size()<<endl;
-				
+
 		contador++;
 	}
 	return noSoportadas;

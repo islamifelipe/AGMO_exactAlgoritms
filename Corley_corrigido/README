@@ -1,0 +1,3 @@
+Este arquivo contém a implmentaçao 2 3 e 4 objetivos do Corley corrigido segundo a ideia de Beth em 16/02/2018.
+
+Verifica a dominância somentre dentro de cada subconjunto do arvores em cada iteraçao. Verifica a dominância entre conjunto somente no final (ultima iteraçao)
