@@ -1,0 +1,13 @@
+Loading graph Instancias/Conjunto2/concave/5.conc3.in...
+Graph loaded
+4 edges removed
+6 edges left
+1 mandatory edges
+LS time =  0.005283 s
+6 solutions after LS
+Search time  =  0.018812 s
+Total time   =  0.057237 s
+6 solutions
+11 calls to oracle
+LS finds the optimum
+(1242,2131)(1261,2114)(1802,1911)(1821,1894)(2022,1351)(2041,1334)

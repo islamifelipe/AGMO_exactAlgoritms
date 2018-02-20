@@ -1,0 +1,17 @@
+Loading graph Instancias/Conjunto3/concave/7.conc2.in...
+Graph loaded
+11 edges removed
+10 edges left
+1 mandatory edges
+LS time =  0.005583 s
+21 solutions after LS
+23 presorted orderings of arcs
+Presort time =  0.000902 s
+Shaving removed 0 edges
+Shaving time =  0.002007 s
+Search time  =  0.019253 s
+Total time   =  0.056464 s
+21 solutions
+47 calls to oracle
+LS finds the optimum
+(1761,2490)(1775,2475)(1797,2438)(1811,2423)(1837,2409)(1851,2394)(1889,2392)(2481,2350)(2495,2335)(2517,2298)(2531,2283)(2557,2269)(2571,2254)(2609,2252)(2621,1630)(2635,1615)(2657,1578)(2671,1563)(2697,1549)(2711,1534)(2749,1532)

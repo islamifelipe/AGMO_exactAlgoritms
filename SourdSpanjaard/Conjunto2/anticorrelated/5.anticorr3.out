@@ -1,0 +1,17 @@
+Loading graph Instancias/Conjunto2/anticorrelated/5.anticorr3.in...
+Graph loaded
+0 edges removed
+10 edges left
+0 mandatory edges
+LS time =  0.005496 s
+22 solutions after LS
+40 presorted orderings of arcs
+Presort time =  0.000864 s
+Shaving removed 0 edges
+Shaving time =  0.001855 s
+Search time  =  0.018883 s
+Total time   =  0.055575 s
+22 solutions
+91 calls to oracle
+LS finds the optimum
+(131,259)(143,243)(155,241)(156,230)(162,229)(163,222)(168,214)(175,206)(187,200)(189,196)(196,188)(205,178)(212,170)(224,164)(229,163)(231,154)(243,147)(257,137)(266,129)(268,118)(290,114)(292,103)
