@@ -1,0 +1,13 @@
+Loading graph Instancias/Completo/anticorrelated/5.1/5.anticorr1.in...
+Graph loaded
+5 edges removed
+5 edges left
+3 mandatory edges
+LS time =  0.005035 s
+2 solutions after LS
+Search time  =  0.018379 s
+Total time   =  0.051248 s
+2 solutions
+3 calls to oracle
+LS finds the optimum
+(152,124)(184,109)

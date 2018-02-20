@@ -1,0 +1,28 @@
+Fim da primeira fase ... 
+0
+Fim da segunda fase ... 
+0
+0
+Total: 0
+Suportadas = 2
+Nao suportadas = 0
+TOTAL DE SOLUCOES = 2
+
+SUPORTADAS: 
+
+Arvore 1
+0 2 15 41
+1 2 18 26
+0 4 50 41
+2 3 69 16
+(152 124)
+
+Arvore 2
+2 3 69 16
+1 2 18 26
+3 4 82 26
+0 2 15 41
+(184 109)
+
+
+NAO SUPORTADAS: 

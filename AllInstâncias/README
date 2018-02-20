@@ -1,0 +1,3 @@
+README
+
+As instâncias do conjunto 1, 2 e 3 são geradas randomicamente com os mesmo parâmetros entre si. Por exemplo, uma instância 5.corr1, possui 5 vértices, e mesmo fator de correlaçao X para os três conjuntos. 

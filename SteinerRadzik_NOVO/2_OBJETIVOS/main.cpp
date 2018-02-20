@@ -26,9 +26,6 @@
 #include "LexKruskal.cpp"
 using namespace std;
 
-
-#define MAX_K_BEST 3000000 // este valor representa somente a k-ésima best árvore encontrada e NAO O TAMANHO DA HEAP
-
 // ATENCAO: esta implementençao é para GRAFOS COMPLETOS
 
 double custos[NUMOBJETIVOS][NUMEROVERTICES][NUMEROVERTICES];
@@ -295,11 +292,13 @@ void phase2KB(){
 	vector<SolucaoEdgeSet *>::iterator it = suportadas.begin(); 
 	int contador = 0;
 	int size = suportadas.size();
+	cout<<"contador = "<<size<<endl;
 	while (contador<size-1){
 		SolucaoEdgeSet *pp = *(it);
 		SolucaoEdgeSet *pq = *(++it);
 		// int *p = pp.first; 
 		// int *q = pq.first;
+		cout<<"it = "<<contador<<endl;
 		float yp, yq, xp, xq;
 		list< pair<float, float> > regiaoViavel; // lista de pontos que delimitam a regiao viável.
 	
@@ -335,8 +334,14 @@ void phase2KB(){
 			make_heap(Heap.begin(),Heap.end(), compareHeap);
 		} else delete pii;
 
-		for (int k = 1; k<MAX_K_BEST && Heap.size()!=0; k++){
-			SolucaoEdgeSet *nova = AllSpaningTree(xp,yp, xq,yq,a, bM);
+		for (int k = 1; Heap.size()!=0; k++){
+			SolucaoEdgeSet *nova;
+			if (k<MAX_K_BEST)
+				nova = AllSpaningTree(xp,yp, xq,yq,a, bM);
+			else {
+				nova = Heap.front();
+				std::pop_heap (Heap.begin(),Heap.end(),compareHeap); Heap.pop_back();
+			}
 			float x = nova->getObj(0);
 			float y = nova->getObj(1);
 			if (isInViableRegion(regiaoViavel, x, y)){ // se estiver na regiao viavel
@@ -348,7 +353,9 @@ void phase2KB(){
 			
 			} else if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
 			//	cout<<"K break = "<<k<<endl;
-				k = MAX_K_BEST+1; // sai;
+				// k = MAX_K_BEST+1; // sai;
+				delete nova;
+				break;
 
 			}
 			delete nova;
@@ -366,17 +373,54 @@ void phase2KB(){
 int main(){
 
 	input(); // ler instância
+	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
+	times(&tempsInit);
 	FirstPhase();
-	stable_sort (suportadas.begin(), suportadas.end(),auxEdgeStructCompSolutions);
+	cout<<"Fim da primeira fase ... "<<endl;
+
+	times(&tempsFinal1);   /* current time */ // clock final
+	clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);
+	cout<<(float) user_time1 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+   	
+   	stable_sort (suportadas.begin(), suportadas.end(),auxEdgeStructCompSolutions);
+	
+	times(&tempsInit);
 	phase2KB();
+	times(&tempsFinal2); 
+
+	cout<<"Fim da segunda fase ... "<<endl;
+	
+	clock_t user_time2 = (tempsFinal2.tms_utime - tempsInit.tms_utime);
+	cout<<user_time2<<endl;
+	cout<<(float) user_time2 / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+	cout<<"Total: ";
+	cout<<(float) (user_time1+user_time2) / (float) sysconf(_SC_CLK_TCK)<<endl;
+
+
+	cout<<"Suportadas = "<<suportadas.size()<<endl;
+	cout<<"Nao suportadas = "<<noSuportadas.size()<<endl;
 	cout<<"TOTAL DE SOLUCOES = "<<suportadas.size()+noSuportadas.size()<<endl;
-	cout<<"SUPORTADAS: "<<endl;
+	cout<<"\nSUPORTADAS: "<<endl;
+	int congjr = 1;
+	cout<<endl;
 	for (int i=0; i<suportadas.size(); i++){
-		cout<<suportadas[i]->getObj(0)<<" "<<suportadas[i]->getObj(1)<<endl;
+		cout<<"Arvore "<<congjr<<endl;
+		for (int ar=0; ar<NUMEROVERTICES-1; ar++){
+			cout<<suportadas[i]->edges[ar][0]<<" "<<suportadas[i]->edges[ar][1]<<" "<<f(0,suportadas[i]->edges[ar][0], suportadas[i]->edges[ar][1])<<" "<<f(1,suportadas[i]->edges[ar][0], suportadas[i]->edges[ar][1])<<endl;
+		}
+		cout<<"("<<suportadas[i]->getObj(0)<<" "<<suportadas[i]->getObj(1)<<")"<<endl;
+		congjr++;
+		cout<<endl;
 	}
 	cout<<"\nNAO SUPORTADAS: "<<endl;
 	for (int i=0; i<noSuportadas.size(); i++){
-		cout<<noSuportadas[i]->getObj(0)<<" "<<noSuportadas[i]->getObj(1)<<endl;
+		cout<<"Arvore "<<congjr<<endl;
+		for (int ar=0; ar<NUMEROVERTICES-1; ar++){
+			cout<<noSuportadas[i]->edges[ar][0]<<" "<<noSuportadas[i]->edges[ar][1]<<" "<<f(0,noSuportadas[i]->edges[ar][0], noSuportadas[i]->edges[ar][1])<<" "<<f(1,noSuportadas[i]->edges[ar][0], noSuportadas[i]->edges[ar][1])<<endl;
+		}
+		cout<<"("<<noSuportadas[i]->getObj(0)<<" "<<noSuportadas[i]->getObj(1)<<")"<<endl;
+		congjr++;
+		cout<<endl;
 	}
 
 
