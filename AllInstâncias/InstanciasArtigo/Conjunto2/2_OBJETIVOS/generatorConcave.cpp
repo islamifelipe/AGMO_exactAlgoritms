@@ -13,7 +13,7 @@
 
 using namespace std;
 
-#define multiplicador 100000
+#define multiplicador 100//100000
 
 int main (int argc, char *argv[]){
 	srand (time(NULL));
@@ -49,16 +49,18 @@ int main (int argc, char *argv[]){
 				obj1 = (double) a_obj1/multiplicador;
 				obj2 = (double)a_obj2/multiplicador;
 			} else if ((i<=2 && j>2) || (i>2 && j<=2)){
+
 				int divisor= multiplicador - (int)((1.0 - zeta)*multiplicador) + 1;
 				
 				int a_obj1 = ((rand()%(divisor) + (int)((1.0 - zeta)*multiplicador))); // entre 1-zeta e 1
 				int a_obj2 = ((rand()%(divisor) + (int)((1.0 - zeta)*multiplicador))); // entre 1-zeta e 1
+				// cout<<"aqui : "<<a_obj1<<" "<<a_obj2<<endl;
 				obj1 = (double)a_obj1/multiplicador;
 				obj2 = (double)a_obj2/multiplicador;
 			} else {
 				cout<<"opsss"<<endl;
 			}
-			cout<<(int)(obj1*1000)<<" "<<(int)(obj2*1000)<<endl;
+			cout<<(int)(obj1*100)<<" "<<(int)(obj2*100)<<endl;
 		}
 	}
 }

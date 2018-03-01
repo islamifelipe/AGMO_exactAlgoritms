@@ -58,7 +58,7 @@ int main (int argc, char *argv[]){
 			} else {
 				cout<<"opsss"<<endl;
 			}
-			cout<<(int)(obj1*1000)<<" "<<(int)(obj2*1000)<<endl;
+			cout<<(int)(obj1*100)<<" "<<(int)(obj2*100)<<endl;
 		}
 	}
 }

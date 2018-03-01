@@ -155,7 +155,7 @@
 
 
 
-	./generatorConcave 30 0.09 0.017 > concave/30.conc1.in
+	./generatorConcave 30 0.09 0.017 > concave/30.conc1.in # SS
 
 	sleep 1 #como a semete do gerador aleatrorio usa o tempo, é preciso colocar o shell pra dormir pelo menos um segundo, de modo a nao gerar o mesmo time para a semente
 
@@ -215,7 +215,7 @@
 
 
 
-	./generatorConcave 40 0.1 0.01 > concave/40.conc1.in
+	./generatorConcave 40 0.1 0.01 > concave/40.conc1.in # SS
 
 	sleep 1 #como a semete do gerador aleatrorio usa o tempo, é preciso colocar o shell pra dormir pelo menos um segundo, de modo a nao gerar o mesmo time para a semente
 
@@ -245,7 +245,7 @@
 
 
 
-	./generatorConcave 45 0.1 0.01 > concave/45.conc1.in
+	./generatorConcave 45 0.1 0.01 > concave/45.conc1.in # SS
 
 	sleep 1 #como a semete do gerador aleatrorio usa o tempo, é preciso colocar o shell pra dormir pelo menos um segundo, de modo a nao gerar o mesmo time para a semente
 
@@ -258,8 +258,8 @@
 	sleep 1 #como a semete do gerador aleatrorio usa o tempo, é preciso colocar o shell pra dormir pelo menos um segundo, de modo a nao gerar o mesmo time para a semente
 
 
-
-	./generatorConcave 48 0.09 0.014 > concave/48.conc1.in
+						  #0.15
+	./generatorConcave 48 0.09 0.014 > concave/48.conc1.in # SS 
 
 	sleep 1 #como a semete do gerador aleatrorio usa o tempo, é preciso colocar o shell pra dormir pelo menos um segundo, de modo a nao gerar o mesmo time para a semente
 
