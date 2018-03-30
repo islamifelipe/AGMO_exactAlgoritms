@@ -52,7 +52,7 @@ bool t1_domina_t2(float xl, float yl,float xll, float yll){
 int idMST = 0;
 
 
-#define MAX2 50
+#define MAX2 100
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs,list <Grafo > &vetorParticoes, int direto){
@@ -79,7 +79,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 				res = kruskal(&P1, A2, xl, yl, xll, yll,custo,x,y, direto);//kruskal(&P1,A2, x, y);
 				// double custo2 =x*(yl-yll)+y*(xll-xl);
 				// cout<<"ODKFODK"<<endl;
-
+				// if (arvoresSuportadasGLOBAL.size()==0) cout<<x<<" "<<y<<" "<<custo<<endl;
 				if (res){
 					vetorParticoes.push_back(P1);
 					list<Grafo>::iterator itt = vetorParticoes.end();
@@ -117,7 +117,6 @@ void AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, vector< p
 			MSTs[idMST] = make_pair(make_pair(A, make_pair(x, y)),itt);//A2;
 			List.insert(idMST++, custo); // o valor da variavel "custo" vem do kruskal
 		}
-
 		while (List.getSize()!=0){ // && custo==primeiro && xprimeiro == x && yprimeiro == y
  			int id = List.getId();
 			pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > par = MSTs[id];
@@ -125,8 +124,13 @@ void AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, vector< p
 			pair<int*, pair<float, float> > it = par.first;//MSTs[id];
 			Grafo Ps = *par.second;
 			float coosottt = it.second.first*(yl-yll) + it.second.second*(xll-xl);
-			if (coosottt != primeiro || xprimeiro != it.second.first || yprimeiro != it.second.second) break; // TOMA SOMENTE OS PRIMEIROS IGUAIS
+			
+			//if (coosottt != primeiro || xprimeiro != it.second.first || yprimeiro != it.second.second) break; // TOMA SOMENTE OS PRIMEIROS IGUAIS
+			if (coosottt != primeiro) break;
 			List.extract();
+			if (xprimeiro != it.second.first || yprimeiro != it.second.second) continue; // TOMA SOMENTE OS PRIMEIROS IGUAIS
+			
+			
 			resul.push_back(it);
 			//MSTs.erase(id);
 			//vetorParticoes.erase(id);
