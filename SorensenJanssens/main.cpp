@@ -73,6 +73,7 @@ void Partition(Grafo P, int* Pa, Heap &List, map<int, pair< pair<int*, float>, l
 }
 
 vector< pair<int*, float> > AllSpaningTree(Grafo *g, int k){ 
+	cout<<"Chamou"<<endl;
 	vector< pair<int*, float> > result;
 	Heap List(MAX2); 
 	list<Grafo> vetorParticoes; //Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
@@ -83,7 +84,7 @@ vector< pair<int*, float> > AllSpaningTree(Grafo *g, int k){
 	mergesort(arestasPtr, g->getQuantArestas());
 	float custo = 0;
 	bool res = kruskal(g, arestasPtr, A,custo);
-		
+	float primeiro = custo;	
 	if (res){
 		vetorParticoes.push_back(*g);
 		list<Grafo>::iterator itt = vetorParticoes.end();
@@ -93,12 +94,17 @@ vector< pair<int*, float> > AllSpaningTree(Grafo *g, int k){
 	}
 
 
-	while (List.getSize()!=0){
+	while (List.getSize()!=0 && custo==primeiro){
 			int id = List.getId();
 			pair< pair<int*, float >, list<Grafo>::iterator > par = MSTs[id];
 				
 			pair<int*, float > it = par.first;//MSTs[id];
+
+			if (it.second != primeiro) break; // TOMA SOMENTE OS PRIMEIROS IGUAIS
+
 			result.push_back(it);
+			custo =it.second;			
+
 			Grafo Ps = *par.second;
 			
 			List.extract();
@@ -116,7 +122,7 @@ int main(){
 	struct tms tempsInit, tempsFinal1,tempsFinal2 ; // para medir o tempo
 	
 	int n;
-	float peso1;
+	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
 	cin>>n; // quantidade de vértices do grafo;
@@ -128,13 +134,14 @@ int main(){
 	while (cin>>origem){
 		cin>>destino;
 		cin>>peso1;
+		// cin>>peso2;
 		my_grafo.addAresta(id, origem, destino, peso1);
 		id++;
 	}
 
 	int nA = id; // quantidade de arestas do grafo	
 	//my_grafo.gerarArestasPtr();
-	
+	cout<<"leu"<<endl;
 	arestas = my_grafo.get_allArestas();
 	arestasPtr = my_grafo.getAllArestasPtr();
 	vector< pair<int*, float> > result = AllSpaningTree(&my_grafo, 0);

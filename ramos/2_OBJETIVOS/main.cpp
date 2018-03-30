@@ -20,15 +20,17 @@
 #include "Grafo.h"
 #include "Conjunto.h"
 #include "kruskal.h"
+#include "Heap.h"
 using namespace std;
 
 
 struct tms tempsInit, tempsFinal; // para medir o tempo
 list<pair<int*, pair<float, float> > > noSuportadas;
 list<pair<int*, pair<float, float> > > arvoresSuportadas;
+list<pair<int*, pair<float, float> > > arvoresSuportadasGLOBAL;
 map <int, Aresta *> arestasPtr;
 Grafo my_grafo;
-
+int nA ;
 
 vector< pair<float, float> > min_f_g_vector;
 
@@ -40,11 +42,104 @@ bool isEgalObjetive(float xl, float yl,float xll, float yll){
 }
 bool t1_domina_t2(float xl, float yl,float xll, float yll){
 	float t1_peso1=xl, t1_peso2=yl, t2_peso1=xll, t2_peso2=yll;
-	
 	if (t1_peso1 <= t2_peso1 && t1_peso2 <= t2_peso2 && (t1_peso1 < t2_peso1 || t1_peso2 < t2_peso2)){
 		return true;
 	} else return false;
 }
+
+
+
+int idMST = 0;
+
+
+#define MAX2 50
+///ALGORITMO DA SONRENSEN JANSSENS (2003)
+
+void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs,list <Grafo > &vetorParticoes, int direto){
+	/*Pa = vetor de arestas = correspondente à partição P (n-1 arestas)
+	cont = contar quantas vezes o Kruskal foi invocado (apenas para fins estatísticos)
+	*/
+	Grafo P1 = P;//, P2 = P;
+	//cout<<List.getSize()<<endl;
+	bool res = false;
+	float custo;
+	int *A2;
+	int m = P.getQuantArestas();
+	int n =P.getQuantVertices();
+	//for (int i=0; i<m && List.getSize()<MAX2; i++){
+	for (int i=0; i<m && List.getSize()<MAX2; i++){
+		//int iddnovo = Pa[i];
+		if (Pa[i]==1){
+			int iddnovo = i;
+			if (P.getStatus(iddnovo)==0){ /*Se a aresta for opcional*/
+				A2 =  new int[m];//new int[n-1];
+				P1.setStatus(iddnovo, 2); /*proibida*/
+				//P2.setStatus(iddnovo, 1); /*obrigatória*/
+				float x, y;
+				res = kruskal(&P1, A2, xl, yl, xll, yll,custo,x,y, direto);//kruskal(&P1,A2, x, y);
+				// double custo2 =x*(yl-yll)+y*(xll-xl);
+				// cout<<"ODKFODK"<<endl;
+
+				if (res){
+					vetorParticoes.push_back(P1);
+					list<Grafo>::iterator itt = vetorParticoes.end();
+					itt--;
+					MSTs[idMST] = make_pair(make_pair(A2,make_pair( x, y)),itt);//A2;
+					List.insert(idMST++, custo); // o valor da variavel "custo" vem do kruskal
+					
+				} else {
+					delete[] A2;
+				}
+				P1.setStatus(iddnovo, 1); 
+			}
+		}
+	}
+}
+
+void AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, vector< pair<int*, pair<float, float> > > &resul, int direto){ 
+		// vector< pair<int*, pair<float, float> > > resul;
+		Heap List(MAX2); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE UM VALOR
+		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
+		map<int, pair<pair<int*, pair<float, float> >, list<Grafo>::iterator > > MSTs; // usada para lista de árvores
+		idMST = 0;
+		int *A = new int[g->getQuantArestas()]; //new int[g->getQuantVertices()-1]; // usada para a primeira árvore 
+		//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
+		// mergesort(xp,yp, xq,yq, arestasPtr, g->getQuantArestas(),3);
+		float x, y, custo;
+		bool res = kruskal(g, A, xl, yl, xll, yll,custo,x,y, direto);//kruskal(&P1,A2, x, y);
+		float primeiro = custo;
+		float xprimeiro = x, yprimeiro = y;
+		// cout<<"custo = "<<primeiro<<endl;
+		if (res){
+			vetorParticoes.push_back(*g);
+			list<Grafo>::iterator itt = vetorParticoes.end();
+			itt--;
+			MSTs[idMST] = make_pair(make_pair(A, make_pair(x, y)),itt);//A2;
+			List.insert(idMST++, custo); // o valor da variavel "custo" vem do kruskal
+		}
+
+		while (List.getSize()!=0){ // && custo==primeiro && xprimeiro == x && yprimeiro == y
+ 			int id = List.getId();
+			pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > par = MSTs[id];
+				
+			pair<int*, pair<float, float> > it = par.first;//MSTs[id];
+			Grafo Ps = *par.second;
+			float coosottt = it.second.first*(yl-yll) + it.second.second*(xll-xl);
+			if (coosottt != primeiro || xprimeiro != it.second.first || yprimeiro != it.second.second) break; // TOMA SOMENTE OS PRIMEIROS IGUAIS
+			List.extract();
+			resul.push_back(it);
+			//MSTs.erase(id);
+			//vetorParticoes.erase(id);
+			float x = it.second.first;
+			float y = it.second.second;
+			
+			Partition(Ps,xl, yl, xll, yll, it.first, List,MSTs,vetorParticoes, direto);
+		}	
+			
+}
+
+
+/// END ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 
 void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul, int * sl, pair<float, float> psl, int *sll, pair<float, float> psll){ 
@@ -90,25 +185,32 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 
 		//getXandY(s1, g->get_allArestas(), xl, yl);
 		//getXandY(s2, g->get_allArestas(), xll, yll);
-		A2 = new int[g->getQuantArestas()];
-		for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
+		// A2 = new int[g->getQuantArestas()];
+		// for (int i=0; i<g->getQuantArestas(); i++) A2[i] = 0;
 		float cont; // nao utilisazado nesse caso
 		float x, y;
-		kruskal(g, A2, xl, yl, xll, yll,cont,x,y, 3);
-		
+		vector< pair<int*, pair<float, float> > > resulttttt;
+		 AllSpaningTree(g,xl, yl,  xll, yll, resulttttt, 3);
+		x = resulttttt[0].second.first;
+		y = resulttttt[0].second.second;
+		// kruskal(g, A2, xl, yl, xll, yll,cont,x,y, 3);
+		// cout<<"size() = "<<resulttttt.size()<<endl;
 		if( !( (isEgalObjetive(x,y,xl,yl)) || (isEgalObjetive(x,y, xll,yll)) ) ){
 			if (it.first == 1){ // antes
-				resul.insert(it.second, make_pair(A2, make_pair(x,y))); 
+				resul.insert(it.second, make_pair(resulttttt[0].first, make_pair(x,y))); 
 				it.second--;// it agora aponta para o item  A2
 			} else if (it.first == 2) { // depois
 				it.second++;
-				resul.insert(it.second, make_pair(A2, make_pair(x,y)));
+				resul.insert(it.second, make_pair(resulttttt[0].first, make_pair(x,y)));
 				it.second--;// it agora aponta para o item  A2
 			}
+			for (int i=0; i<resulttttt.size(); i++){
+				arvoresSuportadasGLOBAL.push_back(resulttttt[i]);
+			}
 
-			pilha.push(make_pair(A2, s2)); // L''
+			pilha.push(make_pair(resulttttt[0].first, s2)); // L''
 			pilhaIt.push(make_pair(2,it.second)); 
-			pilha.push(make_pair(s1, A2));  // L'
+			pilha.push(make_pair(s1, resulttttt[0].first));  // L'
 			pilhaIt.push(make_pair(1,it.second)); 
 
 			pilhaF.push(make_pair(x, xll));
@@ -117,7 +219,7 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 			pilhaF.push(make_pair(xl, x));
 			pilhaG.push(make_pair(yl, y));
 			
-		} else delete[] A2; // NOVO
+		} //else delete[] A2; // NOVO
 	}
 }
 
@@ -131,22 +233,34 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 */
 void efficientBiobjectiveSTinEB(Grafo *g){
 	//list<pair<int*, pair<float, float> >  > arvoresSuportadas;
-	int *s1 = new int[g->getQuantArestas()];
-	for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
-	float cont; // nao utilisazado nesse caso
-	float xl, yl;
-	kruskal(g, s1, 0, 0, 0, 0,cont, xl, yl,  1); // arvore para o primeiro objetivo
-	arvoresSuportadas.push_back(make_pair(s1, make_pair(xl, yl)));
-	int* s2 = new int[g->getQuantArestas()];
-	for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
-	float xll, yll;
-	kruskal(g, s2, 0, 0, 0, 0,cont, xll, yll, 2); // arvore para o segundo objetivo
-	list<pair<int*, pair<float, float> > >::iterator it = arvoresSuportadas.end();
-	if (isEgalObjetive(xl,yl,xll, yll)==false){
-		UniobjectiveSearch(g, arvoresSuportadas, s1, make_pair(xl, yl), s2, make_pair(xll, yll));
-		arvoresSuportadas.push_back(make_pair(s2, make_pair(xll, yll)));
+	// int *s1 = new int[g->getQuantArestas()];
+	// for (int i=0; i<g->getQuantArestas(); i++) s1[i] = 0;
+	// float cont; // nao utilisazado nesse caso
+	// float xl, yl;
+	vector< pair<int*, pair<float, float> > > resul;
+	AllSpaningTree(g,0, 1, 0, 0, resul, 1);// primeiro objetivo
+	// kruskal(g, s1, 0, 0, 0, 0,cont, xl, yl,  1); // arvore para o primeiro objetivo
+	arvoresSuportadas.push_back(resul[0]);
+	for (int i=0; i<resul.size(); i++){
+		arvoresSuportadasGLOBAL.push_back(resul[i]);
 	}
-//	return arvoresSuportadas;
+	// int* s2 = new int[g->getQuantArestas()];
+	// for (int i=0; i<g->getQuantArestas(); i++) s2[i] = 0;
+	// float xll, yll;
+	// kruskal(g, s2, 0, 0, 0, 0,cont, xll, yll, 2); // arvore para o segundo objetivo
+	vector< pair<int*, pair<float, float> > > resul2;
+	AllSpaningTree(g,0,0, 1, 0, resul2, 2); //segundo objetivo
+	
+	list<pair<int*, pair<float, float> > >::iterator it = arvoresSuportadas.end();
+	if (isEgalObjetive(resul[0].second.first,resul[0].second.second,resul2[0].second.first,resul2[0].second.second)==false){
+		UniobjectiveSearch(g, arvoresSuportadas, resul[0].first, resul[0].second,resul2[0].first, resul2[0].second);
+		
+
+		for (int i=0; i<resul2.size(); i++){
+			arvoresSuportadasGLOBAL.push_back(resul2[i]);
+		}
+		arvoresSuportadas.push_back(resul2[0]);
+	}
 }
 /* 
 # retorna verdadeiro se o ponto (x,y) está dentro da regiao viável
@@ -165,6 +279,7 @@ bool isInViableRegion(Grafo *g, list< pair<float, float> > &regiaoViavel, float 
 			return true;
 		}
 	}
+	
 	return false;
 }
 
@@ -191,12 +306,19 @@ void retiraDominadas(list<pair<int*, pair<float, float> > > &noSuportadas, pair<
 			it--;
 		} else if (t1_domina_t2((*it).second.first, (*it).second.second, T.second.first, T.second.second)){
 			noSuportadas.remove(T);
+
 			delete[] T.first;
 			return;
 		}
 	}
 }
 
+bool isInViableRegion2(float x, float y){
+	for (std::list<pair<int*, pair<float, float> > >::iterator ittt=noSuportadas.begin(); ittt != noSuportadas.end(); ++ittt){
+		if (isEgalObjetive((*ittt).second.first, (*ittt).second.second, x, y)==true) return true;
+	}
+	return false;
+}
 void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair<int*, pair<float, float> > > &noSuportadas, Conjunto conjunto, list< pair<float, float> > &regiaoViavel){
 	
 	stack<Conjunto> pilhaCojunto; // cojuntos
@@ -252,7 +374,9 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 				//getXandY(T, g->get_allArestas(), tf, tg);
 				//list< pair<float, float> >::iterator it;
 				//cout<<isInViableRegion(g, regiaoViavel, tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound, it)<<endl;
+
 				if (isInViableRegion(g, regiaoViavel, tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound, it)){ // se estiver na regiao viavel
+					
 					T_aux = new int[g->getQuantArestas()];
 					for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
 					Conjunto copie(g->getQuantVertices());
@@ -276,11 +400,24 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 						regiaoViavel.remove(ponto); // remove-se o ponto (corner), e adiciona-se os novos dois pontos formados
 							
 					} else {
-						 fg_step1 = min_f_g_vector[step+1];//min_f_g(g->getVertice(step+1)->getAdjacentes());
+						fg_step1 = min_f_g_vector[step+1];//min_f_g(g->getVertice(step+1)->getAdjacentes());
 						pilhaCojunto.push(copie);
 						pilhaLimites.push(make_pair(fBound-fg_step1.first,gBound-fg_step1.second));
 						pilha.push(make_pair(T_aux, step+1));
 						pilhaFG.push(make_pair(novo_tf, novo_tg));
+					}
+				} else if (isInViableRegion2(tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound)){
+					T_aux = new int[g->getQuantArestas()];
+					for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
+					Conjunto copie(g->getQuantVertices());
+					copie.copia(conjunto);
+					T_aux[e->getId()] = 1;
+					novo_tf = tf+e->getPeso1();
+					novo_tg = tg+e->getPeso2();
+					copie.union1(e->getOrigem(), e->getDestino());
+					if (step+1 == g->getQuantVertices()-1){
+						novo = make_pair(T_aux,make_pair(novo_tf,novo_tg));
+						noSuportadas.push_back(novo); // armazena T
 					}
 				}
 			}
@@ -333,7 +470,7 @@ void efficientBiobjectiveSTinENB(Grafo *g, list<pair<int*, pair<float, float> > 
 void printResultado(){
 	int i = 1;
    cout<<"SUPORTADAS"<<endl;
-    for (list<pair<int*, pair<float, float> > >::iterator it=arvoresSuportadas.begin(); it!=arvoresSuportadas.end(); it++){
+    for (list<pair<int*, pair<float, float> > >::iterator it=arvoresSuportadasGLOBAL.begin(); it!=arvoresSuportadasGLOBAL.end(); it++){
 		cout<<"Arvore "<<i<<endl;
     	for (int a = 0; a<my_grafo.getQuantArestas(); a++){ // cada aresta da arvore
 		
@@ -414,7 +551,7 @@ int main(){
 		id++;
 	}
 
-	int nA = id; // quantidade de arestas do grafo	
+	nA = id; // quantidade de arestas do grafo	
 	my_grafo.gerarArestasPtr();
 	
 	for (int i=0; i<my_grafo.getQuantVertices(); i++){

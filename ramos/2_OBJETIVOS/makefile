@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o ramos AllMST
+all: Aresta.o Vertice.o Grafo.o Conjunto.o kruskal.o  Heap.o  ramos AllMST
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -7,6 +7,10 @@ Aresta.o : Aresta.cpp Aresta.h
 Vertice.o : Vertice.cpp Vertice.h
 	g++ -g -c Vertice.cpp
 	
+
+Heap.o : Heap.cpp Heap.h
+	g++ -g -c Heap.cpp
+
 Grafo.o : Grafo.cpp Grafo.h
 	g++ -g -c Grafo.cpp
 	
@@ -19,8 +23,8 @@ kruskal.o : kruskal.cpp kruskal.h
 main.o : main.cpp
 	g++ -g -c  main.cpp
 		
-ramos : main.o  Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o   
-	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o main.o -lm -o ramos
+ramos : main.o  Grafo.o Vertice.o Aresta.o Conjunto.o kruskal.o  Heap.o   
+	g++ -g  Aresta.o  Vertice.o Grafo.o Conjunto.o kruskal.o  Heap.o  main.o -lm -o ramos
 
 AllMST.o : AllMST.cpp
 	g++ -pthread -g -c AllMST.cpp

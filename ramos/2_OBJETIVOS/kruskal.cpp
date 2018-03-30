@@ -87,7 +87,7 @@ void intercala(float xl, float yl, float xll, float yll, int p, int q, int r, Ar
 			peso_j = (-1)*(v[j]->getPeso1()*(yll - yl)-v[j]->getPeso2()*(xll-xl));
 			//peso_i=(v[i]->getPeso1()*(yl-yll)-v[i]->getPeso2()*(xll-xl)); //Monteiro ERRADO (deve ser +)
 			//peso_j=(v[j]->getPeso1()*(yl-yll)-v[j]->getPeso2()*(xll-xl)); //Monteiro ERRADO (deve ser +)
-			//peso_i = v[i]->getPeso1()*(abs(yll - yl))+v[i]->getPeso2()*(abs(xll-xl)); // Beth OK
+			//peso_i = v[i]->getPeso1()*(abs(yll - ysl))+v[i]->getPeso2()*(abs(xll-xl)); // Beth OK
 			//peso_j = v[j]->getPeso1()*(abs(yll - yl))+v[j]->getPeso2()*(abs(xll-xl));
 			
 			if (!maiorIgualQuefloat(peso_i,peso_j)) {
@@ -150,9 +150,13 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 	/* s'  = (x' , y' ) <--> (xl , yl )
 	 * s'' = (x'', y'') <--> (xll , yll )
 	 */
+	 for (int i=0; i<g->getQuantArestas(); i++){
+	 	A[i] = 0;
+	 }
 	Conjunto conjunto(g->getQuantVertices());
 	int cont=0, i=0;
 	x = 0;y= 0;
+	custo =0;
 	//float peso;
 	Aresta **listaAresta = g->getAllArestasPtr();
 	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/

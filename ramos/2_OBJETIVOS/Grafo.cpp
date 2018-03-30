@@ -6,9 +6,9 @@ Grafo::Grafo(){}
 Grafo::Grafo(int n1){
 	n = n1;
 	lista_vertices = new Vertice*[n];
-	//for (int i=0; i<lista_allArestas.size(); i++){
-	//	particao[i] = 0; /*inicialmente opcional*/
-	//}
+	for (int i=0; i<lista_allArestas.size(); i++){
+		particao[i] = 0; /*inicialmente opcional*/
+	}
 }
 
 void Grafo::setN(int n1){
@@ -59,4 +59,17 @@ int Grafo::getStatus(int i){
 }
 void Grafo::setStatus(int i, int valor){
 	particao[i] = valor;
+}
+
+Grafo& Grafo::operator=( Grafo& d){
+	
+	if (this == &d) return *this;
+	n = d.getQuantVertices();
+	// cout<<"ok"<<endl;
+	for (int i=0; i<d.lista_allArestas.size(); i++){
+		particao[i] = d.getStatus(i);
+	}
+	lista_allArestas = d.lista_allArestas;
+	return *this;
+	
 }

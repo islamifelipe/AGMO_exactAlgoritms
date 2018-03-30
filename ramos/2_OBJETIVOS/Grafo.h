@@ -33,7 +33,7 @@ class Grafo{
 		int getStatus(int i);
 		void setStatus(int i, int valor);
 		void setN(int n1);
-
+		Grafo& operator=( Grafo& d);
 };
 
 #endif

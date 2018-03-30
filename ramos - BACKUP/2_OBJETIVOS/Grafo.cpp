@@ -1,0 +1,62 @@
+#include "Grafo.h"
+
+using namespace std;
+
+Grafo::Grafo(){}
+Grafo::Grafo(int n1){
+	n = n1;
+	lista_vertices = new Vertice*[n];
+	//for (int i=0; i<lista_allArestas.size(); i++){
+	//	particao[i] = 0; /*inicialmente opcional*/
+	//}
+}
+
+void Grafo::setN(int n1){
+	n = n1;
+	lista_vertices = new Vertice*[n];
+}
+
+void Grafo::addVertice(int id){
+	Vertice *novo = new Vertice(id);
+	lista_vertices[id] = novo; /*PADRÃO: A faixa de id's dos vértices é de 0 até n-1*/
+}
+
+Vertice *Grafo::getVertice(int id){
+	return lista_vertices[id]; 		
+}
+
+Aresta *Grafo::addAresta(int id, int origem, int destino, float peso1, float peso2){
+	Aresta *nova = new Aresta(id, origem, destino, peso1, peso2);
+	//lista_allArestas.push_back(nova); /*deve ser passado o ponteiro, isto é, a referência*/
+	lista_allArestas[id] = nova;
+	lista_vertices[origem]->adicionaAresta(nova);
+	lista_vertices[destino]->adicionaAresta(nova);
+	particao[id] = 0;
+	return nova;
+}
+
+map <int, Aresta *> Grafo::get_allArestas(){ /*retorna a primeira posição do vetor lista_allArestas*/
+	return lista_allArestas;
+}
+int Grafo::getQuantArestas(){
+	return lista_allArestas.size();
+}
+
+int Grafo::getQuantVertices(){	
+	return n;	
+}
+Aresta ** Grafo::getAllArestasPtr(){
+	return arestasPtr;
+}
+void Grafo::gerarArestasPtr(){
+	arestasPtr = new Aresta*[lista_allArestas.size()];
+	for (int i=0; i<lista_allArestas.size(); i++){
+		arestasPtr[i] = lista_allArestas[i];
+	}
+}
+int Grafo::getStatus(int i){
+	return particao[i];
+}
+void Grafo::setStatus(int i, int valor){
+	particao[i] = valor;
+}
