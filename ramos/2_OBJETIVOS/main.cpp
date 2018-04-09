@@ -383,12 +383,12 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 					
 					T_aux = new int[g->getQuantArestas()];
 					for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
-					Conjunto copie(g->getQuantVertices());
-					copie.copia(conjunto);
+					// Conjunto copie(g->getQuantVertices());
+					// copie.copia(conjunto);
 					T_aux[e->getId()] = 1;
 					novo_tf = tf+e->getPeso1();
 					novo_tg = tg+e->getPeso2();
-					copie.union1(e->getOrigem(), e->getDestino());
+					
 					if (step+1 == g->getQuantVertices()-1){
 						novo = make_pair(T_aux,make_pair(novo_tf,novo_tg));
 						noSuportadas.push_back(novo); // armazena T
@@ -404,6 +404,10 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 						regiaoViavel.remove(ponto); // remove-se o ponto (corner), e adiciona-se os novos dois pontos formados
 							
 					} else {
+
+						Conjunto copie(g->getQuantVertices());
+						copie.copia(conjunto);
+						copie.union1(e->getOrigem(), e->getDestino());
 						fg_step1 = min_f_g_vector[step+1];//min_f_g(g->getVertice(step+1)->getAdjacentes());
 						pilhaCojunto.push(copie);
 						pilhaLimites.push(make_pair(fBound-fg_step1.first,gBound-fg_step1.second));
@@ -411,15 +415,16 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 						pilhaFG.push(make_pair(novo_tf, novo_tg));
 					}
 				} else if (isInViableRegion2(tf+e->getPeso1()+fBound, tg+e->getPeso2()+gBound)){
-					T_aux = new int[g->getQuantArestas()];
-					for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
-					Conjunto copie(g->getQuantVertices());
-					copie.copia(conjunto);
-					T_aux[e->getId()] = 1;
-					novo_tf = tf+e->getPeso1();
-					novo_tg = tg+e->getPeso2();
-					copie.union1(e->getOrigem(), e->getDestino());
-					if (step+1 == g->getQuantVertices()-1){
+					if (step+1 == g->getQuantVertices()-1){ // EmAbril
+						T_aux = new int[g->getQuantArestas()];
+						for (int i=0; i<g->getQuantArestas(); i++) T_aux[i] = T[i]; // copia
+						// Conjunto copie(g->getQuantVertices());
+						// copie.copia(conjunto);
+						T_aux[e->getId()] = 1;
+						novo_tf = tf+e->getPeso1();
+						novo_tg = tg+e->getPeso2();
+						// copie.union1(e->getOrigem(), e->getDestino());
+						
 						novo = make_pair(T_aux,make_pair(novo_tf,novo_tg));
 						noSuportadas.push_back(novo); // armazena T
 					}
