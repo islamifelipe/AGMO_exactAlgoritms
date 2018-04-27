@@ -1,0 +1,19 @@
+Loading graph InstanciasGrid/Conjunto2/correlated/36.gridcorr2.in...
+Graph loaded
+15 edges removed
+42 edges left
+24 mandatory edges
+LS time =  0,012846 s
+19 solutions after LS
+151 presorted orderings of arcs
+Presort time =  0,001439 s
+Shaving removed 0 edges
+Shaving time =  0,002971 s
+Search time  =  0,111509 s
+Total time   =  0,166888 s
+19 solutions
+135 calls to oracle
+LS finds the optimum
+(1130,1291)(1135,1282)(1137,1279)(1151,1260)(1160,1254)(1162,1251)(1178,1248)(1179,1240)(1195,1237)(1207,1231)(1223,1228)(1239,1227)(1243,1225)(1251,1221)(1267,1218)(1287,1215)(1321,1214)(1323,1213)(1357,1212)
+WARNING: The runtime version supported by this application is unavailable.
+Using default runtime: v4.0.30319

@@ -1,0 +1,15 @@
+Loading graph InstanciasGrid/Conjunto3/correlated/100.gridcorr3.in...
+Graph loaded
+76 edges removed
+104 edges left
+94 mandatory edges
+LS time =  0,006863 s
+7 solutions after LS
+Search time  =  0,132246 s
+Total time   =  0,178503 s
+7 solutions
+29 calls to oracle
+LS finds the optimum
+(3056,3263)(3057,3255)(3061,3253)(3067,3251)(3071,3249)(3077,3247)(3084,3245)
+WARNING: The runtime version supported by this application is unavailable.
+Using default runtime: v4.0.30319

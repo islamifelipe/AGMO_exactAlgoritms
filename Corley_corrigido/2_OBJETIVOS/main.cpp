@@ -295,24 +295,24 @@ int main(){
 						//if (l==false && r+1!=n) cout<<"init = "<<init+1<<" fim = "<<m[r+1]-1<<" sol = "<<m[r+1]<<endl;
 						
 
-						//ultima iteraçao
-						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
-							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-								m[r+1]-=1;
-								l = true;
-								break;
-							}
-						}
-						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
-						 	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
-								for (int mmm=k; mmm<m[r+1]; mmm++){
-									A[r+1][mmm] = A[r+1][mmm+1];
-									X[r+1][mmm] = X[r+1][mmm+1];
-								}
-								m[r+1]-=1;
-								k--;
-							}
-						}
+						// //ultima iteraçao // com a PODA na derradeira iteraçao temos o corley corrigido por Elizabeth. Sem essa poda, temos o Prim-like!!!
+						// for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
+						// 	if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
+						// 		m[r+1]-=1;
+						// 		l = true;
+						// 		break;
+						// 	}
+						// }
+						// for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
+						//  	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
+						// 		for (int mmm=k; mmm<m[r+1]; mmm++){
+						// 			A[r+1][mmm] = A[r+1][mmm+1];
+						// 			X[r+1][mmm] = X[r+1][mmm+1];
+						// 		}
+						// 		m[r+1]-=1;
+						// 		k--;
+						// 	}
+						// }
 
 						
 					}

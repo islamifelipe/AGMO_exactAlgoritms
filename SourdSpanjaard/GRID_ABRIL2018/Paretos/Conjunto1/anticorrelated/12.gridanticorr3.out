@@ -1,0 +1,19 @@
+Loading graph InstanciasGrid/Conjunto1/anticorrelated/12.gridanticorr3.in...
+Graph loaded
+0 edges removed
+16 edges left
+2 mandatory edges
+LS time =  0,007984 s
+47 solutions after LS
+83 presorted orderings of arcs
+Presort time =  0,000909 s
+Shaving removed 0 edges
+Shaving time =  0,001765 s
+Search time  =  0,106288 s
+Total time   =  0,155597 s
+47 solutions
+217 calls to oracle
+LS finds the optimum
+(355,706)(357,697)(371,691)(373,682)(375,679)(393,674)(394,669)(396,660)(405,658)(407,649)(417,646)(421,643)(423,634)(425,631)(428,628)(438,627)(442,622)(444,613)(446,610)(461,608)(462,604)(465,600)(467,591)(478,589)(482,587)(483,583)(486,580)(488,577)(498,572)(499,568)(501,567)(503,566)(509,558)(519,551)(521,548)(522,546)(535,545)(537,542)(540,538)(541,535)(542,529)(553,527)(558,521)(564,513)(574,506)(576,505)(597,484)
+WARNING: The runtime version supported by this application is unavailable.
+Using default runtime: v4.0.30319

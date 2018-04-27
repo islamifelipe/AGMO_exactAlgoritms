@@ -1,0 +1,9 @@
+Loading graph InstanciasGrid/Conjunto2/correlated/100.gridcorr3.in...
+Graph loaded
+74 edges removed
+106 edges left
+92 mandatory edges
+LS time =  0,008015 s
+8 solutions after LS
+WARNING: The runtime version supported by this application is unavailable.
+Using default runtime: v4.0.30319

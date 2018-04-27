@@ -1,0 +1,5 @@
+ABORTADO
+
+Este arquivo contém a implmentaçao 2 objetivos do Corley corrigido segundo a ideia de Beth em 16/02/2018, onde a ultima poda é desativada. Isso é o Prim-like, gerando superconjunto
+
+Verifica a dominância somentre dentro de cada subconjunto de subarvores em cada iteraçao. Verifica a dominância entre conjunto total somente no final (ultima iteraçao)
