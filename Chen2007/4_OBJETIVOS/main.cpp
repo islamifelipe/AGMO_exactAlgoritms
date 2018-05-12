@@ -2,7 +2,7 @@
 #=======================================================================
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
-# This code implements the Corley's (1985) algorithm 
+# This code implements the Chen's (2007) algorithm 
 # to resolve the 4-objective Spanning Tree Problem
 # The user time is returned;
 #=======================================================================
@@ -118,6 +118,81 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){
 
 
 
+
+// conjunto de vertices 1 e 2 e seus tamanhos (quantidade de vértices do grafo)
+bool condicao1(int *v1, int *v2, int size){ // V1 == V2? 
+	for (int i=0; i<size; i++){
+		if(v1[i]!=v2[i]) return false;
+	}
+	// contCondition1++;
+	return true;
+}
+
+// // ESSA CONDICAO ESTÁ ERRADA!
+// bool condicao2(int *v1, int *v2, int n, int* e1, int *e2, int m){
+// 	int cont=0;
+// 	for (int i=0; i<n && cont<=1; i++){
+// 		if(v1[i]==v2[i] && v2[i]==1) cont++;
+// 	}
+// 	if (cont==1){
+// 		int contarestas = 0;
+// 		for (int i=0; i<m && contarestas<=1; i++){
+// 			if (e1[i]==e2[i] && e2[i]==1) contarestas++;
+// 		}
+// 		if (contarestas==1) return true;
+// 	} 
+// 	return false;
+// }
+
+
+bool condicao2(int *v1, int *v2, int n, int* e1, int *e2, int m){
+	
+	int contarestas1 = 0, contarestas2=0;
+	for (int i=0; i<m; i++){ 
+		if (e1[i]==1) contarestas1++;
+		if (e2[i]==1) contarestas2++;
+	}
+	// cout<<"contarestas1 = "<<contarestas1<<" contarestas2 = "<<contarestas2<<endl;
+	if (contarestas1==1 && contarestas2==1){ // both two subtrees have only one edge 
+		int cont=0;
+		for (int i=0; i<n; i++){
+			if(v1[i]==v2[i] && v2[i]==1) cont++;
+		}
+		if (cont==1){ // have one common vertex;
+			// contCondition2++;
+			return true;
+		} 
+	}
+	return false;
+}
+
+
+// Se diferem em apenas uma aresta e apenas um vértice
+bool condicao3(int *v1, int *v2, int n, int* e1, int *e2, int m){
+	int contAresta=0;
+	for (int i=0; i<m; i++){
+		if(e1[i]!=e2[i]) contAresta++;
+	}
+	if (contAresta==2) { // SE DIFEREM EM APENAS UMA ARESTA
+
+		int cont=0;
+		for (int i=0; i<n; i++){
+			if(v1[i]!=v2[i]) cont++;
+		}
+		if (cont==2){
+			// contCondition3++;
+			return true; // s1, s2 have only one different vertex
+		}
+		// DIFEREM EM APENAS UM VERTICE
+		// 1 0 1 0 0
+		// 1 1 0 0 0
+		// 
+	}
+	
+	return false;
+}
+
+
 void printResultado(){
 	cout<<m[n]<<endl;
    	cout<<endl;
@@ -152,15 +227,16 @@ void *tempo(void *nnnn){
 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-		if (sec>=3600 && sec<=3660){ 
-			cout<<"RESULTADO AO FIM DE 1H"<<endl;
-			printResultado();
-			sleep(70); // é importante pra nao ficar verificando todo o tempo
-		} else if (sec>=7200 && sec<=7260){
-			cout<<"RESULTADO AO FIM DE 2H"<<endl;
-			printResultado();
-			sleep(70); // é importante pra nao ficar verificando todo o tempo
-		} else if (sec>=10800){// se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+		// if (sec>=3600 && sec<=3660){ 
+		// 	cout<<"RESULTADO AO FIM DE 1H"<<endl;
+		// 	printResultado();
+		// 	sleep(70); // é importante pra nao ficar verificando todo o tempo
+		// } else if (sec>=7200 && sec<=7260){
+		// 	cout<<"RESULTADO AO FIM DE 2H"<<endl;
+		// 	printResultado();
+		// 	sleep(70); // é importante pra nao ficar verificando todo o tempo
+		// } else
+		 if (sec>=10800){// se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
 			
 			cout<<"RESULTADO AO FIM DE 3H"<<endl;
 			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
@@ -289,47 +365,68 @@ int main(){
 					A[r+1][m[r+1]][j] = 1;
 					if (m[r+1] != 1){ //precisa incluir um teste de dominância nos testes em k do passo 6
 						bool l = false;
-						for (int k = 1; k<=m[r+1]-1; k++){
+
+						for (int k=init+1; k<=m[r+1]-1 && l == false && r+1 != n; k++){  //CORLEY CORRIGIDO: r+1 != n // se nao for a ultima iteraçao
+							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
+								m[r+1]-=1;
+								l = true;
+								break;
+							} 
+						}
+						
+						for (int k = 1;  k<=m[r+1]-1 && l == false; k++){
+							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)) {
+								if (condicao1(X[r+1][k],X[r+1][m[r+1]],n) || condicao3(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)) { //|| condicao2(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)
+									// if (condicao1(X[r+1][k],X[r+1][m[r+1]],n)){
+									// 	int cont1=0, cont2=0;
+									// 	for (int y = 0; y<nA; y++){
+									// 		if (A[r+1][m[r+1]][y]==1){
+									// 			cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+									// 			cont1+=arestas[y]->getPeso1();
+									// 			cont2+=arestas[y]->getPeso2();
+									// 		}
+									// 	}
+									// 	cout<<"("<<cont1<<","<<cont2<<") C1"<<endl;
+									// }
+									m[r+1]-=1;
+									l = true;
+									break;
+								}
+							}
+						}
+
+						for (int k = 1; k<=m[r+1]-1 && l == false; k++){
+							if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)) {
+								if (condicao1(X[r+1][k],X[r+1][m[r+1]],n) || condicao3(X[r+1][k],X[r+1][m[r+1]],n, A[r+1][k], A[r+1][m[r+1]], nA)) { //condicao2(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)
+									// if (condicao1(X[r+1][k],X[r+1][m[r+1]],n)){
+									// 	int cont1=0, cont2=0;
+									// 	for (int y = 0; y<nA; y++){
+									// 		if (A[r+1][k][y]==1){
+									// 			cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+									// 			cont1+=arestas[y]->getPeso1();
+									// 			cont2+=arestas[y]->getPeso2();
+									// 		}
+									// 	}
+									// 	cout<<"("<<cont1<<","<<cont2<<") C1"<<endl;
+									// }
+									for (int mmm=k; mmm<m[r+1]; mmm++){
+										A[r+1][mmm] = A[r+1][mmm+1];
+										X[r+1][mmm] = X[r+1][mmm+1];
+									}
+									m[r+1]-=1;
+									k--;
+								}
+							}
+						}
+
+
+
+						for (int k = 1; k<=m[r+1]-1 && l == false; k++){
 							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
 								m[r+1]-=1;
 								l = true;
 								break;
 							} 
-							// else if (r+1 == n && t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-							// 	m[r+1]-=1;
-							// 	l = true;
-							// 	break;
-							// }
-						}
-
-						
-						for (int k=init+1; k<=m[r+1]-1 && l == false && r+1 != n; k++){ // se nao for a ultima iteraçao
-							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-								m[r+1]-=1;
-								l = true;
-								break;
-							} 
-						}
-						//if (l==false && r+1!=n) cout<<"init = "<<init+1<<" fim = "<<m[r+1]-1<<" sol = "<<m[r+1]<<endl;
-						
-
-						//ultima iteraçao
-						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
-							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-								m[r+1]-=1;
-								l = true;
-								break;
-							}
-						}
-						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
-						 	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
-								for (int mmm=k; mmm<m[r+1]; mmm++){
-									A[r+1][mmm] = A[r+1][mmm+1];
-									X[r+1][mmm] = X[r+1][mmm+1];
-								}
-								m[r+1]-=1;
-								k--;
-							}
 						}
 
 					}

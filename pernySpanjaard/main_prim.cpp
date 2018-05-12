@@ -146,15 +146,16 @@ void *tempo(void *nnnn){
 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-		if (sec==3600){ //3600
-			cout<<"RESULTADO AO FIM DE 1H"<<endl;
-			printResultado();
-			sleep(3400); // 3400 é importante pra nao ficar verificando todo o tempo
-		} else if (sec==7200){//7200
-			cout<<"RESULTADO AO FIM DE 2H"<<endl;
-			printResultado();
-			sleep(3400); // é importante pra nao ficar verificando todo o tempo
-		} else if (sec==10800){// 10800 se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+		// if (sec==3600){ //3600
+		// 	cout<<"RESULTADO AO FIM DE 1H"<<endl;
+		// 	printResultado();
+		// 	sleep(3400); // 3400 é importante pra nao ficar verificando todo o tempo
+		// } else if (sec==7200){//7200
+		// 	cout<<"RESULTADO AO FIM DE 2H"<<endl;
+		// 	printResultado();
+		// 	sleep(3400); // é importante pra nao ficar verificando todo o tempo
+		// } else 
+		if (sec>=10800){// 10800 se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
 			
 			cout<<"RESULTADO AO FIM DE 3H"<<endl;
 			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;

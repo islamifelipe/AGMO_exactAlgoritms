@@ -1,5 +1,5 @@
 
-all: Aresta.o Vertice.o Grafo.o corley
+all: Aresta.o Vertice.o Grafo.o chen
 
 Aresta.o : Aresta.cpp Aresta.h
 	g++ -g -c Aresta.cpp
@@ -11,8 +11,8 @@ Grafo.o : Grafo.cpp Grafo.h
 	g++ -g -c Grafo.cpp
 	
 main.o : main.cpp
-	g++ -g -c  main.cpp
+	g++ -lpthread -g -c  main.cpp
 		
-corley : main.o  Grafo.o Vertice.o Aresta.o   
-	g++ -g  Aresta.o  Vertice.o Grafo.o main.o -lm -o corley
+chen : main.o  Grafo.o Vertice.o Aresta.o   
+	g++ -lpthread -g  Aresta.o  Vertice.o Grafo.o main.o -lm -o chen
 	

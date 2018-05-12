@@ -2,7 +2,7 @@
 #=======================================================================
 # Islame Felipe DA COSTA FERNANDES --- Copyright 2016
 #-----------------------------------------------------------------------
-# This code implements the Corley's (1985) algorithm 
+# This code implements the Chen's (2007) algorithm 
 # to resolve the Biobjective Spanning Tree Problem
 # The user time is returned;
 #=======================================================================
@@ -42,6 +42,8 @@ map<int, int* > *A;
 int *m;
 map <int, Aresta *> arestasPtr;
 
+int contCondition1=0, contCondition2=0, contCondition3=0; 
+
 bool a_domina_b( Aresta *a, Aresta *b){
 	if (a->getPeso1() <= b->getPeso1() && a->getPeso2() <= b->getPeso2() && (a->getPeso1() < b->getPeso1() || a->getPeso2() < b->getPeso2())){
 		return true;
@@ -54,7 +56,7 @@ bool a_domina_fracamente_b( Aresta *a, Aresta *b){
 	} else return false;
 }
 
-int* vmin(int* vertices, Grafo &my_grafo){
+int* vmin(int* vertices, Grafo &my_grafo, int r){
 	map <int, Aresta *> arestas = my_grafo.get_allArestas();
 	int *retorno = new int[arestas.size()]; // vetor dos id das arestas
 
@@ -66,25 +68,29 @@ int* vmin(int* vertices, Grafo &my_grafo){
 			retorno[a->getId()] = 1; 
 		} else {
 			retorno[a->getId()] = 0; 
-		}
+		} 
 	}
 
 	// depois verificamos a dominância entre as arestas
 
-	for (int i = 0; i<arestas.size(); i++){ // O(m^2)
-		if (retorno[i] == 1){ // se a aresta de id=i está contida no conjunto... 
-			Aresta *ai = arestas[i];
-			for (int j = i+1; j<arestas.size(); j++){
-				if (retorno[j] == 1 && retorno[i] == 1){
-					if (a_domina_b(ai, arestas[j])){
-						retorno[j] = 0;
-					} else if (a_domina_b(arestas[j], ai)){
-						retorno[i] = 0;
+	// if (r==1){
+		for (int i = 0; i<arestas.size(); i++){ // O(m^2)
+			if (retorno[i] == 1){ // se a aresta de id=i está contida no conjunto... 
+				Aresta *ai = arestas[i];
+				for (int j = i+1; j<arestas.size(); j++){
+					if (retorno[j] == 1 && retorno[i] == 1){
+						
+						if (a_domina_b(ai, arestas[j])){
+							retorno[j] = 0;
+						} else if (a_domina_b(arestas[j], ai)){
+							retorno[i] = 0;
+						}
+	
 					}
 				}
 			}
 		}
-	}
+	// }
 	return retorno;
 }
 
@@ -118,34 +124,71 @@ bool condicao1(int *v1, int *v2, int size){ // V1 == V2?
 	for (int i=0; i<size; i++){
 		if(v1[i]!=v2[i]) return false;
 	}
+	contCondition1++;
 	return true;
 }
 
-//
+// // ESSA CONDICAO ESTÁ ERRADA!
+// bool condicao2(int *v1, int *v2, int n, int* e1, int *e2, int m){
+// 	int cont=0;
+// 	for (int i=0; i<n && cont<=1; i++){
+// 		if(v1[i]==v2[i] && v2[i]==1) cont++;
+// 	}
+// 	if (cont==1){
+// 		int contarestas = 0;
+// 		for (int i=0; i<m && contarestas<=1; i++){
+// 			if (e1[i]==e2[i] && e2[i]==1) contarestas++;
+// 		}
+// 		if (contarestas==1) return true;
+// 	} 
+// 	return false;
+// }
+
+
 bool condicao2(int *v1, int *v2, int n, int* e1, int *e2, int m){
-	int cont=0;
-	for (int i=0; i<n && cont<=1; i++){
-		if(v1[i]==v2[i] && v2[i]==1) cont++;
+	
+	int contarestas1 = 0, contarestas2=0;
+	for (int i=0; i<m; i++){ 
+		if (e1[i]==1) contarestas1++;
+		if (e2[i]==1) contarestas2++;
 	}
-	if (cont==1){
-		int contarestas = 0;
-		for (int i=0; i<m && contarestas<=1; i++){
-			if (e1[i]==e2[i] && e2[i]==1) contarestas++;
+	// cout<<"contarestas1 = "<<contarestas1<<" contarestas2 = "<<contarestas2<<endl;
+	if (contarestas1==1 && contarestas2==1){ // both two subtrees have only one edge 
+		int cont=0;
+		for (int i=0; i<n; i++){
+			if(v1[i]==v2[i] && v2[i]==1) cont++;
 		}
-		if (contarestas==1) return true;
-	} 
+		if (cont==1){ // have one common vertex;
+			contCondition2++;
+			return true;
+		} 
+	}
 	return false;
 }
 
 
-bool condicao3(int *v1, int *v2, int size, int k, int init){
-	if (k>=init+1){
+// Se diferem em apenas uma aresta e apenas um vértice
+bool condicao3(int *v1, int *v2, int n, int* e1, int *e2, int m){
+	int contAresta=0;
+	for (int i=0; i<m; i++){
+		if(e1[i]!=e2[i]) contAresta++;
+	}
+	if (contAresta==2) { // SE DIFEREM EM APENAS UMA ARESTA
+
 		int cont=0;
-		for (int i=0; i<size && cont<=2; i++){
+		for (int i=0; i<n; i++){
 			if(v1[i]!=v2[i]) cont++;
 		}
-		if (cont==2)return true;
+		if (cont==2){
+			contCondition3++;
+			return true; // s1, s2 have only one different vertex
+		}
+		// DIFEREM EM APENAS UM VERTICE
+		// 1 0 1 0 0
+		// 1 1 0 0 0
+		// 
 	}
+	
 	return false;
 }
 
@@ -172,22 +215,6 @@ void printResultado(){
 }
 
 
-// void *tempo(void *nnnn){
-// 	while (true){
-// 		times(&tempsFinal);   /* current time */ // clock final
-// 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
-// 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
-		
-// 		if (sec>1000000){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
-// 			cout<<sec<<endl;
-// 			cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
-
-// 			printResultado();
-// 			//cout<<"saindo... valor de ppp="<<ppp<<endl;
-// 			exit(-1);
-// 		}
-// 	}
-// }
 
 
 void *tempo(void *nnnn){
@@ -269,6 +296,7 @@ int main(){
     for (int mmm=0; mmm<nA; mmm++)A[1][1][mmm] = 0; // by felipe
 
     for (int r = 1; r<n; r++){
+    	// cout<<"r = "<<r<<endl;
     	map<int, int* > Wr; 
     	m[r+1] = 0;
     	/* pra guardar o retorno do Step2
@@ -277,7 +305,7 @@ int main(){
 	     */
 
     	for (int k = 1; k<=m[r]; k++){
-    		Wr[k] = vmin(X[r][k], my_grafo);  //Step2
+    		Wr[k] = vmin(X[r][k], my_grafo, r);  //Step2
     	}
 	     
 	     for (int s = 1; s<=m[r]; s++){
@@ -302,25 +330,30 @@ int main(){
 					}
 					int p = arestas[j]->getOrigem();
 					int q = arestas[j]->getDestino();
-					X[r+1][m[r+1]][p] = 1; // redundante
+					X[r+1][m[r+1]][p] = 1; 
 					X[r+1][m[r+1]][q] = 1;
 					A[r+1][m[r+1]][j] = 1;
-					if (m[r+1] != 1){ //precisa incluir um teste de dominância nos testes em k do passo 6
-						bool l = false;
-						for (int k = 1; k<=m[r+1]-1; k++){
-							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
-								m[r+1]-=1;
-								l = true;
-								break;
-							} 
-							// else if (r+1 == n && t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-							// 	m[r+1]-=1;
-							// 	l = true;
-							// 	break;
-							// } // depraciate ==> first version without correction
-						}
+					//  if (r==n-1){
+				 //    	// cout<<contCondition1<<" "<<contCondition2<<" "<<contCondition3<<endl;
+				 //    	map <int, Aresta *> arestas = my_grafo.get_allArestas();
+					// 	// for (int k = 1; k<=m[r+1]; k++){
+					// 		int cont1=0, cont2=0;
+					// 		for (int y = 0; y<nA; y++){
+					// 			if (A[r+1][m[r+1]][y]==1){
+					// 				cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+					// 				cont1+=arestas[y]->getPeso1();
+					// 				cont2+=arestas[y]->getPeso2();
+					// 			}
+					// 		}
+					// 		cout<<"("<<cont1<<","<<cont2<<")"<<endl;
+					// 	// }
+					// }
+					if (m[r+1] != 1){ 
 
-						for (int k=init+1; k<=m[r+1]-1 && l == false && r+1 != n; k++){ // se nao for a ultima iteraçao
+						
+						bool l = false;
+
+						for (int k=init+1; k<=m[r+1]-1 && l == false && r+1 != n; k++){  //CORLEY CORRIGIDO: r+1 != n // se nao for a ultima iteraçao
 							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
 								m[r+1]-=1;
 								l = true;
@@ -328,48 +361,86 @@ int main(){
 							} 
 						}
 						
+						for (int k = 1;  k<=m[r+1]-1 && l == false; k++){
+							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)) {
+								if (condicao1(X[r+1][k],X[r+1][m[r+1]],n) || condicao3(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)) { //|| condicao2(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)
+									// if (condicao1(X[r+1][k],X[r+1][m[r+1]],n)){
+									// 	int cont1=0, cont2=0;
+									// 	for (int y = 0; y<nA; y++){
+									// 		if (A[r+1][m[r+1]][y]==1){
+									// 			cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+									// 			cont1+=arestas[y]->getPeso1();
+									// 			cont2+=arestas[y]->getPeso2();
+									// 		}
+									// 	}
+									// 	cout<<"("<<cont1<<","<<cont2<<") C1"<<endl;
+									// }
+									m[r+1]-=1;
+									l = true;
+									break;
+								}
+							}
+						}
+
 						for (int k = 1; k<=m[r+1]-1 && l == false; k++){
-							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas) && (condicao1(X[r+1][k],X[r+1][m[r+1]],n) || condicao2(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][m[r+1]], A[r+1][k], nA) || condicao3(X[r+1][k],X[r+1][m[r+1]],n,k, init))) {
+							if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)) {
+								if (condicao1(X[r+1][k],X[r+1][m[r+1]],n) || condicao3(X[r+1][k],X[r+1][m[r+1]],n, A[r+1][k], A[r+1][m[r+1]], nA)) { //condicao2(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)
+									// if (condicao1(X[r+1][k],X[r+1][m[r+1]],n)){
+									// 	int cont1=0, cont2=0;
+									// 	for (int y = 0; y<nA; y++){
+									// 		if (A[r+1][k][y]==1){
+									// 			cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+									// 			cont1+=arestas[y]->getPeso1();
+									// 			cont2+=arestas[y]->getPeso2();
+									// 		}
+									// 	}
+									// 	cout<<"("<<cont1<<","<<cont2<<") C1"<<endl;
+									// }
+									for (int mmm=k; mmm<m[r+1]; mmm++){
+										A[r+1][mmm] = A[r+1][mmm+1];
+										X[r+1][mmm] = X[r+1][mmm+1];
+									}
+									m[r+1]-=1;
+									k--;
+								}
+							}
+						}
+
+
+
+						for (int k = 1; k<=m[r+1]-1 && l == false; k++){
+							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
 								m[r+1]-=1;
 								l = true;
 								break;
-							}
+							} 
 						}
-
-						for (int k = 1; k<=m[r+1]-1 && l == false; k++){
-							if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas) && (condicao1(X[r+1][k],X[r+1][m[r+1]],n) || condicao2(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][m[r+1]], A[r+1][k], nA) || condicao3(X[r+1][k],X[r+1][m[r+1]],n, k, init))) {
-								for (int mmm=k; mmm<m[r+1]; mmm++){
-									A[r+1][mmm] = A[r+1][mmm+1];
-									X[r+1][mmm] = X[r+1][mmm+1];
-								}
-								m[r+1]-=1;
-								k--;
-							}
-						}
-
-
-						// //ultima iteraçao // com a PODA na derradeira iteraçao temos o corley corrigido por Elizabeth. Sem essa poda, temos o Prim-like!!!
-						// for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
-						// 	if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-						// 		m[r+1]-=1;
-						// 		l = true;
-						// 		break;
-						// 	}
-						// }
-						// for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
-						//  	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
-						// 		for (int mmm=k; mmm<m[r+1]; mmm++){
-						// 			A[r+1][mmm] = A[r+1][mmm+1];
-						// 			X[r+1][mmm] = X[r+1][mmm+1];
-						// 		}
-						// 		m[r+1]-=1;
-						// 		k--;
-						// 	}
-						// }
 					}
 	     		}
 	     	}
 	    }
+
+	    /// ATENCAO: OS CORTES SAO FEITOS DENTRO DA ITERACAO (ASSIM FICA MAIS EFICIENTE)
+	    /// DIFERENTEMENTE DO CHEN ORIGINAL QUE SUGERE OBTER O CONJUNTO DE ARVORES E DEPOIS FAZER O CORTE
+
+
+	 //    // APENAS PARA FINS DE AVALIACAO E VERIFICACAO DA CORRETUDE
+	 //    cout<<"Fim m[r+1] = "<<m[r+1]<<endl;
+	 //    // if (r==1){
+	 //    	cout<<contCondition1<<" "<<contCondition2<<" "<<contCondition3<<endl;
+	 //    	map <int, Aresta *> arestas = my_grafo.get_allArestas();
+		// 	for (int k = 1; k<=m[r+1]; k++){
+		// 		int cont1=0, cont2=0;
+		// 		for (int y = 0; y<nA; y++){
+		// 			if (A[r+1][k][y]==1){
+		// 				cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+		// 				cont1+=arestas[y]->getPeso1();
+		// 				cont2+=arestas[y]->getPeso2();
+		// 			}
+		// 		}
+		// 		cout<<"("<<cont1<<","<<cont2<<")"<<endl;
+		// 	}
+		// // }
     }
     
     /* OUTPUT : 
@@ -385,7 +456,7 @@ int main(){
 	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 	cout<<user_time<<endl;
 	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-   	
+   	// cout<<contCondition1<<" "<<contCondition2<<" "<<contCondition3<<endl;
 	printResultado();
 
 	return 0;
