@@ -193,6 +193,8 @@ void *executar(void *nnnn){
     for (int mmm=0; mmm<nA; mmm++)A[1][1][mmm] = 0; // by felipe
 
     for (int r = 1; r<n; r++){
+    	cout<<"ITERACAO = "<<r<<endl;
+    	
     	map<int, int* > Wr; 
     	m[r+1] = 0;
     	/* pra guardar o retorno do Step2
@@ -205,7 +207,8 @@ void *executar(void *nnnn){
     	}
 	     
 	     for (int s = 1; s<=m[r]; s++){
-
+	     	cout<<"------------------------------- Descendentes da Subarvore "<<s<<" da ITERACAO "<<r-1<<endl;
+	     	
 	     	int *wrs = Wr[s];
 	     	//int *wrs = new int[]
 	     	map <int, Aresta *> arestas = my_grafo.get_allArestas();
@@ -229,14 +232,49 @@ void *executar(void *nnnn){
 					X[r+1][m[r+1]][p] = 1; // redundante
 					X[r+1][m[r+1]][q] = 1;
 					A[r+1][m[r+1]][j] = 1;
+
+					int cont1=0, cont2=0;
+				    cout<<"Subarvore "<<m[r+1]<<endl;
+					for (int y = 0; y<nA; y++){
+						if (A[r+1][m[r+1]][y]==1){
+							cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+							cont1+=arestas[y]->getPeso1();
+							cont2+=arestas[y]->getPeso2();
+						}
+					}
+					cout<<"\t("<<cont1<<","<<cont2<<") \n"<<endl;
+
 					if (m[r+1] != 1){ //precisa incluir um teste de dominância nos testes em k do passo 6
 						bool l = false;
 						for (int k = 1; k<=m[r+1]-1; k++){
 							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
+								int cont1=0, cont2=0;
+								for (int y = 0; y<nA; y++){
+									if (A[r+1][m[r+1]][y]==1){
+										// cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+										cont1+=arestas[y]->getPeso1();
+										cont2+=arestas[y]->getPeso2();
+									}
+								}
+								cout<<"REMOVE DUPLICATA: ("<<cont1<<","<<cont2<<") \n"<<endl;
+
 								m[r+1]-=1;
 								l = true;
 								break;
 							} else if ( t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){ //r+1 == n &&
+								
+								int cont1=0, cont2=0;
+								for (int y = 0; y<nA; y++){
+									if (A[r+1][m[r+1]][y]==1){
+										// cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+										cont1+=arestas[y]->getPeso1();
+										cont2+=arestas[y]->getPeso2();
+									}
+								}
+								cout<<"\tPODA:("<<cont1<<","<<cont2<<") ** \n"<<endl;
+
+
+
 								m[r+1]-=1;
 								l = true;
 								break;
@@ -245,6 +283,18 @@ void *executar(void *nnnn){
 
 						for (int k = 1; k<=m[r+1]-1 && l == false ; k++){ //&& r+1 == n
 						 	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
+								
+						 		int cont1=0, cont2=0;
+								for (int y = 0; y<nA; y++){
+									if (A[r+1][k][y]==1){
+										// cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+										cont1+=arestas[y]->getPeso1();
+										cont2+=arestas[y]->getPeso2();
+									}
+								}
+								cout<<"\tPODA: ("<<cont1<<","<<cont2<<") * \n"<<endl;
+
+
 								for (int mmm=k; mmm<m[r+1]; mmm++){
 									A[r+1][mmm] = A[r+1][mmm+1];
 									X[r+1][mmm] = X[r+1][mmm+1];
@@ -281,6 +331,13 @@ void *executar(void *nnnn){
 int main(){
 	
 	times(&tempsInit);  // pega o tempo do clock inical
+	cout<<"TRACE DO ALGORITMO COMEÇANDO DO VERTICE 0"<<endl;
+	
+	cout<<"A CADA ITERACAO, APENAS SAO CONSIDERDAS AS ARESTAS NAO-DOMINADS NO CORTE CORRENTE"<<endl;
+
+	cout<<"LEGENDA: "<<endl;
+	cout<<"** uma árvore recém criada é podada (ela nao é nem mesmo incluida na lista)"<<endl;
+	cout<<"* uma árvore que fora criada anteriormente, que ja estava na lista, é excluida porque alguém acabou de entrar na lista e a dominou"<<endl;
 
 	// para medir o tempo em caso limite
 	// pthread_t thread_time; 

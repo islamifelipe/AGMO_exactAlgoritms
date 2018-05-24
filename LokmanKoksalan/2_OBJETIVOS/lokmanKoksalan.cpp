@@ -58,7 +58,7 @@ void *tempo(void *nnnn){
 		clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 		float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
 		
-		if (sec>20){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+		if (sec>1000){ // se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
 			cout<<sec<<endl;
 			cout<<"TEMPO LIMITE ATINGIDO...   " <<endl;
 
@@ -92,11 +92,12 @@ int main(){
 
 	GRBEnv env = GRBEnv();;
 	env.set("OutputFlag","0");
+	 env.set(GRB_IntParam_Threads, 3);
 	GRBModel model = GRBModel(env);;
 
 	GRBVar **y, **x;
 
-	float epslon = 0.001;
+	float epslon = 0.001;;
 	//cin>>epslon;
 
 
@@ -124,8 +125,8 @@ int main(){
 		cin>>peso1;
 		cin>>peso2;
 		coeficienteObjetv[origem][destino] = (peso1 + epslon*peso2)*(-1); // o problema é de maximizacao
-		x[origem][destino] = model.addVar(0.0, 1000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(origem)+std::to_string(destino));
-        x[destino][origem] = model.addVar(0.0, 1000, 0.0, GRB_CONTINUOUS, "x"+std::to_string(destino)+std::to_string(origem));
+		x[origem][destino] = model.addVar(0.0, n, 0.0, GRB_CONTINUOUS, "x"+std::to_string(origem)+std::to_string(destino));
+        x[destino][origem] = model.addVar(0.0, n, 0.0, GRB_CONTINUOUS, "x"+std::to_string(destino)+std::to_string(origem));
       	y[origem][destino] = model.addVar(0.0, 1.0, 0.0, GRB_BINARY, "y"+std::to_string(origem)+std::to_string(destino));
       	arestas[origem][destino] = 1;
       	arestas[destino][origem] = 1;
@@ -164,16 +165,36 @@ int main(){
   
 
 
+    // // // Add constraint: 
+    // for (int j=1; j<n; j++){
+    //   GRBLinExpr constr2 = 0;
+    //   for (int i=0; i<n; i++){
+    //     if (arestas[i][j] == 1){
+    //       constr2.addTerms(&co,&x[i][j],1);
+    //       constr2.addTerms(&com,&x[j][i],1);
+    //     }
+    //   }
+    //   model.addConstr(constr2, GRB_EQUAL, 1,std::to_string(constrCont++));
+    // }
+
+
     // // Add constraint:
     for (int j=1; j<n; j++){
       GRBLinExpr constr2 = 0;
       for (int i=0; i<n; i++){
         if (arestas[i][j] == 1){
-          constr2.addTerms(&co,&x[i][j],1);
-          constr2.addTerms(&com,&x[j][i],1);
+          constr2 = constr2 + x[i][j];
         }
       }
-      model.addConstr(constr2, GRB_EQUAL, 1,std::to_string(constrCont++));
+      GRBLinExpr constr3 = 0;
+      for (int k=0; k<n; k++){
+        if (arestas[j][k] == 1){
+          constr3 = constr3 + x[j][k];
+        }
+      }
+      GRBLinExpr constr4 = constr2 - constr3;
+      //cout<<constr4<<endl;
+      model.addConstr(constr4, GRB_EQUAL, 1,std::to_string(constrCont++));
     }
 
     double coef = (double) n - 1;
@@ -226,8 +247,20 @@ int main(){
 
 		int optimstatus;
 		//std::vector<short**> S;
-		 do{
+		  do{
 			//cout<<"Inicio"<<endl;
+		 	
+			// GRBLinExpr constr77;
+			// 	 for (int i=0; i<n; i++){
+			// 	 	for (int j=i+1; j<n; j++){
+			// 	 		if (arestas[i][j] == 1){
+			// 	 			constr77.addTerms(&matrix_peso2[i][j], &y[i][j],1);
+			// 	 		}
+			// 	 	}
+			// 	 }
+			// 	 // cout<<constr77<<"<="<<sum<<endl;
+			// 	 model.addConstr(constr77, GRB_GREATER_EQUAL, -969,std::to_string(constrCont++));
+		    	
 			short **result = new short*[n];
 			for (int ii=0; ii<n; ii++){
 				result[ii] = new short[n];
@@ -239,7 +272,8 @@ int main(){
 				 for (int i=0; i<n; i++){
 				    for (int j=i+1; j<n; j++){
 				     	if (arestas[i][j] == 1){
-				         	result[i][j] = y[i][j].get(GRB_DoubleAttr_X);
+				     		result[i][j]=0;
+				     		if (fabs(y[i][j].get(GRB_DoubleAttr_X)-1.0)<0.00001) result[i][j]=1;
 				     		sum+=(matrix_peso2[i][j])*result[i][j];
 				     	}
 				    }
@@ -249,19 +283,20 @@ int main(){
 				 for (int i=0; i<n; i++){
 				 	for (int j=i+1; j<n; j++){
 				 		if (arestas[i][j] == 1){
-				 			constr77.addTerms(&matrix_peso2[i][j], &y[i][j],1);
+				 			constr77 = constr77 + matrix_peso2[i][j]*y[i][j];
 				 		}
 				 	}
 				 }
-				// cout<<constr77<<"<="<<sum<<endl;
-				 model.addConstr(constr77, GRB_GREATER_EQUAL, sum,std::to_string(constrCont++));
-		    	
+				 cout<<sum<<endl;
+				 model.addConstr(constr77, GRB_GREATER_EQUAL, sum,"nova"+std::to_string(constrCont++));
+		    	 model.reset();
+
 				S.push_back(result);
 				nn++;
 
 			 }
 			 //cout<<"fim"<<endl;
-	  	 	} while (optimstatus != GRB_INFEASIBLE)	;
+	  	 	 } while (optimstatus != GRB_INFEASIBLE)	;
 
 	  	 	times(&tempsFinal1);   /* current time */ // clock final
 			clock_t user_time1 = (tempsFinal1.tms_utime - tempsInit.tms_utime);

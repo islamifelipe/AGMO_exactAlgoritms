@@ -196,7 +196,15 @@ int main(){
         exit(-1);
     }
     //
+    cout<<"TRACE DO ALGORITMO COMEÇANDO DO VERTICE 0"<<endl;
 		
+	cout<<"OBS.: ESTAO IMPLÍCITAS NO TRACE AS PODAS DENTRO DO MESMO SUBCONJUNTO DESCENDENTE DE UMA SUBARVORE "<<endl;
+	cout<<"OBS.: AS PODAS DA ÚLTIMA ITERACAO ESTAO EXPLÍCITAS"<<endl;
+	
+	cout<<"LEGENDA: "<<endl;
+	cout<<"** uma árvore recém criada é podada (ela nao é nem mesmo incluida na lista)"<<endl;
+	cout<<"* uma árvore que fora criada anteriormente, que ja estava na lista, é excluida porque alguém acabou de entrar na lista e a dominou"<<endl;
+
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
 	int id = 0; // id das arestas que leremos do arquivo para criar o grafo
@@ -234,6 +242,7 @@ int main(){
     for (int mmm=0; mmm<nA; mmm++)A[1][1][mmm] = 0; // by felipe
 
     for (int r = 1; r<n; r++){
+    	cout<<"ITERACAO = "<<r<<endl;
     	map<int, int* > Wr; 
     	m[r+1] = 0;
     	/* pra guardar o retorno do Step2
@@ -247,6 +256,7 @@ int main(){
 	     
 	     for (int s = 1; s<=m[r]; s++){
 	     	int init = m[r+1]; // demarca o iniciio do conjunto
+	     	cout<<"------------------------------- Descendentes da Subarvore "<<s<<" da ITERACAO "<<r-1<<endl;
 	     	int *wrs = Wr[s];
 	     	//int *wrs = new int[]
 	     	map <int, Aresta *> arestas = my_grafo.get_allArestas();
@@ -270,23 +280,53 @@ int main(){
 					X[r+1][m[r+1]][p] = 1; // redundante
 					X[r+1][m[r+1]][q] = 1;
 					A[r+1][m[r+1]][j] = 1;
+					
+					// for (int s = init+1; s<=m[r+1]; s++){
+				     	int cont1=0, cont2=0;
+					    cout<<"Subarvore "<<m[r+1]<<endl;
+						for (int y = 0; y<nA; y++){
+							if (A[r+1][m[r+1]][y]==1){
+								cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+								cont1+=arestas[y]->getPeso1();
+								cont2+=arestas[y]->getPeso2();
+							}
+						}
+						cout<<"\t("<<cont1<<","<<cont2<<") \n"<<endl;
+					// }
 					if (m[r+1] != 1){ //precisa incluir um teste de dominância nos testes em k do passo 6
 						bool l = false;
 						for (int k = 1; k<=m[r+1]-1; k++){
 							if (isEgal(A[r+1][m[r+1]], A[r+1][k], nA)){
+								int cont1=0, cont2=0;
+								for (int y = 0; y<nA; y++){
+									if (A[r+1][m[r+1]][y]==1){
+										// cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+										cont1+=arestas[y]->getPeso1();
+										cont2+=arestas[y]->getPeso2();
+									}
+								}
+								cout<<"REMOVE DUPLICATA: ("<<cont1<<","<<cont2<<") \n"<<endl;
+
 								m[r+1]-=1;
 								l = true;
 								break;
 							} 
-							// else if (r+1 == n && t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
-							// 	m[r+1]-=1;
-							// 	l = true;
-							// 	break;
-							// } // depraciate ==> first version without correction
 						}
 
 						for (int k=init+1; k<=m[r+1]-1 && l == false && r+1 != n; k++){ // se nao for a ultima iteraçao
+							
 							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
+								// int cont1=0, cont2=0;
+								// for (int y = 0; y<nA; y++){
+								// 	if (A[r+1][m[r+1]][y]==1){
+								// 		cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+								// 		cont1+=arestas[y]->getPeso1();
+								// 		cont2+=arestas[y]->getPeso2();
+								// 	}
+								// }
+								// cout<<"\t("<<cont1<<","<<cont2<<") \n"<<endl;
+
+
 								m[r+1]-=1;
 								l = true;
 								break;
@@ -298,6 +338,17 @@ int main(){
 						//ultima iteraçao // com a PODA na derradeira iteraçao temos o corley corrigido por Elizabeth. Sem essa poda, temos o Prim-like!!!
 						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
 							if (t1_domina_t2(A[r+1][k],A[r+1][m[r+1]], arestas)){
+								int cont1=0, cont2=0;
+								for (int y = 0; y<nA; y++){
+									if (A[r+1][m[r+1]][y]==1){
+										// cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+										cont1+=arestas[y]->getPeso1();
+										cont2+=arestas[y]->getPeso2();
+									}
+								}
+								cout<<"\tPODA:("<<cont1<<","<<cont2<<") ** \n"<<endl;
+
+
 								m[r+1]-=1;
 								l = true;
 								break;
@@ -305,6 +356,18 @@ int main(){
 						}
 						for (int k = 1; k<=m[r+1]-1 && l == false && r+1 == n; k++){
 						 	if (t1_domina_t2(A[r+1][m[r+1]],A[r+1][k], arestas)){
+								
+						 		int cont1=0, cont2=0;
+								for (int y = 0; y<nA; y++){
+									if (A[r+1][k][y]==1){
+										// cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+										cont1+=arestas[y]->getPeso1();
+										cont2+=arestas[y]->getPeso2();
+									}
+								}
+								cout<<"\tPODA: ("<<cont1<<","<<cont2<<") * \n"<<endl;
+
+
 								for (int mmm=k; mmm<m[r+1]; mmm++){
 									A[r+1][mmm] = A[r+1][mmm+1];
 									X[r+1][mmm] = X[r+1][mmm+1];
@@ -318,6 +381,10 @@ int main(){
 					}
 	     		}
 	     	}
+	     	
+
+	     	////
+			
 	    }
     }
     
@@ -334,7 +401,6 @@ int main(){
 	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
 	cout<<user_time<<endl;
 	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-   	
 	printResultado();
 
 	return 0;

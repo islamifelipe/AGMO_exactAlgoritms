@@ -248,7 +248,6 @@ void *tempo(void *nnnn){
 int main(){
 	
 	times(&tempsInit);  // pega o tempo do clock inical
-
 	// para medir o tempo em caso limite
 	pthread_t thread_time; 
 	pthread_attr_t attr;
@@ -296,7 +295,7 @@ int main(){
     for (int mmm=0; mmm<nA; mmm++)A[1][1][mmm] = 0; // by felipe
 
     for (int r = 1; r<n; r++){
-    	// cout<<"r = "<<r<<endl;
+    	// cout<<"Podas da ITERACAO = "<<r<<endl;
     	map<int, int* > Wr; 
     	m[r+1] = 0;
     	/* pra guardar o retorno do Step2
@@ -373,7 +372,19 @@ int main(){
 									// 			cont2+=arestas[y]->getPeso2();
 									// 		}
 									// 	}
-									// 	cout<<"("<<cont1<<","<<cont2<<") C1"<<endl;
+									// 	cout<<"\t("<<cont1<<","<<cont2<<") C1\n"<<endl;
+									// }
+
+									// if (condicao3(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)){
+									// 	int cont1=0, cont2=0;
+									// 	for (int y = 0; y<nA; y++){
+									// 		if (A[r+1][m[r+1]][y]==1){
+									// 			cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+									// 			cont1+=arestas[y]->getPeso1();
+									// 			cont2+=arestas[y]->getPeso2();
+									// 		}
+									// 	}
+									// 	cout<<"\t("<<cont1<<","<<cont2<<") C3\n"<<endl;
 									// }
 									m[r+1]-=1;
 									l = true;
@@ -394,7 +405,19 @@ int main(){
 									// 			cont2+=arestas[y]->getPeso2();
 									// 		}
 									// 	}
-									// 	cout<<"("<<cont1<<","<<cont2<<") C1"<<endl;
+									// 	cout<<"\t("<<cont1<<","<<cont2<<") C1\n"<<endl;
+									// }
+
+									// if (condicao3(X[r+1][k],X[r+1][m[r+1]],n,A[r+1][k], A[r+1][m[r+1]], nA)){
+									// 	int cont1=0, cont2=0;
+									// 	for (int y = 0; y<nA; y++){
+									// 		if (A[r+1][k][y]==1){
+									// 			cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+									// 			cont1+=arestas[y]->getPeso1();
+									// 			cont2+=arestas[y]->getPeso2();
+									// 		}
+									// 	}
+									// 	cout<<"\t("<<cont1<<","<<cont2<<") C3\n"<<endl;
 									// }
 									for (int mmm=k; mmm<m[r+1]; mmm++){
 										A[r+1][mmm] = A[r+1][mmm+1];

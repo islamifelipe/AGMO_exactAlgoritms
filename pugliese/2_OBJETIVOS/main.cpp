@@ -58,9 +58,26 @@ bool t1_domina_t2(int *t1, int *t2, map <int, Aresta *> arestas){ // fracamente
 */
 bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g){
 	// verificacao se Tqh1 é dominada por alguém
+	map <int, Aresta *> proTraceARESTAS = g->get_allArestas(); // remover
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
 		if (isEquivalente(Tqh1.first,Lq1[t].first, g->getQuantVertices()) && t1_domina_t2(arvore_parcial, Tqh1.second, g->get_allArestas())){
+			
+			/// PODA: print subarvore Tqh1.second (domianda)
+
+			int cont1=0, cont2=0;
+    		// cout<<"Subarvore "<<t<<endl;
+			for (int arrgr=0; arrgr<g->getQuantArestas(); arrgr++){
+				if (Tqh1.second[arrgr]==1){
+					// cout<<"\t"<<proTraceARESTAS[arrgr]->getOrigem()<<" "<<proTraceARESTAS[arrgr]->getDestino()<<" "<<proTraceARESTAS[arrgr]->getPeso1()<<" "<<proTraceARESTAS[arrgr]->getPeso2()<<endl;
+					cont1+=proTraceARESTAS[arrgr]->getPeso1();
+					cont2+=proTraceARESTAS[arrgr]->getPeso2();
+				}
+			}
+			cout<<"PODA: ("<<cont1<<","<<cont2<<") ** \n"<<endl;
+
+
+
 			return true; // é dominada
 		}
 	} 
@@ -69,7 +86,33 @@ bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g
 	for (int t = 0; t<Lq1.size(); t++){
 		int *arvore_parcial = Lq1[t].second; 
 		if ((isEquivalente(Tqh1.first,Lq1[t].first,  g->getQuantVertices()) && t1_domina_t2(Tqh1.second, arvore_parcial, g->get_allArestas())) || isEgal(Tqh1.second, arvore_parcial, g->getQuantArestas())){
-			
+			/// PODA: print subarvore Lq1[t] (domianda)
+			if (isEquivalente(Tqh1.first,Lq1[t].first,  g->getQuantVertices()) && t1_domina_t2(Tqh1.second, arvore_parcial, g->get_allArestas())){
+				int cont1=0, cont2=0;
+	    		// cout<<"Subarvore "<<t<<endl;
+				for (int arrgr=0; arrgr<g->getQuantArestas(); arrgr++){
+					if (arvore_parcial[arrgr]==1){
+						// cout<<"\t"<<proTraceARESTAS[arrgr]->getOrigem()<<" "<<proTraceARESTAS[arrgr]->getDestino()<<" "<<proTraceARESTAS[arrgr]->getPeso1()<<" "<<proTraceARESTAS[arrgr]->getPeso2()<<endl;
+						cont1+=proTraceARESTAS[arrgr]->getPeso1();
+						cont2+=proTraceARESTAS[arrgr]->getPeso2();
+					}
+				}
+				cout<<"PODA: ("<<cont1<<","<<cont2<<") *\n"<<endl;
+			} else {
+				int cont1=0, cont2=0;
+	    		// cout<<"Subarvore "<<t<<endl;
+				for (int arrgr=0; arrgr<g->getQuantArestas(); arrgr++){
+					if (arvore_parcial[arrgr]==1){
+						// cout<<"\t"<<proTraceARESTAS[arrgr]->getOrigem()<<" "<<proTraceARESTAS[arrgr]->getDestino()<<" "<<proTraceARESTAS[arrgr]->getPeso1()<<" "<<proTraceARESTAS[arrgr]->getPeso2()<<endl;
+						cont1+=proTraceARESTAS[arrgr]->getPeso1();
+						cont2+=proTraceARESTAS[arrgr]->getPeso2();
+					}
+				}
+				cout<<"REMOVE DUPLICATA: ("<<cont1<<","<<cont2<<") \n"<<endl;
+			}	
+
+
+
 			Lq1.erase(Lq1.begin()+t); 
 			t--;
 		}
@@ -86,6 +129,7 @@ bool isDominada(pair<int*, int*> Tqh1, vector< pair<int*, int*> > &Lq1, Grafo *g
  OBS.: os autores numeram os vértices de 1 à n; nós porém enumeramos de 0 à n-1
 */
 vector< pair<int*, int*> > algoritmoPD(Grafo *g){
+	map <int, Aresta *> proTraceARESTAS = g->get_allArestas(); // remover
 	int n = g->getQuantVertices();
 	map <int, vector< pair<int*, int*> > > L ;//= new map <int, vector< pair<int*, int*> > >[n-1]; // n níveis (1 até n) // nao confundir com a enumeracao dos vertices
 	int *X = new int[n];
@@ -99,8 +143,11 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 	L[1] = L1;
 
 	for (int q = 1; q<=n-1; q++) { // para cada nivel. Deve ser no maximo n-1, porque q+1 deve ser no máximo n 
+		cout<<"ITERACAO "<<q<<endl;
 		vector< pair<int*, int*> > Lq = L[q];
 		for (int h = 0; h<Lq.size(); h++){ // como Lq é um vector, começaremos do 0
+			cout<<"------------------------------- Descendentes da Subarvore "<<h<<" da ITERACAO "<<q-1<<endl;
+	     	
 			pair<int*, int*> Sq_h = Lq[h];
 			for (int i=0; i<n; i++){
 				if ((Sq_h.first)[i] == 1){
@@ -118,6 +165,17 @@ vector< pair<int*, int*> > algoritmoPD(Grafo *g){
 							Eqhij[ij->getId()] = 1;
 							pair<int*, int*> Sq1 = make_pair(Xq1, Eqhij);
 
+							// PRINT TRACE: Sq1
+							int cont1=0, cont2=0;
+				    		cout<<"Subarvore "<<L[q+1].size()<<endl;
+							for (int arrgr=0; arrgr<g->getQuantArestas(); arrgr++){
+								if (Eqhij[arrgr]==1){
+									cout<<"\t"<<proTraceARESTAS[arrgr]->getOrigem()<<" "<<proTraceARESTAS[arrgr]->getDestino()<<" "<<proTraceARESTAS[arrgr]->getPeso1()<<" "<<proTraceARESTAS[arrgr]->getPeso2()<<endl;
+									cont1+=proTraceARESTAS[arrgr]->getPeso1();
+									cont2+=proTraceARESTAS[arrgr]->getPeso2();
+								}
+							}
+							cout<<"\t("<<cont1<<","<<cont2<<") \n"<<endl;
 							// Teste de dominância 
 							if (isDominada(Sq1, L[q+1], g) == false){
 								L[q+1].push_back(Sq1);
@@ -138,6 +196,12 @@ int main(){
 	struct tms tempsInit, tempsFinal; // para medir o tempo
 	times(&tempsInit);  // pega o tempo do clock inical
 	
+	cout<<"ATENCAO: LEMBRE-SE QUE A PODA É EFETUADA APENAS ENTRE SUBARVORES (ESTADOS) **EQUIVALENTES** QUE SE DOMINAM "<<endl;
+
+	cout<<"LEGENDA: "<<endl;
+	cout<<"** uma árvore recém criada é podada (ela nao é nem mesmo incluida na lista)"<<endl;
+	cout<<"* uma árvore que fora criada anteriormente, que ja estava na lista, é excluida porque alguém acabou de entrar na lista e a dominou"<<endl;
+
 	int n;
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;

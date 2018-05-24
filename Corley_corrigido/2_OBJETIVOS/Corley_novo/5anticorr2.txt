@@ -1,0 +1,849 @@
+TRACE DO ALGORITMO COMEÇANDO DO VERTICE 0
+OBS.: ESTAO IMPLÍCITAS NO TRACE AS PODAS DENTRO DO MESMO SUBCONJUNTO DESCENDENTE DE UMA SUBARVORE 
+OBS.: AS PODAS DA ÚLTIMA ITERACAO ESTAO EXPLÍCITAS
+LEGENDA: 
+** uma árvore recém criada é podada (ela nao é nem mesmo incluida na lista)
+* uma árvore que fora criada anteriormente, que ja estava na lista, é excluida porque alguém acabou de entrar na lista e a dominou
+ITERACAO = 1
+------------------------------- Descendentes da Subarvore 1 da ITERACAO 0
+Subarvore 1
+	0 2 97 11
+	(97,11) 
+
+Subarvore 2
+	0 3 92 24
+	(92,24) 
+
+Subarvore 3
+	0 4 23 66
+	(23,66) 
+
+ITERACAO = 2
+------------------------------- Descendentes da Subarvore 1 da ITERACAO 1
+Subarvore 1
+	0 2 97 11
+	0 3 92 24
+	(189,35) 
+
+Subarvore 2
+	0 2 97 11
+	1 2 0 77
+	(97,88) 
+
+Subarvore 3
+	0 2 97 11
+	2 3 21 60
+	(118,71) 
+
+Subarvore 4
+	0 2 97 11
+	2 4 42 46
+	(139,57) 
+
+------------------------------- Descendentes da Subarvore 2 da ITERACAO 1
+Subarvore 5
+	0 2 97 11
+	0 3 92 24
+	(189,35) 
+
+REMOVE DUPLICATA: (189,35) 
+
+Subarvore 5
+	0 3 92 24
+	1 3 34 38
+	(126,62) 
+
+Subarvore 6
+	0 3 92 24
+	2 3 21 60
+	(113,84) 
+
+------------------------------- Descendentes da Subarvore 3 da ITERACAO 1
+Subarvore 7
+	0 2 97 11
+	0 4 23 66
+	(120,77) 
+
+Subarvore 8
+	0 3 92 24
+	0 4 23 66
+	(115,90) 
+
+Subarvore 9
+	0 4 23 66
+	1 4 17 43
+	(40,109) 
+
+ITERACAO = 3
+------------------------------- Descendentes da Subarvore 1 da ITERACAO 2
+Subarvore 1
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	(212,101) 
+
+Subarvore 2
+	0 2 97 11
+	0 3 92 24
+	1 2 0 77
+	(189,112) 
+
+Subarvore 3
+	0 2 97 11
+	0 3 92 24
+	1 3 34 38
+	(223,73) 
+
+------------------------------- Descendentes da Subarvore 2 da ITERACAO 2
+Subarvore 4
+	0 2 97 11
+	0 3 92 24
+	1 2 0 77
+	(189,112) 
+
+REMOVE DUPLICATA: (189,112) 
+
+Subarvore 4
+	0 2 97 11
+	1 2 0 77
+	1 3 34 38
+	(131,126) 
+
+Subarvore 5
+	0 2 97 11
+	1 2 0 77
+	1 4 17 43
+	(114,131) 
+
+------------------------------- Descendentes da Subarvore 3 da ITERACAO 2
+Subarvore 6
+	0 2 97 11
+	0 4 23 66
+	2 3 21 60
+	(141,137) 
+
+Subarvore 7
+	0 2 97 11
+	1 2 0 77
+	2 3 21 60
+	(118,148) 
+
+Subarvore 8
+	0 2 97 11
+	1 3 34 38
+	2 3 21 60
+	(152,109) 
+
+------------------------------- Descendentes da Subarvore 4 da ITERACAO 2
+Subarvore 9
+	0 2 97 11
+	0 3 92 24
+	2 4 42 46
+	(231,81) 
+
+Subarvore 10
+	0 2 97 11
+	1 2 0 77
+	2 4 42 46
+	(139,134) 
+
+Subarvore 11
+	0 2 97 11
+	1 4 17 43
+	2 4 42 46
+	(156,100) 
+
+------------------------------- Descendentes da Subarvore 5 da ITERACAO 2
+Subarvore 12
+	0 2 97 11
+	0 3 92 24
+	1 3 34 38
+	(223,73) 
+
+REMOVE DUPLICATA: (223,73) 
+
+Subarvore 12
+	0 3 92 24
+	1 2 0 77
+	1 3 34 38
+	(126,139) 
+
+Subarvore 13
+	0 3 92 24
+	1 3 34 38
+	1 4 17 43
+	(143,105) 
+
+------------------------------- Descendentes da Subarvore 6 da ITERACAO 2
+Subarvore 14
+	0 3 92 24
+	0 4 23 66
+	2 3 21 60
+	(136,150) 
+
+Subarvore 15
+	0 3 92 24
+	1 2 0 77
+	2 3 21 60
+	(113,161) 
+
+Subarvore 16
+	0 3 92 24
+	1 3 34 38
+	2 3 21 60
+	(147,122) 
+
+------------------------------- Descendentes da Subarvore 7 da ITERACAO 2
+Subarvore 17
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	(212,101) 
+
+REMOVE DUPLICATA: (212,101) 
+
+Subarvore 17
+	0 2 97 11
+	0 4 23 66
+	1 2 0 77
+	(120,154) 
+
+Subarvore 18
+	0 2 97 11
+	0 4 23 66
+	1 4 17 43
+	(137,120) 
+
+------------------------------- Descendentes da Subarvore 8 da ITERACAO 2
+Subarvore 19
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	(212,101) 
+
+REMOVE DUPLICATA: (212,101) 
+
+Subarvore 19
+	0 3 92 24
+	0 4 23 66
+	1 3 34 38
+	(149,128) 
+
+Subarvore 20
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	(132,133) 
+
+------------------------------- Descendentes da Subarvore 9 da ITERACAO 2
+Subarvore 21
+	0 2 97 11
+	0 4 23 66
+	1 4 17 43
+	(137,120) 
+
+REMOVE DUPLICATA: (137,120) 
+
+Subarvore 21
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	(132,133) 
+
+REMOVE DUPLICATA: (132,133) 
+
+Subarvore 21
+	0 4 23 66
+	1 2 0 77
+	1 4 17 43
+	(40,186) 
+
+Subarvore 22
+	0 4 23 66
+	1 3 34 38
+	1 4 17 43
+	(74,147) 
+
+ITERACAO = 4
+------------------------------- Descendentes da Subarvore 1 da ITERACAO 3
+Subarvore 1
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 2 0 77
+	(212,178) 
+
+Subarvore 2
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 3 34 38
+	(246,139) 
+
+Subarvore 3
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	(229,144) 
+
+------------------------------- Descendentes da Subarvore 2 da ITERACAO 3
+Subarvore 4
+	0 2 97 11
+	0 3 92 24
+	1 2 0 77
+	1 4 17 43
+	(206,155) 
+
+	PODA: (212,178) * 
+
+------------------------------- Descendentes da Subarvore 3 da ITERACAO 3
+Subarvore 4
+	0 2 97 11
+	0 3 92 24
+	1 3 34 38
+	1 4 17 43
+	(240,116) 
+
+	PODA: (246,139) * 
+
+------------------------------- Descendentes da Subarvore 4 da ITERACAO 3
+Subarvore 4
+	0 2 97 11
+	1 2 0 77
+	1 3 34 38
+	1 4 17 43
+	(148,169) 
+
+------------------------------- Descendentes da Subarvore 5 da ITERACAO 3
+Subarvore 5
+	0 2 97 11
+	0 3 92 24
+	1 2 0 77
+	1 4 17 43
+	(206,155) 
+
+REMOVE DUPLICATA: (206,155) 
+
+Subarvore 5
+	0 2 97 11
+	1 2 0 77
+	1 3 34 38
+	1 4 17 43
+	(148,169) 
+
+REMOVE DUPLICATA: (148,169) 
+
+Subarvore 5
+	0 2 97 11
+	1 2 0 77
+	1 4 17 43
+	2 3 21 60
+	(135,191) 
+
+------------------------------- Descendentes da Subarvore 6 da ITERACAO 3
+Subarvore 6
+	0 2 97 11
+	0 4 23 66
+	1 2 0 77
+	2 3 21 60
+	(141,214) 
+
+	PODA:(141,214) ** 
+
+Subarvore 6
+	0 2 97 11
+	0 4 23 66
+	1 3 34 38
+	2 3 21 60
+	(175,175) 
+
+	PODA:(175,175) ** 
+
+Subarvore 6
+	0 2 97 11
+	0 4 23 66
+	1 4 17 43
+	2 3 21 60
+	(158,180) 
+
+	PODA:(158,180) ** 
+
+------------------------------- Descendentes da Subarvore 7 da ITERACAO 3
+Subarvore 6
+	0 2 97 11
+	1 2 0 77
+	1 4 17 43
+	2 3 21 60
+	(135,191) 
+
+REMOVE DUPLICATA: (135,191) 
+
+------------------------------- Descendentes da Subarvore 8 da ITERACAO 3
+Subarvore 6
+	0 2 97 11
+	1 3 34 38
+	1 4 17 43
+	2 3 21 60
+	(169,152) 
+
+	PODA: (206,155) * 
+
+------------------------------- Descendentes da Subarvore 9 da ITERACAO 3
+Subarvore 6
+	0 2 97 11
+	0 3 92 24
+	1 2 0 77
+	2 4 42 46
+	(231,158) 
+
+	PODA:(231,158) ** 
+
+Subarvore 6
+	0 2 97 11
+	0 3 92 24
+	1 3 34 38
+	2 4 42 46
+	(265,119) 
+
+	PODA:(265,119) ** 
+
+Subarvore 6
+	0 2 97 11
+	0 3 92 24
+	1 4 17 43
+	2 4 42 46
+	(248,124) 
+
+	PODA:(248,124) ** 
+
+------------------------------- Descendentes da Subarvore 10 da ITERACAO 3
+Subarvore 6
+	0 2 97 11
+	0 3 92 24
+	1 2 0 77
+	2 4 42 46
+	(231,158) 
+
+	PODA:(231,158) ** 
+
+Subarvore 6
+	0 2 97 11
+	1 2 0 77
+	1 3 34 38
+	2 4 42 46
+	(173,172) 
+
+	PODA:(173,172) ** 
+
+Subarvore 6
+	0 2 97 11
+	1 2 0 77
+	2 3 21 60
+	2 4 42 46
+	(160,194) 
+
+	PODA:(160,194) ** 
+
+------------------------------- Descendentes da Subarvore 11 da ITERACAO 3
+Subarvore 6
+	0 2 97 11
+	0 3 92 24
+	1 4 17 43
+	2 4 42 46
+	(248,124) 
+
+	PODA:(248,124) ** 
+
+Subarvore 6
+	0 2 97 11
+	1 3 34 38
+	1 4 17 43
+	2 4 42 46
+	(190,138) 
+
+	PODA: (229,144) * 
+
+Subarvore 6
+	0 2 97 11
+	1 4 17 43
+	2 3 21 60
+	2 4 42 46
+	(177,160) 
+
+	PODA:(177,160) ** 
+
+------------------------------- Descendentes da Subarvore 12 da ITERACAO 3
+Subarvore 6
+	0 3 92 24
+	1 2 0 77
+	1 3 34 38
+	1 4 17 43
+	(143,182) 
+
+------------------------------- Descendentes da Subarvore 13 da ITERACAO 3
+Subarvore 7
+	0 2 97 11
+	0 3 92 24
+	1 3 34 38
+	1 4 17 43
+	(240,116) 
+
+REMOVE DUPLICATA: (240,116) 
+
+Subarvore 7
+	0 3 92 24
+	1 2 0 77
+	1 3 34 38
+	1 4 17 43
+	(143,182) 
+
+REMOVE DUPLICATA: (143,182) 
+
+Subarvore 7
+	0 3 92 24
+	1 3 34 38
+	1 4 17 43
+	2 3 21 60
+	(164,165) 
+
+Subarvore 8
+	0 3 92 24
+	1 3 34 38
+	1 4 17 43
+	2 4 42 46
+	(185,151) 
+
+------------------------------- Descendentes da Subarvore 14 da ITERACAO 3
+Subarvore 9
+	0 3 92 24
+	0 4 23 66
+	1 2 0 77
+	2 3 21 60
+	(136,227) 
+
+	PODA:(136,227) ** 
+
+Subarvore 9
+	0 3 92 24
+	0 4 23 66
+	1 3 34 38
+	2 3 21 60
+	(170,188) 
+
+	PODA:(170,188) ** 
+
+Subarvore 9
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	2 3 21 60
+	(153,193) 
+
+	PODA:(153,193) ** 
+
+------------------------------- Descendentes da Subarvore 15 da ITERACAO 3
+Subarvore 9
+	0 3 92 24
+	1 2 0 77
+	1 4 17 43
+	2 3 21 60
+	(130,204) 
+
+------------------------------- Descendentes da Subarvore 16 da ITERACAO 3
+Subarvore 10
+	0 3 92 24
+	1 3 34 38
+	1 4 17 43
+	2 3 21 60
+	(164,165) 
+
+REMOVE DUPLICATA: (164,165) 
+
+------------------------------- Descendentes da Subarvore 17 da ITERACAO 3
+Subarvore 10
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 2 0 77
+	(212,178) 
+
+	PODA:(212,178) ** 
+
+Subarvore 10
+	0 2 97 11
+	0 4 23 66
+	1 2 0 77
+	1 3 34 38
+	(154,192) 
+
+	PODA:(154,192) ** 
+
+Subarvore 10
+	0 2 97 11
+	0 4 23 66
+	1 2 0 77
+	2 3 21 60
+	(141,214) 
+
+	PODA:(141,214) ** 
+
+------------------------------- Descendentes da Subarvore 18 da ITERACAO 3
+Subarvore 10
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	(229,144) 
+
+	PODA:(229,144) ** 
+
+Subarvore 10
+	0 2 97 11
+	0 4 23 66
+	1 3 34 38
+	1 4 17 43
+	(171,158) 
+
+	PODA:(171,158) ** 
+
+Subarvore 10
+	0 2 97 11
+	0 4 23 66
+	1 4 17 43
+	2 3 21 60
+	(158,180) 
+
+	PODA:(158,180) ** 
+
+------------------------------- Descendentes da Subarvore 19 da ITERACAO 3
+Subarvore 10
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 3 34 38
+	(246,139) 
+
+	PODA:(246,139) ** 
+
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 2 0 77
+	1 3 34 38
+	(149,205) 
+
+	PODA:(149,205) ** 
+
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 3 34 38
+	2 3 21 60
+	(170,188) 
+
+	PODA:(170,188) ** 
+
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 3 34 38
+	2 4 42 46
+	(191,174) 
+
+	PODA:(191,174) ** 
+
+------------------------------- Descendentes da Subarvore 20 da ITERACAO 3
+Subarvore 10
+	0 2 97 11
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	(229,144) 
+
+	PODA:(229,144) ** 
+
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 2 0 77
+	1 4 17 43
+	(132,210) 
+
+	PODA:(132,210) ** 
+
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	2 3 21 60
+	(153,193) 
+
+	PODA:(153,193) ** 
+
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 4 17 43
+	2 4 42 46
+	(174,179) 
+
+	PODA:(174,179) ** 
+
+------------------------------- Descendentes da Subarvore 21 da ITERACAO 3
+Subarvore 10
+	0 3 92 24
+	0 4 23 66
+	1 2 0 77
+	1 4 17 43
+	(132,210) 
+
+	PODA:(132,210) ** 
+
+Subarvore 10
+	0 4 23 66
+	1 2 0 77
+	1 3 34 38
+	1 4 17 43
+	(74,224) 
+
+Subarvore 11
+	0 4 23 66
+	1 2 0 77
+	1 4 17 43
+	2 3 21 60
+	(61,246) 
+
+------------------------------- Descendentes da Subarvore 22 da ITERACAO 3
+Subarvore 12
+	0 2 97 11
+	0 4 23 66
+	1 3 34 38
+	1 4 17 43
+	(171,158) 
+
+	PODA:(171,158) ** 
+
+Subarvore 12
+	0 4 23 66
+	1 2 0 77
+	1 3 34 38
+	1 4 17 43
+	(74,224) 
+
+REMOVE DUPLICATA: (74,224) 
+
+Subarvore 12
+	0 4 23 66
+	1 3 34 38
+	1 4 17 43
+	2 3 21 60
+	(95,207) 
+
+Subarvore 13
+	0 4 23 66
+	1 3 34 38
+	1 4 17 43
+	2 4 42 46
+	(116,193) 
+
+	PODA: (130,204) * 
+
+RESULTADO FINAL
+
+Arvore 1
+0 2 97 11
+0 3 92 24
+1 3 34 38
+1 4 17 43
+(240, 116)
+
+
+Arvore 2
+0 2 97 11
+1 2 0 77
+1 3 34 38
+1 4 17 43
+(148, 169)
+
+
+Arvore 3
+0 2 97 11
+1 2 0 77
+1 4 17 43
+2 3 21 60
+(135, 191)
+
+
+Arvore 4
+0 2 97 11
+1 3 34 38
+1 4 17 43
+2 3 21 60
+(169, 152)
+
+
+Arvore 5
+0 2 97 11
+1 3 34 38
+1 4 17 43
+2 4 42 46
+(190, 138)
+
+
+Arvore 6
+0 3 92 24
+1 2 0 77
+1 3 34 38
+1 4 17 43
+(143, 182)
+
+
+Arvore 7
+0 3 92 24
+1 3 34 38
+1 4 17 43
+2 3 21 60
+(164, 165)
+
+
+Arvore 8
+0 3 92 24
+1 3 34 38
+1 4 17 43
+2 4 42 46
+(185, 151)
+
+
+Arvore 9
+0 4 23 66
+1 2 0 77
+1 3 34 38
+1 4 17 43
+(74, 224)
+
+
+Arvore 10
+0 4 23 66
+1 2 0 77
+1 4 17 43
+2 3 21 60
+(61, 246)
+
+
+Arvore 11
+0 4 23 66
+1 3 34 38
+1 4 17 43
+2 3 21 60
+(95, 207)
+
+
+Arvore 12
+0 4 23 66
+1 3 34 38
+1 4 17 43
+2 4 42 46
+(116, 193)
+
+
