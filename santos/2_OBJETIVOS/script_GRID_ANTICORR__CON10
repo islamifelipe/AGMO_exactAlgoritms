@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --time=15-0:0   # Especifica o tempo máximo de execução do job, dado no padrão dias-horas:minutos
+for i in  6 12 18 20 24 27 30 33 36 38 40 42 44 48 50 52 55 58 60 63 66 68 70 75 77 80 82 86 90 93 96 100
+do
+	./santos < ../../GrafosGrid/Conjunto10/2_OBJETIVOS/anticorrelated/"$i".gridanticorr1.in > Testes/GrafosGrid/Conjunto10/anticorrelated/"$i".gridanticorr1.out
+	./santos < ../../GrafosGrid/Conjunto10/2_OBJETIVOS/anticorrelated/"$i".gridanticorr2.in > Testes/GrafosGrid/Conjunto10/anticorrelated/"$i".gridanticorr2.out
+	./santos < ../../GrafosGrid/Conjunto10/2_OBJETIVOS/anticorrelated/"$i".gridanticorr3.in > Testes/GrafosGrid/Conjunto10/anticorrelated/"$i".gridanticorr3.out
+done
+
+
+
