@@ -44,6 +44,8 @@ list<Path* > U; //o  U do algoritmo 3 do artigo
 
 map <int, Aresta *> allArestas;
 
+bool *Xaux = new bool[n]; // um X auxiliar
+
 bool equalSets(bool *X1, bool *X2){ // retorna true se os conjuntos X1 e X2 forem iguais
 	for (int i=0; i<n; i++){ // X1 in X2
 		if (X1[i]!=X2[i]) return false;
@@ -167,9 +169,10 @@ void removeFromU(Path *p){
 	list<Path* >::iterator it = U.begin() ;
 	list<list<Path* >::iterator> remover;
 	while (it!=U.end()){
-		if ((*it)->peso1==p->peso1 && (*it)->peso2==p->peso2){
-			remover.push_back(it);
-		}
+		if ((*it) == p) remover.push_back(it);
+		// if ((*it)->peso1==p->peso1 && (*it)->peso2==p->peso2){
+		// 	remover.push_back(it);
+		// }
 		it++;
 	}
 	list<list<Path* >::iterator>::iterator re = remover.begin();
@@ -271,18 +274,56 @@ void searchNewNDminimalPaths(Path *p, int i, int j, bool *Y){
 	}	
 }
 
+
+void printResultado(){
+	for (int i=0; i<n; i++) Xaux[i] = true;
+	Stipo *SN = getSX(Xaux);
+	int cont=1;
+	cout<<"Quantidade de solucoes: "<<(SN->listaCaminhos).size()<<endl;
+	cout<<"Resultado Final"<<endl;
+	for (list<Path* >::iterator iptl=(SN->listaCaminhos).begin(); iptl!=(SN->listaCaminhos).end(); iptl++){
+		list<Aresta *>::iterator iiiittt = (*iptl)->sequenciaDeArestas.begin();
+		cout<<"Arvore "<<cont++<<endl;
+		while (iiiittt!= (*iptl)->sequenciaDeArestas.end()){
+			cout<<(*iiiittt)->getOrigem()<<" "<<(*iiiittt)->getDestino()<<" "<<(*iiiittt)->getPeso1()<<" "<<(*iiiittt)->getPeso2()<<endl;
+			iiiittt++;	
+		}
+		cout<<"("<<(*iptl)->peso1<<","<<(*iptl)->peso2<<")"<<endl;
+		cout<<endl;
+	}	
+}
+
+void *tempo(void *nnnn){
+        while (true){
+	        times(&tempsFinal);   /* current time */ // clock final
+	        clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
+	        float sec = (float) user_time / (float) sysconf(_SC_CLK_TCK);
+
+                   
+           if (sec>=10800){// se o tempo limite for atingido, esse if é ativado, o resultado (na ultima iteraçao, se for o caso) é escrito e o programa para 
+            // if(sec>30){
+
+                cout<<"RESULTADO AO FIM DE 3H"<<endl;
+                cout<<"TEMPO LIMITE ATINGIDO..."<<endl;
+
+                exit(EXIT_FAILURE); // TALVEZ ELE DÊ UMA FALHA DE SEGMENTACAO AQUI; MAS ISSO NAO AFETA O POSSIVEL RESULTADO ANTES DAS 3H
+            }
+        }
+}
+
+
 int main(){
 	
 	times(&tempsInit);  // pega o tempo do clock inical
 
-	// // para medir o tempo em caso limite
-	// pthread_t thread_time; 
-	// pthread_attr_t attr;
-	// int nnnnnnnn=0;
-	// if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
- //        printf("Error to create the thread");
- //        exit(-1);
- //    }
+	// para medir o tempo em caso limite
+	pthread_t thread_time; 
+	pthread_attr_t attr;
+	int nnnnnnnn=0;
+	if(pthread_create(&thread_time, NULL, &tempo, (void*)nnnnnnnn)){ // on criee efectivement la thread de rechaufage
+        printf("Error to create the thread");
+        exit(EXIT_FAILURE);
+    }
     
 	float peso1, peso2;
 	int origem, destino; // vértices para cada aresta;
@@ -322,7 +363,7 @@ int main(){
 	// U funciona como uma FILA: primeiro sai quem primeiro entrou. Os elementos sao inseridos no fim da fila
 	
 
-	bool *Xaux = new bool[n]; // um X auxiliar
+	Xaux = new bool[n]; // um X auxiliar
 
 	// Aresta *a01 = getAresta(0,2);
 	// Aresta *a12 = getAresta(2,1);
@@ -340,18 +381,20 @@ int main(){
 	// for (int i=0; i<seq.size(); i++) cout<<"seq["<<i<<"] = "<<seq[i]<<endl;
 	// 	pair<int, int> eij = p->ultimaAresta.back();;
 	// 	cout<<eij.first<<" "<<eij.second<<endl;
-
-
+	
 	while (it!=U.end()){
 		p = *it;
 		for (int i=0; i<n; i++) Xaux[i] = false;
 		std::vector<int> seq = getSequence(p);
 		for (int i=0; i<seq.size(); i++) {
-			cout<<seq[i]<<" ";
+			// cout<<seq[i]<<" ";
 			Xaux[seq[i]] = true;
 		}
+		// cout<<endl;
+			
 		pair<int, int> eij = p->ultimaAresta.back();//= getEp(	seq ); //[i,j]
-		cout<<"["<< eij.first<<" "<<eij.second<<"]"<<endl;
+	
+		// cout<<"["<< eij.first<<" "<<eij.second<<"]"<<endl;
 		int l; // o index de eij.first em seq
 		for (int i=0; i<seq.size(); i++){
 			if(seq[i]==eij.first){
@@ -368,27 +411,18 @@ int main(){
 	}
 
 
-	for (int i=0; i<n; i++) Xaux[i] = true;
-	Stipo *SN = getSX(Xaux);
-	int cont=1;
-	cout<<"Tamanho = "<<(SN->listaCaminhos).size()<<endl;
-	for (list<Path* >::iterator iptl=(SN->listaCaminhos).begin(); iptl!=(SN->listaCaminhos).end(); iptl++){
-		list<Aresta *>::iterator iiiittt = (*iptl)->sequenciaDeArestas.begin();
-		cout<<"Arvore "<<cont++<<endl;
-		while (iiiittt!= (*iptl)->sequenciaDeArestas.end()){
-			cout<<(*iiiittt)->getOrigem()<<" "<<(*iiiittt)->getDestino()<<" "<<(*iiiittt)->getPeso1()<<" "<<(*iiiittt)->getPeso2()<<endl;
-			iiiittt++;	
-		}
-		cout<<"("<<(*iptl)->peso1<<","<<(*iptl)->peso2<<")"<<endl;
-		cout<<endl;
-	}	
-
-
-    times(&tempsFinal);   /* current time */ // clock final
+	times(&tempsFinal);   /* current time */ // clock final
 	clock_t user_time = (tempsFinal.tms_utime - tempsInit.tms_utime);
-	cout<<user_time<<endl;
-	cout<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
-	// printResultado();
+	// cout<<user_time<<endl;
+	cout<<"Tempo total: "<<(float) user_time / (float) sysconf(_SC_CLK_TCK)<<endl;//"Tempo do usuario por segundo : "
+	
+
+	
+
+
+    printResultado();
+
+
 
 	return 0;
 }

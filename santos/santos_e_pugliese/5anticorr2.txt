@@ -1,0 +1,477 @@
+TRACE DO SANTOS E PUGLIESE. ESTE TRACE FOCHA *** NOS CAMINHOS *** E É ANÁLOGO ÀQUELE DO ARTIGO (Fig. 3 e 4)
+O TERMO CAMINHO SE REFERE AO CAMINHO DEFINIDO NO ARTIGO (VARIAVEL p DO ALGORITMO 3)
+Por exemplo, "Caminho:  0 3 2", onde "0 3 2" é a sequência de vérties 
+Abaixo do caminho, está a árvore associada
+Caminho : 0 
+Subarvore 0
+(0,0)
+
+Caminho : 0 1 
+Subarvore 1
+0 1 45 69
+(45,69)
+
+Caminho : 0 2 
+Subarvore 2
+0 2 97 11
+(97,11)
+
+Caminho : 0 3 
+Subarvore 3
+0 3 92 24
+(92,24)
+
+Caminho : 0 4 
+Subarvore 4
+0 4 23 66
+(23,66)
+
+Caminho : 0 1 2 
+Subarvore 5
+0 1 45 69
+0 2 97 11
+(142,80)
+
+Caminho : 0 1 2 
+Subarvore 6
+0 1 45 69
+1 2 0 77
+(45,146)
+
+Caminho : 0 1 3 
+Subarvore 7
+0 1 45 69
+1 3 34 38
+(79,107)
+
+Caminho : 0 2 3 
+Subarvore 8
+0 2 97 11
+0 3 92 24
+(189,35)
+
+Caminho : 0 2 4 
+Subarvore 9
+0 2 97 11
+0 4 23 66
+(120,77)
+
+Caminho : 0 2 1 
+Subarvore 10
+0 2 97 11
+1 2 0 77
+(97,88)
+
+Caminho : 0 2 3 
+Subarvore 11
+0 2 97 11
+2 3 21 60
+(118,71)
+
+Caminho : 0 2 4 
+Subarvore 12
+0 2 97 11
+2 4 42 46
+(139,57)
+
+Caminho : 0 3 4 
+Subarvore 13
+0 3 92 24
+0 4 23 66
+(115,90)
+
+Caminho : 0 3 1 
+Subarvore 14
+0 3 92 24
+1 3 34 38
+(126,62)
+
+Caminho : 0 3 2 
+Subarvore 15
+0 3 92 24
+2 3 21 60
+(113,84)
+
+Caminho : 0 3 4 
+Subarvore 16
+0 3 92 24
+3 4 46 64
+(138,88)
+
+Caminho : 0 4 1 
+Subarvore 17
+0 4 23 66
+1 4 17 43
+(40,109)
+
+Caminho : 0 4 2 
+Subarvore 18
+0 4 23 66
+2 4 42 46
+(65,112)
+
+Caminho : 0 4 3 
+Subarvore 19
+0 4 23 66
+3 4 46 64
+(69,130)
+
+Caminho : 0 1 2 3 
+Subarvore 20
+0 1 45 69
+1 2 0 77
+1 3 34 38
+(79,184)
+
+Caminho : 0 1 2 3 
+Subarvore 21
+0 1 45 69
+1 2 0 77
+2 3 21 60
+(66,206)
+
+Caminho : 0 1 3 2 
+Subarvore 22
+0 1 45 69
+1 3 34 38
+2 3 21 60
+(100,167)
+
+Caminho : 0 2 3 4 
+Subarvore 23
+0 2 97 11
+0 3 92 24
+0 4 23 66
+(212,101)
+
+Caminho : 0 2 3 4 
+Subarvore 24
+0 2 97 11
+0 3 92 24
+2 4 42 46
+(231,81)
+
+Caminho : 0 2 3 1 
+Subarvore 25
+0 2 97 11
+0 3 92 24
+1 3 34 38
+(223,73)
+
+Caminho : 0 2 4 3 
+Subarvore 26
+0 2 97 11
+0 4 23 66
+2 3 21 60
+(141,137)
+
+Caminho : 0 2 4 1 
+Subarvore 27
+0 2 97 11
+0 4 23 66
+1 4 17 43
+(137,120)
+
+Caminho : 0 2 1 3 
+Subarvore 28
+0 2 97 11
+1 2 0 77
+2 3 21 60
+(118,148)
+
+Caminho : 0 2 1 3 
+Subarvore 29
+0 2 97 11
+1 2 0 77
+1 3 34 38
+(131,126)
+
+Caminho : 0 2 1 4 
+Subarvore 30
+0 2 97 11
+1 2 0 77
+1 4 17 43
+(114,131)
+
+Caminho : 0 2 3 4 
+Subarvore 31
+0 2 97 11
+2 3 21 60
+2 4 42 46
+(160,117)
+
+Caminho : 0 2 3 1 
+Subarvore 32
+0 2 97 11
+2 3 21 60
+1 3 34 38
+(152,109)
+
+Caminho : 0 2 4 1 
+Subarvore 33
+0 2 97 11
+2 4 42 46
+1 4 17 43
+(156,100)
+
+Caminho : 0 3 4 2 
+Subarvore 34
+0 3 92 24
+0 4 23 66
+2 3 21 60
+(136,150)
+
+Caminho : 0 3 4 1 
+Subarvore 35
+0 3 92 24
+0 4 23 66
+1 4 17 43
+(132,133)
+
+Caminho : 0 3 1 2 
+Subarvore 36
+0 3 92 24
+1 3 34 38
+2 3 21 60
+(147,122)
+
+Caminho : 0 3 1 2 
+Subarvore 37
+0 3 92 24
+1 3 34 38
+1 2 0 77
+(126,139)
+
+Caminho : 0 3 1 4 
+Subarvore 38
+0 3 92 24
+1 3 34 38
+1 4 17 43
+(143,105)
+
+Caminho : 0 3 2 1 
+Subarvore 39
+0 3 92 24
+2 3 21 60
+1 2 0 77
+(113,161)
+
+Caminho : 0 3 2 4 
+Subarvore 40
+0 3 92 24
+2 3 21 60
+2 4 42 46
+(155,130)
+
+Caminho : 0 4 1 2 
+Subarvore 41
+0 4 23 66
+1 4 17 43
+2 4 42 46
+(82,155)
+
+Caminho : 0 4 1 2 
+Subarvore 42
+0 4 23 66
+1 4 17 43
+1 2 0 77
+(40,186)
+
+Caminho : 0 4 1 3 
+Subarvore 43
+0 4 23 66
+1 4 17 43
+1 3 34 38
+(74,147)
+
+Caminho : 0 4 2 3 
+Subarvore 44
+0 4 23 66
+2 4 42 46
+2 3 21 60
+(86,172)
+
+Caminho : 0 2 3 1 4 
+Subarvore 45
+0 2 97 11
+0 3 92 24
+1 3 34 38
+1 4 17 43
+(240,116)
+
+Caminho : 0 2 1 3 4 
+Subarvore 46
+0 2 97 11
+1 2 0 77
+2 3 21 60
+1 4 17 43
+(135,191)
+
+Caminho : 0 2 1 3 4 
+Subarvore 47
+0 2 97 11
+1 2 0 77
+1 3 34 38
+1 4 17 43
+(148,169)
+
+Caminho : 0 2 3 1 4 
+Subarvore 48
+0 2 97 11
+2 3 21 60
+1 3 34 38
+1 4 17 43
+(169,152)
+
+Caminho : 0 2 4 1 3 
+Subarvore 49
+0 2 97 11
+2 4 42 46
+1 4 17 43
+1 3 34 38
+(190,138)
+
+Caminho : 0 3 1 2 4 
+Subarvore 50
+0 3 92 24
+1 3 34 38
+2 3 21 60
+1 4 17 43
+(164,165)
+
+Caminho : 0 3 1 2 4 
+Subarvore 51
+0 3 92 24
+1 3 34 38
+1 2 0 77
+1 4 17 43
+(143,182)
+
+Caminho : 0 3 1 4 2 
+Subarvore 52
+0 3 92 24
+1 3 34 38
+1 4 17 43
+2 4 42 46
+(185,151)
+
+Caminho : 0 4 1 2 3 
+Subarvore 53
+0 4 23 66
+1 4 17 43
+2 4 42 46
+1 3 34 38
+(116,193)
+
+Caminho : 0 4 1 2 3 
+Subarvore 54
+0 4 23 66
+1 4 17 43
+1 2 0 77
+1 3 34 38
+(74,224)
+
+Caminho : 0 4 1 2 3 
+Subarvore 55
+0 4 23 66
+1 4 17 43
+1 2 0 77
+2 3 21 60
+(61,246)
+
+Caminho : 0 4 1 3 2 
+Subarvore 56
+0 4 23 66
+1 4 17 43
+1 3 34 38
+2 3 21 60
+(95,207)
+
+Resultado Final
+Quantidade de solucoes: 12
+Arvore 1
+0 2 97 11
+0 3 92 24
+1 3 34 38
+1 4 17 43
+(240,116)
+
+Arvore 2
+0 2 97 11
+1 2 0 77
+2 3 21 60
+1 4 17 43
+(135,191)
+
+Arvore 3
+0 2 97 11
+1 2 0 77
+1 3 34 38
+1 4 17 43
+(148,169)
+
+Arvore 4
+0 2 97 11
+2 3 21 60
+1 3 34 38
+1 4 17 43
+(169,152)
+
+Arvore 5
+0 2 97 11
+2 4 42 46
+1 4 17 43
+1 3 34 38
+(190,138)
+
+Arvore 6
+0 3 92 24
+1 3 34 38
+2 3 21 60
+1 4 17 43
+(164,165)
+
+Arvore 7
+0 3 92 24
+1 3 34 38
+1 2 0 77
+1 4 17 43
+(143,182)
+
+Arvore 8
+0 3 92 24
+1 3 34 38
+1 4 17 43
+2 4 42 46
+(185,151)
+
+Arvore 9
+0 4 23 66
+1 4 17 43
+2 4 42 46
+1 3 34 38
+(116,193)
+
+Arvore 10
+0 4 23 66
+1 4 17 43
+1 2 0 77
+1 3 34 38
+(74,224)
+
+Arvore 11
+0 4 23 66
+1 4 17 43
+1 2 0 77
+2 3 21 60
+(61,246)
+
+Arvore 12
+0 4 23 66
+1 4 17 43
+1 3 34 38
+2 3 21 60
+(95,207)
+
+0
+0
