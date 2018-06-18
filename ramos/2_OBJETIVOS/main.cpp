@@ -52,7 +52,7 @@ bool t1_domina_t2(float xl, float yl,float xll, float yll){
 int idMST = 0;
 
 
-#define MAX2 100
+#define MAX2 10000
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
 
 void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &List, map<int, pair< pair<int*, pair<float, float> >, list<Grafo>::iterator > > &MSTs,list <Grafo > &vetorParticoes, int direto){
@@ -62,7 +62,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 	Grafo P1 = P;//, P2 = P;
 	//cout<<List.getSize()<<endl;
 	bool res = false;
-	float custo;
+	long double custo;
 	int *A2;
 	int m = P.getQuantArestas();
 	int n =P.getQuantVertices();
@@ -98,6 +98,7 @@ void Partition(Grafo P, float xl, float yl, float xll, float yll,int* Pa, Heap &
 
 void AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, vector< pair<int*, pair<float, float> > > &resul, int direto){ 
 		// vector< pair<int*, pair<float, float> > > resul;
+	
 		Heap List(MAX2); // LEMBRAR: AQUI NÓS ESTAMOS MANIPULANDO CUSTOS DE ÁRVORES. NÃO SE PODE SABER AO CERTO QUANTAS ÁROVRES SERÃO GERADAS. AMARRA-SE UM VALOR
 		list<Grafo> vetorParticoes; //Parece dispensável, mas não é. Usa-se para guardar as partições por Id, e poder fornecer à função Partition. Note que List guarda somente os id e as chaves(custos das árvores)
 		map<int, pair<pair<int*, pair<float, float> >, list<Grafo>::iterator > > MSTs; // usada para lista de árvores
@@ -105,11 +106,13 @@ void AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, vector< p
 		int *A = new int[g->getQuantArestas()]; //new int[g->getQuantVertices()-1]; // usada para a primeira árvore 
 		//for(int mmm = 0; mmm<g->getQuantArestas(); mmm++) A[mmm] = 0;
 		// mergesort(xp,yp, xq,yq, arestasPtr, g->getQuantArestas(),3);
-		float x, y, custo;
+		float x, y;
+		long double custo;
+		// cout<<xl<<" "<<yl<< " "<<xll<<" "<<yll<<endl;
 		bool res = kruskal(g, A, xl, yl, xll, yll,custo,x,y, direto);//kruskal(&P1,A2, x, y);
-		float primeiro = custo;
+		long double primeiro = custo;
 		float xprimeiro = x, yprimeiro = y;
-		// cout<<"custo = "<<primeiro<<endl;
+		// cout<<"custo = "<<primeiro<<" res = "<<res<<endl;
 		if (res){
 			vetorParticoes.push_back(*g);
 			list<Grafo>::iterator itt = vetorParticoes.end();
@@ -123,21 +126,23 @@ void AllSpaningTree(Grafo *g,float xl, float yl, float xll, float yll, vector< p
 				
 			pair<int*, pair<float, float> > it = par.first;//MSTs[id];
 			Grafo Ps = *par.second;
-			float coosottt = it.second.first*(yl-yll) + it.second.second*(xll-xl);
-			
+			long double prlfp__1 = (long double) it.second.first*(yl-yll); // TEM QUE SER ASSIM, porque o valor de "coosottt" pode ser muito alto, dependendo dos pesos das arestas
+			long double prlfp__2 = (long double) it.second.second*(xll-xl);
+			long double coosottt = (long double) prlfp__1 + prlfp__2;
 			//if (coosottt != primeiro || xprimeiro != it.second.first || yprimeiro != it.second.second) break; // TOMA SOMENTE OS PRIMEIROS IGUAIS
 			if (coosottt != primeiro) break;
 			List.extract();
+			
 			if (xprimeiro != it.second.first || yprimeiro != it.second.second) continue; // TOMA SOMENTE OS PRIMEIROS IGUAIS
 			
-			
 			resul.push_back(it);
+			
 			//MSTs.erase(id);
 			//vetorParticoes.erase(id);
 			float x = it.second.first;
 			float y = it.second.second;
-			
 			Partition(Ps,xl, yl, xll, yll, it.first, List,MSTs,vetorParticoes, direto);
+		
 		}	
 			
 }
@@ -185,8 +190,7 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 
 		pilhaF.pop();
 		pilhaG.pop();
-
-
+		
 		//getXandY(s1, g->get_allArestas(), xl, yl);
 		//getXandY(s2, g->get_allArestas(), xll, yll);
 		// A2 = new int[g->getQuantArestas()];
@@ -194,7 +198,9 @@ void UniobjectiveSearch(Grafo *g, list<pair<int*, pair<float, float> > > &resul,
 		float cont; // nao utilisazado nesse caso
 		float x, y;
 		vector< pair<int*, pair<float, float> > > resulttttt;
+		// cout<<"ANTESSSSSSSSSSSS"<<endl;
 		 AllSpaningTree(g,xl, yl,  xll, yll, resulttttt, 3);
+
 		x = resulttttt[0].second.first;
 		y = resulttttt[0].second.second;
 		// kruskal(g, A2, xl, yl, xll, yll,cont,x,y, 3);
@@ -244,6 +250,7 @@ void efficientBiobjectiveSTinEB(Grafo *g){
 	vector< pair<int*, pair<float, float> > > resul;
 	AllSpaningTree(g,0, 1, 0, 0, resul, 1);// primeiro objetivo
 	// kruskal(g, s1, 0, 0, 0, 0,cont, xl, yl,  1); // arvore para o primeiro objetivo
+	//cout<<"resul.size() = "<<resul.size()<<endl;
 	arvoresSuportadas.push_back(resul[0]);
 	for (int i=0; i<resul.size(); i++){
 		arvoresSuportadasGLOBAL.push_back(resul[i]);
@@ -580,6 +587,7 @@ int main(){
     }
     //
 
+
 	efficientBiobjectiveSTinEB(&my_grafo);
 	
 	efficientBiobjectiveSTinENB(&my_grafo, arvoresSuportadas);
@@ -591,5 +599,14 @@ int main(){
 
 	cout<<"RESULTADO FINAL"<<endl;
     printResultado();
+
+
+
+
+
+
+
+
+
 	return 0;
 }

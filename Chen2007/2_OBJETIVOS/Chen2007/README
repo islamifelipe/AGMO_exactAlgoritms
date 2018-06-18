@@ -1,5 +1,2 @@
 
-
-Eu notei que a regra 2 do Chen et al (2007) é redudante devido à forma como o Procedure 2 foi formulado. Observe que o Step 1 do Procedure 2 considera apenas as arestas não-domindas. Ora, o Step 1 está justamente olhando sub-árvores com apenas uma aresta (k=1) e com um vértice em comum (o vértice inicial). Assim, no Step 3 não há necessidade de k ==1,|V12|==1, pois as arestas domindas com esta caracteristica ja foram excluidas no Step1. Além disso, k será 1 (sub-árvores com apenas 1 aresta) apenas na primeira iteraçao do algoritmo. 
-
-Note, por exemplo, que no Apêndice B do Chen et al (2007), a regra 2 poderia eliminar a aresta ( sub-árvore ) 0-1 (356,979) na primeira iteração. Mas tal aresta é, de fato, foi eliminada anteriormente pelo Step1 (que descarta a aresta 0-1 pois esta é dominada por 0-4 (26, 603)). Tal aresta é, pois, eliminada antes da verificaçao da regra 2.
+NESTA RAIZ DESTE DIRETORIO, TEMOS APENAS O TRACE. AS PODAS ESTAO NA SUBPASTA.

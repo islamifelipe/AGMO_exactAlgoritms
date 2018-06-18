@@ -1,0 +1,314 @@
+** SUBARVORES QUE NAO FORAM ENCONTRADAS NO TRACE DA PROFA. ELIZABETH
+
+Iteracao 1
+	Subarvore 1
+		(0,0)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-3 1-2 3-4
+
+Iteracao 2
+	Subarvore 1
+		0 3 745 225
+		(745,225)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-2 1-4 3-4
+	Subarvore 2
+		1 2 926 138
+		(926,138)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-3 3-4
+	Subarvore 3
+		3 4 10 275
+		(10,275)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 0-3 0-4 1-2 2-3
+
+Iteracao 3
+	Subarvore 1
+		0 3 745 225
+		1 2 926 138
+		(1671,363)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-4 3-4
+	** Subarvore 2
+		0 3 745 225
+		1 4 857 231
+		(1602,456) 
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-2 3-4
+	Subarvore 3
+		0 3 745 225
+		3 4 10 275
+		(755,500)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 0-2 1-2 1-4 2-3
+	Subarvore 4
+		1 2 926 138
+		3 4 10 275
+		(936,413)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 0-3 0-4 2-3
+	Subarvore 5
+		0 2 587 285
+		3 4 10 275
+		(597,560)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-3 0-4 1-2 2-3
+	Subarvore 6
+		0 4 26 603
+		3 4 10 275
+		(36,878)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 0-2 1-2 1-4 2-3
+	Subarvore 7
+		2 3 375 323
+		3 4 10 275
+		(385,598)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 0-3 0-4 1-2
+
+Iteracao 4
+	** Subarvore 1
+		0 3 745 225
+		1 2 926 138
+		1 4 857 231
+		(2528,594)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 3-4
+	Subarvore 2
+		0 3 745 225
+		1 2 926 138
+		3 4 10 275
+		(1681,638)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 0-2 1-4 2-3
+	Subarvore 3
+		0 3 745 225
+		1 4 857 231
+		3 4 10 275
+		(1612,731)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 1-2 2-3
+	** Subarvore 4
+		0 1 356 979
+		0 3 745 225
+		3 4 10 275
+		(1111,1479)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 1-2 2-3
+	Subarvore 5
+		0 2 587 285
+		0 3 745 225
+		3 4 10 275
+		(1342,785)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 1-2 1-3 1-4
+	Subarvore 6
+		0 3 745 225
+		2 3 375 323
+		3 4 10 275
+		(1130,823)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 1-2 1-3 1-4
+	Subarvore 7
+		0 2 587 285
+		1 2 926 138
+		3 4 10 275
+		(1523,698)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-3 0-4 2-3
+	Subarvore 8
+		0 4 26 603
+		1 2 926 138
+		3 4 10 275
+		(962,1016)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 0-2 1-4 2-3
+	Subarvore 9
+		1 2 926 138
+		2 3 375 323
+		3 4 10 275
+		(1311,736)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 0-3 0-4
+	Subarvore 10
+		0 2 587 285
+		0 4 26 603
+		3 4 10 275
+		(623,1163)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 1-2 1-3 1-4
+	Subarvore 11
+		0 2 587 285
+		2 3 375 323
+		3 4 10 275
+		(972,883)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 1-2 1-3 1-4
+	Subarvore 12
+		0 1 356 979
+		0 4 26 603
+		3 4 10 275
+		(392,1857)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 1-2 2-3
+	Subarvore 13
+		0 4 26 603
+		1 4 857 231
+		3 4 10 275
+		(893,1109)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 1-2 2-3
+	Subarvore 14
+		0 4 26 603
+		2 3 375 323
+		3 4 10 275
+		(411,1201)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-1 1-2 1-3 1-4
+
+0
+0.00
+RESULTADO FINAL
+Arvore 1
+0 3 745 225
+1 2 926 138
+1 4 857 231
+3 4 10 275
+(2538, 869)
+
+Arvore 2
+0 1 356 979
+0 3 745 225
+1 2 926 138
+3 4 10 275
+(2037, 1617)
+
+Arvore 3
+0 2 587 285
+0 3 745 225
+1 2 926 138
+3 4 10 275
+(2268, 923)
+
+Arvore 4
+0 3 745 225
+1 2 926 138
+2 3 375 323
+3 4 10 275
+(2056, 961)
+
+Arvore 5
+0 2 587 285
+0 3 745 225
+1 4 857 231
+3 4 10 275
+(2199, 1016)
+
+Arvore 6
+0 3 745 225
+1 4 857 231
+2 3 375 323
+3 4 10 275
+(1987, 1054)
+
+Arvore 7
+0 1 356 979
+0 2 587 285
+0 3 745 225
+3 4 10 275
+(1698, 1764)
+
+Arvore 8
+0 1 356 979
+0 3 745 225
+2 3 375 323
+3 4 10 275
+(1486, 1802)
+
+Arvore 9
+0 2 587 285
+0 3 745 225
+1 3 826 546
+3 4 10 275
+(2168, 1331)
+
+Arvore 10
+0 3 745 225
+1 3 826 546
+2 3 375 323
+3 4 10 275
+(1956, 1369)
+
+Arvore 11
+0 2 587 285
+0 4 26 603
+1 2 926 138
+3 4 10 275
+(1549, 1301)
+
+Arvore 12
+0 2 587 285
+1 2 926 138
+2 3 375 323
+3 4 10 275
+(1898, 1021)
+
+Arvore 13
+0 1 356 979
+0 4 26 603
+1 2 926 138
+3 4 10 275
+(1318, 1995)
+
+Arvore 14
+0 4 26 603
+1 2 926 138
+1 4 857 231
+3 4 10 275
+(1819, 1247)
+
+Arvore 15
+0 4 26 603
+1 2 926 138
+2 3 375 323
+3 4 10 275
+(1337, 1339)
+
+Arvore 16
+0 1 356 979
+0 2 587 285
+0 4 26 603
+3 4 10 275
+(979, 2142)
+
+Arvore 17
+0 2 587 285
+0 4 26 603
+1 3 826 546
+3 4 10 275
+(1449, 1709)
+
+Arvore 18
+0 2 587 285
+0 4 26 603
+1 4 857 231
+3 4 10 275
+(1480, 1394)
+
+Arvore 19
+0 1 356 979
+0 2 587 285
+2 3 375 323
+3 4 10 275
+(1328, 1862)
+
+Arvore 20
+0 2 587 285
+1 3 826 546
+2 3 375 323
+3 4 10 275
+(1798, 1429)
+
+Arvore 21
+0 2 587 285
+1 4 857 231
+2 3 375 323
+3 4 10 275
+(1829, 1114)
+
+Arvore 22
+0 1 356 979
+0 4 26 603
+2 3 375 323
+3 4 10 275
+(767, 2180)
+
+Arvore 23
+0 4 26 603
+1 4 857 231
+2 3 375 323
+3 4 10 275
+(1268, 1432)
+
+Arvore 24
+0 4 26 603
+1 3 826 546
+2 3 375 323
+3 4 10 275
+(1237, 1747)

@@ -5,7 +5,7 @@
 class Heap {
 	private:
 		int size; /*tamanho atual (parcial) da heap*/
-		float *heap; //Guarda as chaves a serem ordenadas. Vetor de floats
+		long double *heap; //Guarda as chaves a serem ordenadas. Vetor de floats
 		int *auxHeap; // Guarda os id das arestas
 		//int *auxID; 
 		int maximo;
@@ -15,7 +15,7 @@ class Heap {
 		void subir(int i);
 		void descer(int i);
 	public:
-		bool insert (int id, float chave);
+		bool insert (int id, long double chave);
 	
 	
 	/*ESTA FUNÇÃO NÃO RETORNA OS ELEMENTOS MIM. ELA SUMPÕE QUE OS MESMOS FORAM TOMANDOS IMEDIATAMENTE ANTES DA CHAMADA DA FUNÇÃO*/

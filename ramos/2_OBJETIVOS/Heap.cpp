@@ -6,7 +6,7 @@
 
  Heap::Heap(int maximo1){ 
 	maximo = maximo1;
-	heap = new float[maximo];
+	heap = new long double[maximo];
 	auxHeap = new int[maximo];
 	//auxID = new int[maximo];		
 	// Lembrar: A posição 0 do heap é ociosa
@@ -55,7 +55,7 @@ void  Heap::descer(int i){
 		//if (auxHeap[i]>=0)auxID[auxHeap[i]] = i;
 	}
 
-bool  Heap::insert (int id, float chave){ /*insere no final e sobe o elemento*/
+bool  Heap::insert (int id, long double chave){ /*insere no final e sobe o elemento*/
 	//if (size+1<maximo && id<maximo && auxID[id]<maximo && auxHeap[auxID[id]]!=id){
 	if (size+1<maximo ){
 		heap[size+1]=chave;

@@ -72,13 +72,30 @@ void krukal_like(Grafo *g, vector< pair<int, int> > relacao2){
 	for (int t=1; t<=g->getQuantVertices()-1; t++){
 		vector<int * > It = at[t-1];
 		vector<Conjunto* > veco = conjuntos[t-1];
+		cout<<"Iteracao "<<t<<endl;
 		for (int i=0; i<It.size(); i++){
 			Conjunto *conjIt = veco[i];
 			vector <Aresta *> max = maximal(g, It[i], conjIt, relacao2);
 			//cout<<"size = "<<max.size()<<" obj = "<<max[0]->getPeso1()<<" , "<<max[0]->getPeso2()<<endl;
+			
+			///TRACE
+			int pesodo1=0, pesodo2=0;
+			cout<<"\tSubarvore "<<i+1<<endl;
+			for (int zutiu=0; zutiu<g->getQuantArestas(); zutiu++){
+				if (It[i][zutiu]==1){
+					cout<<"\t\t"<<(g->get_allArestas())[zutiu]->getOrigem()<<" "<<(g->get_allArestas())[zutiu]->getDestino()<<" "<<(g->get_allArestas())[zutiu]->getPeso1()<<" "<<(g->get_allArestas())[zutiu]->getPeso2()<<endl;
+					pesodo1+=(g->get_allArestas())[zutiu]->getPeso1();
+					pesodo2+=(g->get_allArestas())[zutiu]->getPeso2();
+				}
+			}
+			cout<<"\t\t("<<pesodo1<<","<<pesodo2<<")"<<endl;
+			cout<<"\t\tLista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo:";
+			//TRACE
+
+
 			for (int a=0; a<max.size(); a++){
 				if (conjIt->compare(max[a]->getOrigem(), max[a]->getDestino())==false){
-					
+					cout<<" "<<max[a]->getOrigem()<<"-"<<max[a]->getDestino();
 					int * arvore = new int[g->getQuantArestas()];
 					for (int p=0; p<g->getQuantArestas(); p++) arvore[p] = It[i][p];
 					arvore[max[a]->getId()] = 1;
@@ -89,8 +106,10 @@ void krukal_like(Grafo *g, vector< pair<int, int> > relacao2){
 					at[t].push_back(arvore);
 				}
 				//}
-			}   
+			}
+			cout<<endl;   
 		}
+		cout<<endl;
 			// retira duplicatas
 			for (int i=0; i<at[t].size(); i++){
 				for (int j=i+1; j<at[t].size(); j++){

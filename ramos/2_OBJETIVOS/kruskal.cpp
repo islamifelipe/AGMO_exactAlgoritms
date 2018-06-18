@@ -142,7 +142,7 @@ void mergesort(float xl, float yl, float xll, float yll, Aresta **v, int size, i
 		b = 2*b;
 	}
 }
-bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float &custo, float &x, float &y, int direto){
+bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, long double &custo, float &x, float &y, int direto){
 	/*O parâmetro "direto" recebe:
 		1 - se as arestas devem ser na ordem lexicográfica direta
 		2 - se as arestas devem ser na ordem lexocográfica inversa  
@@ -160,6 +160,7 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 	//float peso;
 	Aresta **listaAresta = g->getAllArestasPtr();
 	for (int k=0; k<g->getQuantArestas(); k++){ /*Adiciona as arestas obrigatórias*/
+		// cout<<g->getStatus(listaAresta[k]->getId())<<endl;
 		if (g->getStatus(listaAresta[k]->getId())==1){ /*se for obrigatória*/
 		 	
 		 	A[listaAresta[k]->getId()] = 1;
@@ -171,16 +172,20 @@ bool kruskal (Grafo *g, int  *A, float xl, float yl, float xll, float yll, float
 			y += listaAresta[k]->getPeso2();
 		}
 	}
+
 	mergesort(xl, yl, xll, yll, listaAresta, g->getQuantArestas(), direto);
 	i=0;
 	while (cont<g->getQuantVertices()-1 && i<g->getQuantArestas()){ 
 	/*A condição "i<g->getQuantArestas()" assegura que, se por acaso o grafo for desconexo, todas as arestas serão varridas, isto é, i=g->getQuantArestas(), porém, o cont não será será igual a g->getN()-1 */
-		
 		if (g->getStatus(listaAresta[i]->getId())==0 && !conjunto.compare(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino())){ /*Se não formar ciclo*/
 			cont++; // contador que, ao final, deve ser igual à n-1 arestas (uma arvore)
 			A[listaAresta[i]->getId()] = 1;
+			// cout<<listaAresta[i]->getPeso1()<<" "<<listaAresta[i]->getPeso2()<<endl;
+			
+			// cout<<xl<<" "<<yl<< " "<<xll<<" "<<yll<<endl;
 			conjunto.union1(listaAresta[i]->getOrigem(), listaAresta[i]->getDestino());
 			custo+=listaAresta[i]->getPeso1()*(yl-yll)+listaAresta[i]->getPeso2()*(xll-xl);
+			// cout<<"custo = "<<custo<<endl;
 			x +=listaAresta[i]->getPeso1();
 			y += listaAresta[i]->getPeso2();
 		}

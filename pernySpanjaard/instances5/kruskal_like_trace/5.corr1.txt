@@ -1,0 +1,110 @@
+Iteracao 1
+	Subarvore 1
+		(0,0)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-3 1-3
+
+Iteracao 2
+	Subarvore 1
+		0 3 4 40
+		(4,40)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-2 1-3
+	Subarvore 2
+		1 3 73 19
+		(73,19)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 0-3
+
+Iteracao 3
+	Subarvore 1
+		0 3 4 40
+		1 2 24 43
+		(28,83)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-3 1-4 3-4
+	Subarvore 2
+		0 3 4 40
+		1 3 73 19
+		(77,59)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-2 1-2
+	Subarvore 3
+		0 2 93 34
+		1 3 73 19
+		(166,53)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-3
+
+Iteracao 4
+	Subarvore 1
+		0 3 4 40
+		1 2 24 43
+		1 3 73 19
+		(101,102)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-4 1-4 3-4
+	Subarvore 2
+		0 3 4 40
+		1 2 24 43
+		1 4 37 53
+		(65,136)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-3 3-4
+	Subarvore 3
+		0 3 4 40
+		1 2 24 43
+		3 4 31 54
+		(59,137)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 1-3 1-4
+	Subarvore 4
+		0 2 93 34
+		0 3 4 40
+		1 3 73 19
+		(170,93)
+		Lista de arestas não dominadas entre si que não estão nesta subárvore e não ciclo: 0-4 1-4 3-4
+
+0
+0.00
+RESULTADO FINAL
+Arvore 1
+0 3 4 40
+0 4 91 49
+1 2 24 43
+1 3 73 19
+(192, 151)
+
+Arvore 2
+0 3 4 40
+1 2 24 43
+1 3 73 19
+1 4 37 53
+(138, 155)
+
+Arvore 3
+0 3 4 40
+1 2 24 43
+1 3 73 19
+3 4 31 54
+(132, 156)
+
+Arvore 4
+0 3 4 40
+1 2 24 43
+1 4 37 53
+3 4 31 54
+(96, 190)
+
+Arvore 5
+0 2 93 34
+0 3 4 40
+0 4 91 49
+1 3 73 19
+(261, 142)
+
+Arvore 6
+0 2 93 34
+0 3 4 40
+1 3 73 19
+1 4 37 53
+(207, 146)
+
+Arvore 7
+0 2 93 34
+0 3 4 40
+1 3 73 19
+3 4 31 54
+(201, 147)
+

@@ -295,6 +295,27 @@ int main(){
     for (int mmm=0; mmm<nA; mmm++)A[1][1][mmm] = 0; // by felipe
 
     for (int r = 1; r<n; r++){
+
+
+    	//TRACE
+    	cout<<"Iteracao "<<r<<endl;
+    	map <int, Aresta *> arestas = my_grafo.get_allArestas();
+    	for (int k = 1; k<=m[r]; k++){
+    		cout<<"\tSubarvore "<<k<<endl;
+			int cont1=0, cont2=0;
+			for (int y = 0; y<nA; y++){
+				if (A[r][k][y]==1){
+					cout<<"\t"<<arestas[y]->getOrigem()<<" "<<arestas[y]->getDestino()<<" "<<arestas[y]->getPeso1()<<" "<<arestas[y]->getPeso2()<<endl;
+					cont1+=arestas[y]->getPeso1();
+					cont2+=arestas[y]->getPeso2();
+				}
+			}
+			cout<<"\t("<<cont1<<","<<cont2<<")"<<endl;
+			cout<<endl;
+		}
+		//TRACE END
+
+
     	// cout<<"Podas da ITERACAO = "<<r<<endl;
     	map<int, int* > Wr; 
     	m[r+1] = 0;
