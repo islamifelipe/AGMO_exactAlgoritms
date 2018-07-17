@@ -1,0 +1,9 @@
+#!/bin/bash
+#SBATCH --time=15-0:0   # Especifica o tempo máximo de execução do job, dado no padrão dias-horas:minutos
+for i in  5 7 10 12 15 17 20 22 25 27 30 33 35 38 40 42 45 48 50
+do
+	./kruskal < instancias/GrafosCompletos/Conjunto6/correlated/"$i".corr3.in > Testes/GrafosCompletos/Conjunto6/correlated/"$i".corr3.out
+done
+
+
+

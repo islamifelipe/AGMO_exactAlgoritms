@@ -381,16 +381,16 @@ int main(){
 	// for (int i=0; i<seq.size(); i++) cout<<"seq["<<i<<"] = "<<seq[i]<<endl;
 	// 	pair<int, int> eij = p->ultimaAresta.back();;
 	// 	cout<<eij.first<<" "<<eij.second<<endl;
-	
 	while (it!=U.end()){
 		p = *it;
 		for (int i=0; i<n; i++) Xaux[i] = false;
 		std::vector<int> seq = getSequence(p);
+		cout<<"Caminho : ";
 		for (int i=0; i<seq.size(); i++) {
-			// cout<<seq[i]<<" ";
+			cout<<seq[i]+1<<" ";
 			Xaux[seq[i]] = true;
 		}
-		// cout<<endl;
+		cout<<endl;
 			
 		pair<int, int> eij = p->ultimaAresta.back();//= getEp(	seq ); //[i,j]
 	

@@ -51,6 +51,7 @@ bool t1_domina_t2(float xl, float yl,float xll, float yll){
 
 int idMST = 0;
 
+// int trace[5] = {0,0,0,0,0}; // eliminar
 
 #define MAX2 10000
 ///ALGORITMO DA SONRENSEN JANSSENS (2003)
@@ -330,6 +331,21 @@ bool isInViableRegion2(float x, float y){
 	}
 	return false;
 }
+
+// // apenas para o trace. Pode eliminar
+// void printTRACE(int *T_aux, float f, float g,int size){
+// 	int cont = 0;
+// 	for (int i=0; i<size; i++){
+// 		if (T_aux[i]==1){
+// 			cont++;
+// 			Aresta *e = arestasPtr[i];
+// 			cout<<e->getOrigem()<<" "<<e->getDestino()<<" "<<e->getPeso1()<<" "<<e->getPeso2()<<endl;
+// 		}
+// 	}
+// 	trace[cont]++;
+// 	cout<<"("<<f<<" "<<g<<")\n"<<endl;
+// }
+
 void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair<int*, pair<float, float> > > &noSuportadas, Conjunto conjunto, list< pair<float, float> > &regiaoViavel){
 	
 	stack<Conjunto> pilhaCojunto; // cojuntos
@@ -395,7 +411,7 @@ void EBST_BrB(int *T, float fBound, float gBound, int step, Grafo *g, list< pair
 					T_aux[e->getId()] = 1;
 					novo_tf = tf+e->getPeso1();
 					novo_tg = tg+e->getPeso2();
-					
+					// printTRACE(T_aux, novo_tf, novo_tg, g->getQuantArestas());
 					if (step+1 == g->getQuantVertices()-1){
 						novo = make_pair(T_aux,make_pair(novo_tf,novo_tg));
 						noSuportadas.push_back(novo); // armazena T
@@ -587,10 +603,23 @@ int main(){
     }
     //
 
+    // cout<<"ATENCAO: o trace a seguir refere-se apenas as soluçoes NAO-SUPORTADAS\n"<<endl;
 
 	efficientBiobjectiveSTinEB(&my_grafo);
 	
 	efficientBiobjectiveSTinENB(&my_grafo, arvoresSuportadas);
+
+
+	// eliminar
+	// cout<<"Quantidade de arvores nao-suportadas com 1 aresta = "<<trace[1]<<endl;
+	// cout<<"Quantidade de arvores nao-suportadas com 2 aresta = "<<trace[2]<<endl;
+	// cout<<"Quantidade de arvores nao-suportadas com 3 aresta = "<<trace[3]<<endl;
+	// cout<<"Quantidade de arvores nao-suportadas com 4 aresta = "<<trace[4]<<endl;
+
+	// // end eliminar
+
+
+
     
     times(&tempsFinal);   /* current time */ // clock final
 	clock_t user_time2 = (tempsFinal.tms_utime - tempsInit.tms_utime);
