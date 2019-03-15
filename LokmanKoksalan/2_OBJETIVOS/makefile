@@ -1,11 +1,11 @@
 
-all: lokmanKoksalan.o  algoritm1 
+all: spanningTreePM.o  novoAlgo 
 
 	
-lokmanKoksalan.o : lokmanKoksalan.cpp
-	g++ -lpthread -g -c  lokmanKoksalan.cpp
+spanningTreePM.o : spanningTreePM.cpp
+	g++ -lpthread -g -c  spanningTreePM.cpp
 
 		
-algoritm1 : lokmanKoksalan.o  
-	g++ -lpthread -m64 -g  -lm -o algoritm1 lokmanKoksalan.o -Llib/ -lgurobi_c++ -lgurobi65 -lm
+novoAlgo : spanningTreePM.o  
+	g++ -lpthread -m64 -g  -lm -o novoAlgo_2 spanningTreePM.o -Llib/ -lgurobi_c++ -lgurobi65 -lm
 

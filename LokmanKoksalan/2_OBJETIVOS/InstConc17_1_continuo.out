@@ -1,0 +1,38 @@
+NESTE ARQUIVO, temos o resultado do solver para uma instância concave com 17 vertices. AS VARIAVEIS SAO TODAS CONTINUAS
+
+
+Optimize a model with 289 rows, 408 columns and 1344 nonzeros
+Coefficient statistics:
+  Matrix range    [1e+00, 2e+01]
+  Objective range [1e-01, 1e+02]
+  Bounds range    [1e+00, 2e+01]
+  RHS range       [1e+00, 2e+01]
+Presolve time: 0.01s
+Presolved: 289 rows, 408 columns, 1344 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0   -0.0000000e+00   4.600000e+01   0.000000e+00      0s
+     379   -5.5736251e+00   0.000000e+00   0.000000e+00      0s
+
+Solved in 379 iterations and 0.01 seconds
+Optimal objective -5.573625074e+00
+
+
+Arvore 1 ***** (ESTA ARVORE É DOMINADA POR ALGUMA SOLUCAO DO PARETO-SET)
+0 1 4 4
+0 2 0 96
+0 7 8 7
+0 9 6 8
+0 10 7 10
+0 11 5 4
+2 4 7 12
+2 5 7 6
+2 6 5 8
+2 8 4 9
+2 12 4 4
+2 13 6 12
+2 14 4 5
+2 15 4 6
+3 14 5 12
+12 16 4 6
+(80, 209)

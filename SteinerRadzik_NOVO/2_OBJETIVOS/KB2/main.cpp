@@ -41,42 +41,66 @@ struct twoint {
 
 queue <struct twoint> fila;
 
-auxEdgeStruct arestas [(NUMEROVERTICES*(NUMEROVERTICES-1))/2];
+auxEdgeStruct arestas [NUMARESTAS];
 LexKruskal lkr;
 int numIndGenerated = 0;
 std::vector<SolucaoEdgeSet *> Heap;
 
 
+// void input(){
+// 	int n;
+// 	cin>>n; // quantidade de vertices
+// 	int org, dest;
+// 	for (int i=0;i<NUMEROVERTICES-1;i++) {
+// 		for (int j=i+1;j<NUMEROVERTICES;j++) {
+// 			cin>>org;
+// 			cin>>dest;
+// 			if (org!=i) cout<<"ERRO Leitura 1"<<endl;
+// 			if (dest!=j) cout<<"ERRO Leitura 2"<<endl;
+// 			for (int ob = 0; ob<2; ob++){
+// 				cin>>custos[ob][i][j];
+// 				custos[ob][j][i] = custos[ob][i][j]; // a parte superior da matriz é refletida na inferior
+// 			}
+// 		}
+// 	}
+// 	int arectr = 0;
+// 	for (int i = 0; i < NUMEROVERTICES; i++) {
+// 		for (int j = i+1; j < NUMEROVERTICES; j++) {
+// 			arestas [arectr].a = i;
+// 			arestas [arectr].b = j;
+// 			arestas [arectr].c1 = custos [0][i][j];
+// 			arestas [arectr].c2 = custos [1][i][j];
+// 			arestas [arectr].fit = 0.0;
+// 			arectr++;
+// 		}
+// 	}
+
+// }
+
+
 void input(){
-	int n;
-	cin>>n; // quantidade de vertices
-	int org, dest;
-	for (int i=0;i<NUMEROVERTICES-1;i++) {
-		for (int j=i+1;j<NUMEROVERTICES;j++) {
-			cin>>org;
-			cin>>dest;
-			if (org!=i) cout<<"ERRO Leitura 1"<<endl;
-			if (dest!=j) cout<<"ERRO Leitura 2"<<endl;
-			for (int ob = 0; ob<2; ob++){
-				cin>>custos[ob][i][j];
-				custos[ob][j][i] = custos[ob][i][j]; // a parte superior da matriz é refletida na inferior
-			}
-		}
-	}
-	int arectr = 0;
-	for (int i = 0; i < NUMEROVERTICES; i++) {
-		for (int j = i+1; j < NUMEROVERTICES; j++) {
-			arestas [arectr].a = i;
-			arestas [arectr].b = j;
-			arestas [arectr].c1 = custos [0][i][j];
-			arestas [arectr].c2 = custos [1][i][j];
-			arestas [arectr].fit = 0.0;
-			arectr++;
-		}
-	}
+    int n;
+    cin>>n; // quantidade de vertices
+	int org, dest, peso1, peso2;
+	int contttt = 0;
+	while (cin>>org){
+		cin>>dest;
+		cin>>peso1;
+		cin>>peso2;
+		custos[0][org][dest] =  peso1;
+		custos[0][dest][org] = peso1;
 
+		custos[1][org][dest] = peso2;
+        custos[1][dest][org] = peso2;
+
+		arestas [contttt].a = org;
+        arestas [contttt].b = dest;
+        arestas [contttt].c1 = custos [0][org][dest];
+        arestas [contttt].c2 = custos [1][org][dest];
+        arestas [contttt].fit = 0.0;
+		contttt++;
+	}
 }
-
 
 inline bool auxEdgeStructLexCompObj1 (auxEdgeStruct e1, auxEdgeStruct e2) {
 
@@ -287,8 +311,10 @@ pair<float, float> getMaiorDistante(float a, float b, float c, list< pair<float,
 // Recebe o grafo e a lista de solucoes soportads (as extremas do eixo convexo) 
 // Retorna a lista de solucoes nao-suportadas (aquelas que estao dentro de um triângulo formado por duas soluceos extremas)
 // Assim, teremos separadas as solucoes suportadas e nao suportadas
+// Nesta versao, implemenetamos o KB2 do Steine Radzik (2008). 
+// Cada vez que um triângulo-retângulo T é avaliado, o triângulo subsequente T' também é avaliado
 // */
-void phase2KB(){
+void phase2KB_2(){
 	vector<SolucaoEdgeSet *>::iterator it = suportadas.begin(); 
 	int contador = 0;
 	int size = suportadas.size();
@@ -296,12 +322,24 @@ void phase2KB(){
 	while (contador<size-1){
 		SolucaoEdgeSet *pp = *(it);
 		SolucaoEdgeSet *pq = *(++it);
+
+		(++it); // triangulo formado por pq e pTlinha ===> T'
+		SolucaoEdgeSet *pTlinha = NULL;
+		bool analisaTlinha = false; // se true, entao é porque todo o tringângulo T' vai ser explorado
+		bool terminouTlinha = false;
+		if (it!=suportadas.end()) pTlinha = *it;
+		it--;
+		std::vector<SolucaoEdgeSet *> noSuportdasTlinha; // guarda as soluçoes naoSuportdas em T'
+
 		// int *p = pp.first; 
 		// int *q = pq.first;
 		cout<<"it = "<<contador<<endl;
-		float yp, yq, xp, xq;
+		float yp, yq, xp, xq, x_pTlinha, y_pTlinha;
 		list< pair<float, float> > regiaoViavel; // lista de pontos que delimitam a regiao viável.
-	
+		list< pair<float, float> > regiaoViavel_Tlinha; // lista de pontos que delimitam a regiao viável.
+		
+
+
 		xp = pp->getObj(0); //pp.second.first;
 		yp = pp->getObj(1); //pp.second.second;
 		xq = pq->getObj(0); //pq.second.first;
@@ -309,14 +347,38 @@ void phase2KB(){
 
 		regiaoViavel.push_back( make_pair(xq, yp));// inicialmente, a regiao viável é composta por um unico ponto (o âgulo reto do triângulo cuja hipotenusa é a reta entre p-q -- ver algoritmo origial)
 		
+
 		// determina a reta p-q (hipotenusa)
 		float a, b; // pra determinar a equacao da reta p-q na forma ax+b = y
 		a = ((float)(yp-yq))/((float) (xp-xq)); // coeficiente angular da reta p-q
 		b = yq - a*xq; // coeficiente linear de p-q
 		pair<float, float> maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
 		//Agora determinamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
-		//cout<<"Mais distante : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
+		// cout<<"Mais distante T : "<<maisDistante.first<<", "<<maisDistante.second<<endl;
 		float bM = maisDistante.second - a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
+
+		float a_linha, b_linha, bM_linha, bM_ultimo; // pra determinar a equacao da reta q-pTlinha na forma ax+b = y
+		pair<float, float> maisDistante_linha;
+		if (pTlinha!=NULL){
+			x_pTlinha = pTlinha->getObj(0);
+			y_pTlinha = pTlinha->getObj(1);
+
+			if (maiorQuefloat(yq,(a*x_pTlinha+bM))==false){
+				analisaTlinha = true;
+				regiaoViavel_Tlinha.push_back( make_pair(x_pTlinha, yq));// inicialmente, a regiao viável é composta por um unico ponto (o âgulo reto do triângulo cuja hipotenusa é a reta entre p-q -- ver algoritmo origial)
+			
+				// determina a reta q-pTlinha (hipotenusa)
+				a_linha = ((float)(yq-y_pTlinha))/((float) (xq-x_pTlinha)); // coeficiente angular da reta q-pTlinha
+				b_linha = y_pTlinha - a_linha*x_pTlinha; // coeficiente linear de p-q
+				maisDistante_linha = getMaiorDistante(a_linha, -1, b_linha, regiaoViavel_Tlinha);
+				//Agora determinamos a reta de custo maximo, ou seja, a reta paralela à q-pTlinha que passa pelo ponto mais distante
+				// cout<<"Mais distante T' : "<<maisDistante_linha.first<<", "<<maisDistante_linha.second<<endl;
+				bM_linha = maisDistante_linha.second - a_linha*maisDistante_linha.first; // coeficiente angular da reta de custo maximo ax+bM = y
+				bM_ultimo = bM_linha;
+
+			} else  pTlinha=NULL;
+		}
+
 
 		for (int j = 0; j < NUMARESTAS; j++) { // GRAFOS COMPLETOS
 			arestas[j].fit = arestas[j].c1*(yp-yq) + arestas[j].c2*(xq-xp);
@@ -344,22 +406,73 @@ void phase2KB(){
 			}
 			float x = nova->getObj(0);
 			float y = nova->getObj(1);
+			cout<<x<<" "<<y<<" "<<"( "<< nova->objetivoGeral <<") ";
 			if (isInViableRegion(regiaoViavel, x, y)){ // se estiver na regiao viavel
 				SolucaoEdgeSet * nn = new SolucaoEdgeSet(NUMEROVERTICES-1);
 				*nn = *nova;
 				noSuportadas.push_back(nn);
 				//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
+				maisDistante = getMaiorDistante(a, -1, b, regiaoViavel);
+				cout<<" dentro de T maisDistante = "<<maisDistante.first<<" "<<maisDistante.second<<endl;
 				bM = (float)maisDistante.second - (float)a*maisDistante.first; // coeficiente angular da reta de custo maximo ax+bM = y
 			
-			} else if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
-			//	cout<<"K break = "<<k<<endl;
-				// k = MAX_K_BEST+1; // sai;
-				delete nova;
-				break;
+			} else {
+				if (pTlinha!=NULL){ //&& terminouTlinha == false){
+					if (x<=x_pTlinha && y<=yq){ // verifica se a nova soluçao está dentro de T'
+						if (isInViableRegion(regiaoViavel_Tlinha, x, y)){ // testa se a nova soluçao está na regiao viavel do triângulo T' (subsequênte àquele que está sendo analisado)
+							SolucaoEdgeSet * nn = new SolucaoEdgeSet(NUMEROVERTICES-1);
+							*nn = *nova;
+							noSuportdasTlinha.push_back(nn);
+							//Agora atualizamos a reta de custo maximo, ou seja, a reta paralela à p-q que passa pelo ponto mais distante
+							maisDistante_linha = getMaiorDistante(a_linha, -1, b_linha, regiaoViavel_Tlinha);
+							bM_linha = (float)maisDistante_linha.second - (float)a_linha*maisDistante_linha.first; // coeficiente angular da reta de custo maximo ax+bM = y
+							
+							cout<<" fora de T e dentro de T' mais_distante = "<<maisDistante_linha.first<<" "<<maisDistante_linha.second<<endl;//" bM_linha = "<<bM_linha<<" a_linha = "<<a_linha<<endl;
+							
+							cout<<"OK"<<endl;
+						} //else if (maiorIgualQuefloat(y,(a_linha*x+bM_linha))){ // s on or past maximum cost line of T'
+						// 	// se entrar nesse if, entao todas as soluçoes nao-dominadas do tringângulo T' (KB2) foram encontradas
+						// 	// pode-se apenas armazenar essas soluçoes e adiciona-las posteriormente à lista noSuportadas
+						// 	cout<<" fora de T e fora de T'"<<endl;
+						// 	terminouTlinha = true;
+						// }
+					}
+				}
+				if ( maiorIgualQuefloat(y,(a*x+bM))) { //s on or past maximum cost line 
+				//	cout<<"K break = "<<k<<endl;
+					// k = MAX_K_BEST+1; // sai;
+					cout<<" terminou de analisar T"<<endl;
 
+					if (analisaTlinha == true){
+						bM_ultimo = (float)y - (float)a*x; // linha que passa pelo ultimo ponto encontrado em T (que pára T) e que é paralela a p-q 
+						maisDistante_linha = getMaiorDistante(a_linha, -1, b_linha, regiaoViavel_Tlinha);
+						/// ATENCAO: se a linha paralela a p-q que passa pelo último ponto encontrado em T
+						// ultrapassa o ponto da regiao de T' mais distante da sua hipotenusa, entao T' foi completamente explorado!!!!
+					 	if (maiorIgualQuefloat(maisDistante_linha.second,(a*maisDistante_linha.first+bM_ultimo))==false){ // 
+							// se entrar nesse if, entao todas as soluçoes nao-dominadas do tringângulo T' (KB2) foram encontradas
+							// pode-se apenas armazenar essas soluçoes e adiciona-las posteriormente à lista noSuportadas
+							
+							cout<<" fora de T e fora de T' - OK"<<endl;
+							terminouTlinha = true;
+						}
+					}
+					delete nova;
+					break;
+				}
 			}
+			cout<<endl;
 			delete nova;
 		}
+
+		if (analisaTlinha == true && terminouTlinha==true){ // se o triângulo T' foi explorado por inteiro....
+			for (int i=0; i<noSuportdasTlinha.size(); i++){
+				noSuportadas.push_back(noSuportdasTlinha[i]);
+			}
+			it++;
+			contador++;
+			cout<<"OK - "<<contador<<endl;
+		}
+
 		//LIMPA A HEAP
 		for (std::vector<SolucaoEdgeSet* >::iterator ittt = Heap.begin() ; ittt != Heap.end(); ++ittt){
 			delete *ittt;
@@ -385,7 +498,7 @@ int main(){
    	stable_sort (suportadas.begin(), suportadas.end(),auxEdgeStructCompSolutions);
 	
 	times(&tempsInit);
-	phase2KB();
+	phase2KB_2();
 	times(&tempsFinal2); 
 
 	cout<<"Fim da segunda fase ... "<<endl;
