@@ -403,12 +403,12 @@ void phase2KB_2(){
 		int k = 1;
 		for (; Heap.size()!=0; k++){
 			SolucaoEdgeSet *nova;
-			// if (k<MAX_K_BEST)
+			if (k<MAX_K_BEST)
 				nova = AllSpaningTree(xp,yp, xq,yq,a, bM);
-			// else {
-			// 	nova = Heap.front();
-			// 	std::pop_heap (Heap.begin(),Heap.end(),compareHeap); Heap.pop_back();
-			// }
+			else {
+				nova = Heap.front();
+				std::pop_heap (Heap.begin(),Heap.end(),compareHeap); Heap.pop_back();
+			}
 			float x = nova->getObj(0);
 			float y = nova->getObj(1);
 			// cout<<x<<" "<<y<<" "<<"( "<< nova->objetivoGeral <<") ";
